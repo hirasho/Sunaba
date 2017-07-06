@@ -1,0 +1,67 @@
+include "ioMap.txt"
+include "system.txt"
+include "memory.txt"
+include "error.txt"
+
+const Input_MOUSE_LEFT -> 0
+const Input_MOUSE_RIGHT -> 1
+const Input_UP -> 2
+const Input_DOWN -> 3
+const Input_LEFT -> 4
+const Input_RIGHT -> 5
+const Input_SPACE -> 6
+const Input_ENTER -> 7
+
+def Input_create()
+   # 0-7が最新データ、8-15が前のデータ、16がカーソルX、17がカーソルY
+   this -> Memory_allocate(16)
+   if this < 0 
+      System_die(Error_NO_MORE_MEMORY)
+   Input_update(this)
+   i -> 0
+   while i < 8
+      this[i + 8] -> this[i]
+      i -> i + 1
+   out -> this
+
+def Input_update(this)
+   # 新しいのを古いところへコピー
+   i -> 0
+   while i < 8
+      this[i + 8] -> this[i]
+      i -> i + 1
+   # 新しいところに新しいデータを
+   this[Input_MOUSE_LEFT] -> memory[MEM_MOUSE_LEFT]
+   this[Input_MOUSE_RIGHT] -> memory[MEM_MOUSE_RIGHT]
+   this[Input_UP] -> memory[MEM_KEY_UP]
+   this[Input_DOWN] -> memory[MEM_KEY_DOWN]
+   this[Input_LEFT] -> memory[MEM_KEY_LEFT]
+   this[Input_RIGHT] -> memory[MEM_KEY_RIGHT]
+   this[Input_SPACE] -> memory[MEM_KEY_SPACE]
+   this[Input_ENTER] -> memory[MEM_KEY_ENTER]
+   this[16] -> memory[MEM_MOUSE_POINTER_X]
+   this[17] -> memory[MEM_MOUSE_POINTER_Y]
+
+def Input_on(this, key)
+   if (key < 0) + (key >= 8)
+      System_die(Error_OUT_OF_RANGE)
+   out -> this[key]
+
+def Input_triggered(this, key)
+   if (key < 0) + (key >= 8)
+      System_die(Error_OUT_OF_RANGE)
+   out -> this[key] * (1 - this[key + 8]) #古い方が1なら0を返す
+
+def Input_released(this, key)
+   if (key < 0) + (key >= 8)
+      System_die(Error_OUT_OF_RANGE)
+   out -> (1 - this[key]) * this[key + 8] #新しい方が0で古い方が1なら1を返す
+
+def Input_pointerX(this)
+   out -> this[16]
+
+def Input_pointerY(this)
+   out -> this[17]
+
+def Input_destroy(this)
+   Memory_deallocate(this)

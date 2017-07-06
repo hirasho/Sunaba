@@ -1,0 +1,4 @@
+def point(x, y, color)
+   memory[60000 + (y * 100) + x] -> color
+
+point(50, 50, 990000)

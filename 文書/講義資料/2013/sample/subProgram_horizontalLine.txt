@@ -1,0 +1,10 @@
+def point(x, y, color)
+   memory[60000 + (y * 100) + x] -> color
+
+def horizontalLine(left, length, y, color)
+   x -> 0
+   while x < length
+      point(left + x, y, color)
+      x -> x + 1
+
+horizontalLine(10, 80, 50, 990000)

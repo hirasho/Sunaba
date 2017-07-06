@@ -1,0 +1,10 @@
+n -> fact(6)
+i -> 0
+while i < n
+   memory[60000 + i] -> 990000
+   i -> i + 1
+
+def fact(a)
+   out -> 1
+   if a > 1 
+      out -> a * fact(a - 1)

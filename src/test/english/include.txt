@@ -1,0 +1,7 @@
+include "beIncluded.txt"
+
+a -> do(1, 2, 3, 4)
+i -> 0
+while i < a
+   memory[60000 + i] -> 990000
+   i -> i + 1

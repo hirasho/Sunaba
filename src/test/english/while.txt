@@ -1,0 +1,5 @@
+#memory[50015] -> 1 #disable automatic sync.
+i -> 0
+while i < 10000
+   memory[60000 + i] -> 990000
+   i -> i + 1

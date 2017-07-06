@@ -1,0 +1,9 @@
+def do(a, b, c, d)
+   out -> a + b + c + d
+
+a -> do(1, 2, 3, 4)
+do(1, 2, 3, 4)
+i -> 0
+while i < a
+   memory[60000 + i] -> 990000
+   i -> i + 1

@@ -1,0 +1,7 @@
+const Error_MEMORY_DESTRUCTION -> -1
+const Error_NO_MORE_MEMORY -> -2
+const Error_NOT_INITIALIZED -> -3
+const Error_NOT_IMPLEMENTED -> -4
+const Error_OUT_OF_RANGE -> -5
+const Error_ZERO_DIVISION -> -6
+const Error_MUST_GE_ZERO -> -7

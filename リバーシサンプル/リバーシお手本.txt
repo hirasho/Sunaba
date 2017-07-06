@@ -1,0 +1,131 @@
+memory[55001] -> 1
+drawBackground() 
+initializeBoard()
+
+side -> 0
+while 1 #infinite game loop
+   x -> memory[50000]
+   y -> memory[50001]
+   cx -> x / 10
+   cy -> y / 10
+   if memory[50002] != 0
+      if placeDisk(cx, cy, side) != 0 #successfully placed.
+          side -> 1 - side
+   memory[55000] -> 1
+
+#----program end here. followings are subprogram definition----
+
+def initializeBoard()
+   i -> 0
+   while i < (8 * 8)
+      memory[i] -> 2 
+      i -> i + 1
+   set(3, 3, 0)
+   set(4, 4, 0)
+   set(3, 4, 1)
+   set(4, 3, 1)
+
+def placeDisk(x, y, side)
+   out -> 0
+   if (x >= 0) * (x < 8) * (y >= 0) * (y < 8) #inside board
+      if square(x, y) = 2 #vacant
+         if (placeDiskInsideBoard(x, y, side) != 0)
+            out -> 1
+
+def placeDiskInsideBoard(x, y, side)
+   out -> 0
+   out -> out + tryTurn(x, y, 0, -1, side) #12時
+   out -> out + tryTurn(x, y, 1, -1, side) #1時半
+   out -> out + tryTurn(x, y, 1, 0, side) #3時
+   out -> out + tryTurn(x, y, 1, 1, side) #4時半
+   out -> out + tryTurn(x, y, 0, 1, side) #6時
+   out -> out + tryTurn(x, y, -1, 1, side) #7時半
+   out -> out + tryTurn(x, y, -1, 0, side) #9時
+   out -> out + tryTurn(x, y, -1, -1, side) #10時半
+
+def tryTurn(bx, by, dx, dy, side)
+   out -> 0
+   x -> bx + dx
+   y -> by + dy
+   enemySide -> 1 - side
+   turnCount -> 0
+   while square(x, y) = enemySide
+      x -> x + dx
+      y -> y + dy
+   if square(x, y) = side
+      endX -> x
+      endY -> y
+      x -> bx + dx
+      y -> by + dy
+      while (x != endX) + (y != endY)
+         turn(x, y)
+         turnCount -> turnCount + 1
+         x -> x + dx
+         y -> y + dy
+      if turnCount > 0
+         set(bx, by, side)
+   out -> turnCount > 0
+
+def turn(x, y)
+   memory[(y * 8) + x] -> 1 - memory[(y * 8) + x]
+   drawDisk(x, y)
+
+def set(x, y, side)
+   memory[(y * 8) + x] -> side
+   drawDisk(x, y)
+
+def square(x, y)
+   out -> -1
+   if (x >= 0) * (x < 8) * (y >= 0) * (y < 8)
+      out -> memory[(y * 8) + x]
+
+def drawVerticalLine(x, up, down)
+   y -> up
+   while y < down
+      memory[60000 + (y * 100) + x] -> 0
+      y -> y + 1
+
+def drawHorizontalLine(y, left, right)
+   x -> left
+   while x < right
+      memory[60000 + (y * 100) + x] -> 0
+      x -> x + 1
+
+def drawBackground()
+   fillGreen()
+   drawGrid()
+
+def fillGreen()
+   x -> 60000
+   while x < 70000
+      memory[x] -> 005500
+      x -> x + 1
+
+def drawGrid()
+   c -> 0 #horizontal
+   while c < 9
+      drawHorizontalLine(c * 10, 0, 80)
+      c -> c + 1
+   c -> 0 #vertical
+   while c < 9
+      drawVerticalLine(c * 10, 0, 80)
+      c -> c + 1
+
+def getSideColor(side)
+   out -> 005500
+   if side = 0
+      out -> 999999
+   if side = 1
+      out -> 000000
+
+def drawDisk(cx, cy)
+   color -> getSideColor(square(cx, cy))
+   beginX -> (cx * 10) + 2
+   beginY -> (cy * 10) + 2
+   y -> 0
+   while y < 7
+      x -> 0
+      while x < 7
+         memory[60000 + ((beginY + y) * 100) + (beginX + x)] -> color
+         x -> x + 1
+      y -> y + 1

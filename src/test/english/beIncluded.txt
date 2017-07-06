@@ -1,0 +1,2 @@
+def do(a, b, c, d)
+   out -> a + b + c + d

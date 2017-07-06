@@ -1,0 +1,7 @@
+lineCount -> 0
+while lineCount < 10
+   pointCount -> 0
+   while pointCount < 10
+      memory[60000 + (lineCount * 100) + pointCount] -> 990000
+      pointCount -> pointCount + 1
+   lineCount -> lineCount + 1

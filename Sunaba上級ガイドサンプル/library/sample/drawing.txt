@@ -1,0 +1,51 @@
+include "..\graphics.txt"
+include "..\system.txt"
+include "..\input.txt"
+include "..\memory.txt"
+
+System_disableAutoSync()
+System_setResolution(300,300)
+Memory_initialize()
+input -> Input_create()
+
+Input_update(input)
+oldX -> Input_pointerX(input)
+oldY -> Input_pointerY(input)
+rectX -> 0
+rectY -> 0
+rightClickCount -> 0
+
+while 1
+   Input_update(input)
+   x -> Input_pointerX(input)
+   y -> Input_pointerY(input)
+   if Input_on(input, Input_MOUSE_LEFT)
+      drawLine(oldX, oldY, x, y, 999999)
+   if Input_triggered(input, Input_MOUSE_RIGHT)
+      if rightClickCount = 0
+         rectX -> x
+	 rectY -> y
+      if rightClickCount = 1
+         left -> rectX
+	 right -> x
+	 top -> rectY
+	 bottom -> y
+	 if left > right
+	    tmp -> left
+	    left -> right
+	    right -> tmp
+	 if top > bottom
+	    tmp -> top
+	    top -> bottom
+	    bottom -> tmp
+         drawFilledRectangle(left, top, right - left, bottom - top, 990000)
+      rightClickCount -> rightClickCount + 1
+      if rightClickCount = 2
+         rightClickCount -> 0
+   if Input_triggered(input, Input_ENTER)
+      clearScreen(0)
+   System_sync()
+   oldX -> x
+   oldY -> y
+
+Input_destroy(input)

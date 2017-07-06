@@ -1,0 +1,6 @@
+D:\Sunaba\extra\src\Sunaba\obj\Release\ResolveAssemblyReference.cache
+D:\Sunaba\extra\src\Sunaba\obj\Release\SunabaIdeUnited.Form1.resources
+D:\Sunaba\extra\src\Sunaba\obj\Release\Sunaba.Properties.Resources.resources
+D:\Sunaba\extra\src\Sunaba\obj\Release\Sunaba.csproj.GenerateResource.Cache
+D:\Sunaba\extra\src\Sunaba\obj\Release\Sunaba.exe
+D:\Sunaba\Sunaba.exe

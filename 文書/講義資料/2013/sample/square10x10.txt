@@ -1,0 +1,7 @@
+memory[0] -> 0
+while memory[0] < 10
+   memory[1] -> 0
+   while memory[1] < 10
+      memory[60000 + (memory[0] * 100) + memory[1]] -> 990000
+      memory[1] -> memory[1] + 1
+   memory[0] -> memory[0] + 1

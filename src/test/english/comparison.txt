@@ -1,0 +1,39 @@
+i -> 0
+while i < 10 
+   memory[60000 + i] -> 990000
+   i -> i + 1
+
+i -> 0
+while i < 10
+   memory[60100 + i] -> 9900
+   i -> i + 1
+
+i -> 0
+while i <= 10
+   memory[60200 + i] -> 99
+   i -> i + 1
+
+i -> 0
+while 10 > i
+   memory[60300 + i] -> 9900
+   i -> i + 1
+
+i -> 0
+while 10 >= i
+   memory[60400 + i] -> 990000
+   i -> i + 1
+
+i -> 0
+while i != 10
+   memory[60500 + i] -> 99
+   i -> i + 1
+
+i -> 0
+while (i = 10) = 0
+   memory[60600 + i] -> 9900
+   i -> i + 1
+
+i -> 0
+while (i = 10) = 0
+   memory[60700 + i] -> 99
+   i -> i + 1

@@ -1,0 +1,62 @@
+def point(x, y, color)
+   if (x >= 0) * (x < 100) * (y >= 0) * (y < 100)
+      memory[60000 + (y * 100) + x] -> color
+
+def line(x0, y0, x1, y1, color)
+   c -> 0
+   while c < 100
+      x -> x0 + ((x1 - x0) * c / 100)
+      y -> y0 + ((y1 - y0) * c / 100)
+      point(x, y, color)
+      c -> c + 1
+
+def rect(x0, y0, x1, y1, color)
+   if x0 > x1
+      t -> x0
+      x0 -> x1
+      x1 -> t
+   if y0 > y1
+      t -> y0
+      y0 -> y1
+      y1 -> t
+   y -> y0
+   while y <= y1
+      x -> x0
+      while x <= x1
+         point(x, y, color)
+	 x -> x + 1
+      y -> y + 1
+
+memory[55001] -> 1
+oldX -> memory[50000]
+oldY -> memory[50001]
+oldRight -> memory[50003]
+rectX0 -> 0
+rectY0 -> 0
+rightClickCount -> 0
+while 1
+   memory[55000] -> 1 #sync
+   #get input
+   right -> memory[50003]
+   left -> memory[50002]
+   x -> memory[50000]
+   y -> memory[50001]
+   enter -> memory[50009]
+   #draw line
+   if left
+      line(oldX, oldY, x, y, 999999)
+   #draw rectangle or memorize cursor position
+   if right * (oldRight = 0)
+      rightClickCount -> rightClickCount + 1
+      if rightClickCount = 1
+         rectX0 -> x
+         rectY0 -> y
+      if rightClickCount = 2
+         rect(rectX0, rectY0, x, y, 990000)
+	 rightClickCount -> 0
+   if enter
+      rect(0, 0, 100, 100, 0)
+   #update old value
+   oldX -> x
+   oldY -> y
+   oldRight -> right

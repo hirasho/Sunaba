@@ -1,0 +1,216 @@
+include "ioMap.txt"
+include "utility.txt"
+include "system.txt"
+include "error.txt"
+
+#速度はかなり悪いので、改良の余地は大きい
+
+def drawCircle(centerX, centerY, radius, color)
+   # 6時方向から反時計回りに45度。これを90度づつ回し、それぞれを斜め軸で鏡像反転すればいい
+   r2 -> radius * radius
+   x -> 0
+   y -> radius
+   while y >= x
+      drawPoint(centerX + x, centerY + y, color) 
+      drawPoint(centerX - x, centerY + y, color) #x反転
+      drawPoint(centerX + y, centerY - x, color) 
+      drawPoint(centerX + y, centerY + x, color) #y反転
+      drawPoint(centerX - x, centerY - y, color) 
+      drawPoint(centerX + x, centerY - y, color) #x反転
+      drawPoint(centerX - y, centerY + x, color) 
+      drawPoint(centerX - y, centerY - x, color) #y反転
+      x -> x + 1
+      y1 -> y - 1
+      ex -> abs(r2 - (x * x) - (y * y))
+      exy -> abs(r2 - (x * x) - (y1 * y1))
+      if exy < ex
+         y -> y1 
+
+def drawFilledCircle(centerX, centerY, radius, color)
+   # 90度だけ計算。xを+1する度にyに関して必要なだけループを回す
+   r2 -> radius * radius
+   x -> 0
+   y -> radius
+   prevX -> -1
+   while y >= 0
+      if prevX != x
+         ty -> 0
+         while ty <= y
+            drawPoint(centerX + x, centerY + ty, color) 
+            drawPoint(centerX + ty, centerY - x, color) 
+            drawPoint(centerX - x, centerY - ty, color) 
+            drawPoint(centerX - ty, centerY + x, color) 
+	    ty -> ty + 1
+	 prevX -> x
+      x1 -> x + 1
+      y1 -> y - 1
+      ex -> abs(r2 - (x1 * x1) - (y * y))
+      ey -> abs(r2 - (x * x) - (y1 * y1))
+      exy -> abs(r2 - (x1 * x1) - (y1 * y1))
+      if ex < ey
+         if ex < exy
+	    x -> x1
+	 if exy <= ex
+	    x -> x1
+	    y -> y1
+      if ex >= ey
+         if ey < exy
+	    y -> y1
+	 if exy <= ey
+	    x -> x1
+	    y -> y1
+
+def drawRectangle(left, top, width, height, color)
+   x -> left
+   right -> left + width - 1
+   bottom -> top + height - 1
+   while x <= right
+      drawPoint(x, top, color)
+      drawPoint(x, bottom, color)
+      x -> x + 1
+   y -> top + 1
+   while y < bottom
+      drawPoint(left, y, color)
+      drawPoint(right, y, color)
+      y -> y + 1
+
+def drawFilledRectangle(left, top, width, height, color)
+   y -> top
+   bottom -> top + height
+   right -> left + width
+   while y < bottom
+      x -> left
+      while x < right
+         drawPoint(x, y, color)
+         x -> x + 1
+      y -> y + 1
+
+def drawSquare(left, top, size, color)
+   drawRectangle(left, top, size, size, color)
+
+def drawFilledSquare(left, top, size, color)
+   drawFilledRectangle(left, top, size, size, color)
+
+def drawLine(x0, y0, x1, y1, color)
+   xd -> x1 - x0
+   yd -> y1 - y0
+   finished -> 0
+   if abs(xd) > abs(yd) #xでループ
+      finished -> 1
+      dx -> sign(xd)
+      x -> x0
+      while x != x1
+         y -> y0 + ((y1 - y0) * (x - x0) / (x1 - x0))
+         drawPoint(x, y, color)
+         x -> x + dx
+   if finished = 0 #yでループ
+      dy -> sign(yd)
+      y -> y0
+      while y != y1
+         x -> x0 + ((x1 - x0) * (y - y0) / (y1 - y0))
+         drawPoint(x, y, color)
+         y -> y + dy
+   drawPoint(x1, y1, color) #終点
+
+def drawPoint(x, y, color)
+   w -> memory[MEM_SCREEN_WIDTH]
+   h -> memory[MEM_SCREEN_HEIGHT]
+   screen -> memory[MEM_SCREEN_BEGIN]
+   if (x >= 0) * (x < w) * (y >= 0) * (y < h)
+      screen[(y * w) + x] -> color
+
+def drawTriangle(x0, y0, x1, y1, x2, y2, color)
+   drawLine(x0, y0, x1, y1, color)
+   drawLine(x1, y1, x2, y2, color)
+   drawLine(x2, y2, x0, y0, color)
+
+def drawFilledTriangle(x0, y0, x1, y1, x2, y2, color)
+   #yでソートする
+   if y1 < y0 #y0 > y1なら交換
+      t -> x0
+      x0 -> x1
+      x1 -> t
+      t -> y0
+      y0 -> y1
+      y1 -> t
+   if y2 < y1 #y1,y2を交換
+      t -> x1
+      x1 -> x2
+      x2 -> t
+      t -> y1
+      y1 -> y2
+      y2 -> t
+   if y1 < y0 #もう一度y0 > y1なら交換
+      t -> x0
+      x0 -> x1
+      x1 -> t
+      t -> y0
+      y0 -> y1
+      y1 -> t
+      
+   #上と中の間で各yについてxの範囲を定め、その間を塗る
+   y -> y0
+   while y < y1
+      xBegin -> x0 + ((x1 - x0) * (y - y0) / (y1 - y0))
+      xEnd -> x0 + ((x2 - x0) * (y - y0) / (y2 - y0))
+      if xBegin > xEnd
+         t -> xEnd
+	 xEnd -> xBegin
+	 xBegin -> t
+      x -> xBegin
+      while x < xEnd
+         drawPoint(x, y, color)
+	 x -> x + 1
+      y -> y + 1
+   #中と下の間で各yについてxの範囲を定め、その間を塗る
+   while y < y2
+      xBegin -> x2 + ((x1 - x2) * (y - y2) / (y1 - y2))
+      xEnd -> x0 + ((x2 - x0) * (y - y0) / (y2 - y0))
+      if xBegin > xEnd
+         t -> xEnd
+	 xEnd -> xBegin
+	 xBegin -> t
+      x -> xBegin
+      while x < xEnd
+         drawPoint(x, y, color)
+	 x -> x + 1
+      y -> y + 1
+
+def clearScreen(color)
+   w -> memory[MEM_SCREEN_WIDTH]
+   h -> memory[MEM_SCREEN_HEIGHT]
+   screen -> memory[MEM_SCREEN_BEGIN]
+   setMemory(screen, color, w * h)
+
+def drawPicture(left, top, width, height, pictureStart, pictureWidth)
+   screenWidth -> memory[MEM_SCREEN_WIDTH]
+   screenHeight -> memory[MEM_SCREEN_HEIGHT]
+   screen -> memory[MEM_SCREEN_BEGIN]
+   if (left + width) > screenWidth
+      width -> screenWidth - left
+   if (top + height) > screenHeight
+      height -> screenHeight - top
+   y -> 0
+   while y < height
+      x -> 0
+      while x < width
+         screen[((y + top)* screenWidth) + (x + left)] -> 
+	    pictureStart[(y * pictureWidth) + x]
+         x -> x + 1
+      y -> y + 1
+
+def multiplyColor(c0, c1) #赤、緑、青に分解して掛け算し、組み立てる
+   r0 -> c0 / 10000
+   r1 -> c1 / 10000
+   c0 -> c0 - (r0 * 10000)
+   c1 -> c1 - (r1 * 10000)
+   g0 -> c0 / 100
+   g1 -> c1 / 100
+   c0 -> c0 - (g0 * 100)
+   c1 -> c1 - (g1 * 100)
+   b0 -> c0
+   b1 -> c1
+   o -> (r0 * r1 / 99) * 10000
+   o -> o + ((g0 * g1 / 99) * 100)
+   o -> o + (b0 * b1 / 99)
+   out -> o

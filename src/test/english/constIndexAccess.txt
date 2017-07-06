@@ -1,0 +1,3 @@
+const screen -> 60000
+x -> 5
+screen[5050 + x] -> 999999

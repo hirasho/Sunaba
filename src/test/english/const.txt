@@ -1,0 +1,7 @@
+const n0 -> 200
+const n1 -> n0 + 100
+
+i -> 0
+while i < n1
+   memory[60000 + i] -> 990000
+   i -> i + 1

@@ -1,0 +1,8 @@
+D:\Sunaba\extra\Debug\Sunaba.exe
+D:\Sunaba\extra\Debug\Sunaba.pdb
+D:\Sunaba\extra\src\Sunaba\obj\Debug\ResolveAssemblyReference.cache
+D:\Sunaba\extra\src\Sunaba\obj\Debug\SunabaIdeUnited.Form1.resources
+D:\Sunaba\extra\src\Sunaba\obj\Debug\Sunaba.Properties.Resources.resources
+D:\Sunaba\extra\src\Sunaba\obj\Debug\Sunaba.csproj.GenerateResource.Cache
+D:\Sunaba\extra\src\Sunaba\obj\Debug\Sunaba.exe
+D:\Sunaba\extra\src\Sunaba\obj\Debug\Sunaba.pdb

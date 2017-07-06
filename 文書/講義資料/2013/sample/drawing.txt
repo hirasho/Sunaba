@@ -1,0 +1,3 @@
+while memory[50003] = 0
+   if memory[50002] = 1
+      memory[60000 + memory[50000] + (memory[50001] * 100)] -> 990000
