@@ -1,0 +1,83 @@
+SunabaEnvForC.hの説明書
+
+SunabaEnvForCは、
+C言語でSunabaのような手軽さでキーボードやマウスの情報取得と、
+画面描画を行うためのライブラリです。
+
+Sunabaで学んだ後C言語に移行したが、
+標準ライブラリでは画面も出ないしマウスも取れないので学びにくい、
+という声があったので作りました。
+
+使い方は、windows/test.cを見るとおおまかにわかるかと思います。
+これは左クリックするとマウスカーソルのある位置に白い点を描くソフトを
+C言語に移植したものです。
+おおよそSunabaと同じ構成で書くことができます。
+
+
+[使い方]
+* SunabaEnvForC.hを自分が作るファイルと同じ場所に置く。
+* 自分の.cファイルからSunabaEnvForC.hをインクルードする。
+* main()の代わりに、SunabaEnv_main()に自分のコードを書く。
+
+[関数リスト]
+
+SunabaEnvForCの関数には以下のものがあります。
+
+void SunabaEnv_main()
+   main()の代わりに自分で書いてください。
+
+void SunabaEnv_disableAutoSync()
+   memory[55001] -> 1
+   と同じです
+
+void SunabaEnv_sync()
+   memory[55000] -> 1
+   と同じです。
+
+int SunabaEnv_getMouseX(); 
+   memory[50000]が覚えている値を返します
+
+int SunabaEnv_getMouseY(); 
+   memory[50001]が覚えている値を返します
+
+int SunabaEnv_getMouseLeftButton(); 
+   memory[50002]が覚えている値を返します
+
+int SunabaEnv_getMouseRightButton(); 
+   memory[50003]が覚えている値を返します
+
+int SunabaEnv_getKeyUp()
+   memory[50004]が覚えている値を返します
+
+int SunabaEnv_getKeyDown()
+   memory[50005]が覚えている値を返します
+
+int SunabaEnv_getKeyLeft()
+   memory[50006]が覚えている値を返します
+
+int SunabaEnv_getKeyRight()
+   memory[50007]が覚えている値を返します
+
+int SunabaEnv_getKeySpace()
+   memory[50007]が覚えている値を返します
+
+int SunabaEnv_getKeyEnter()
+   memory[50008]が覚えている値を返します
+
+void SunabaEnv_drawPoint(int x, int y, int color)
+   memory[60000 + (y * 100) + x] -> color
+   と同じですが、画面外にはみ出しても大丈夫です
+
+[VisualStudioを使う場合]
+
+VisualStudio2012のソリューション(test.sln)も入れてありますので、
+VisualStudioを使う場合は参考になるかと思います。
+プロジェクトの設定は行わず、書く.cあるいは.cppファイルを
+プロジェクトに入れれば使えます。
+
+[制限事項]
+.cあるいは.cppは1つにしてください。インクルードするだけで
+使える利便性を保つために、.libファイルは存在しません。
+C言語でも使えるようにinlineを使わない実装になっており、
+複数の.cファイルからSunabaEnvForC.hをインクルードされると
+リンクで失敗します。
