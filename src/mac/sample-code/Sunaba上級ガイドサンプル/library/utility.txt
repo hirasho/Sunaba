@@ -1,0 +1,175 @@
+include "error.txt"
+
+const INVALID_POINTER -> -999999999
+
+def modulo(a, b)
+   out -> (a - ((a / b) * b))
+
+def random(prev) #linear congruential generator mod 1048573
+   if prev = 0 #0はマズい
+      prev -> 1
+   out -> modulo(2043 * prev, 1048573)
+
+def abs(x)
+   if x < 0
+      x -> -x
+   out -> x
+
+def sign(x)
+   out -> 0
+   if x < 0
+      out -> -1
+   if x > 0
+      out -> 1
+
+def sqrt(a) #newton法
+   if a < 0
+      System_die(Error_OUT_OF_RANGE)
+   out -> 0 #a = 0なら0
+   if a > 0
+      out -> sqrtPlus(a)
+      
+def sqrtPlus(a) #newton法。a > 0のみ。
+   /*
+   aの最大値は2^31乗であり、その平方根が最大である。ここから始めて良い。46340だ。
+   しかし、なんぼなんでも遅いのでもう少し考えよう。
+   f(x) = sqrt(x)の微分は、f'(x) = 1/2sqrt(x)である。
+   ここでa >= k^2とし、傾きが1/2sqrt(k^2)=1/2kであるような直線を考える。
+   これが(k^2 ,k)を通るとすれば、
+   g(x) = x/2k + b なる関数は、
+   g(k^2) = k/2 + b = k
+   より、b = k/2 すなわち
+   g(x) = x/2k + k/2
+   となる。
+   さてg(x)はx>=k^2において常にf(x)より大きいのだから、g(x)を初期値として良い。
+   初期値g(x) = z = x/2k + k/2
+   通分すれば、
+   z = (x + k^2 + 2k - 1) / 2k
+   となる。切り捨てを問題にするなら1足しておけば良い。あとは適切な段階でkを用意する。
+   */
+   #初期値計算部
+   z -> 46340
+   if a < 1073741823 #数を書ける最大値
+      k2 -> 268435456
+      k -> 16384
+      continue -> 1
+      while continue
+         if a >= k2
+            z -> (a / 2 / k) + (k / 2) + 1
+            continue -> 0
+         if continue
+            k2 -> k2 / 4
+	    k -> k / 2
+   #ニュートン改良部
+   c -> 0
+   e -> abs((z * z) - a)
+   continue -> 1
+   while continue
+      c -> 1
+      newZ -> ((z * z) + a) / (2 * z)
+      newE -> abs((newZ * newZ) - a)
+      if newE >= e #新しいのが前よりダメになったなら終わる
+         continue -> 0
+      if continue = 1 #続ける場合
+         z -> newZ
+	 e -> newE
+   out -> z
+
+def copyMemory(writeStart, readStart, count)
+   writeEnd -> writeStart + count
+   readEnd -> readStart + count
+   while writeStart < writeEnd
+      writeStart[0] -> readStart[0]
+      writeStart -> writeStart + 1
+      readStart -> readStart + 1
+
+def setMemory(writeStart, value, count)
+   e -> writeStart + count
+   while writeStart < e
+      writeStart[0] -> value
+      writeStart -> writeStart + 1
+
+def set1(writeStart, v0)
+   writeStart[0] -> v0
+   out -> writeStart + 1
+
+def set2(writeStart, v0, v1)
+   writeStart[0] -> v0
+   writeStart[1] -> v1
+   out -> writeStart + 2
+
+def set3(writeStart, v0, v1, v2)
+   writeStart[0] -> v0
+   writeStart[1] -> v1
+   writeStart[2] -> v2
+   out -> writeStart + 3
+
+def set4(writeStart, v0, v1, v2, v3)
+   writeStart[0] -> v0
+   writeStart[1] -> v1
+   writeStart[2] -> v2
+   writeStart[3] -> v3
+   out -> writeStart + 4
+
+def set5(writeStart, v0, v1, v2, v3, v4)
+   writeStart[0] -> v0
+   writeStart[1] -> v1
+   writeStart[2] -> v2
+   writeStart[3] -> v3
+   writeStart[4] -> v4
+   out -> writeStart + 5
+
+def set6(writeStart, v0, v1, v2, v3, v4, v5)
+   writeStart[0] -> v0
+   writeStart[1] -> v1
+   writeStart[2] -> v2
+   writeStart[3] -> v3
+   writeStart[4] -> v4
+   writeStart[5] -> v5
+   out -> writeStart + 6
+
+def set7(writeStart, v0, v1, v2, v3, v4, v5, v6)
+   writeStart[0] -> v0
+   writeStart[1] -> v1
+   writeStart[2] -> v2
+   writeStart[3] -> v3
+   writeStart[4] -> v4
+   writeStart[5] -> v5
+   writeStart[6] -> v6
+   out -> writeStart + 7
+
+def set8(writeStart, v0, v1, v2, v3, v4, v5, v6, v7)
+   writeStart[0] -> v0
+   writeStart[1] -> v1
+   writeStart[2] -> v2
+   writeStart[3] -> v3
+   writeStart[4] -> v4
+   writeStart[5] -> v5
+   writeStart[6] -> v6
+   writeStart[7] -> v7
+   out -> writeStart + 8
+
+def set9(writeStart, v0, v1, v2, v3, v4, v5, v6, v7, v8)
+   writeStart[0] -> v0
+   writeStart[1] -> v1
+   writeStart[2] -> v2
+   writeStart[3] -> v3
+   writeStart[4] -> v4
+   writeStart[5] -> v5
+   writeStart[6] -> v6
+   writeStart[7] -> v7
+   writeStart[8] -> v8
+   out -> writeStart + 9
+
+def set10(writeStart, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9)
+   writeStart[0] -> v0
+   writeStart[1] -> v1
+   writeStart[2] -> v2
+   writeStart[3] -> v3
+   writeStart[4] -> v4
+   writeStart[5] -> v5
+   writeStart[6] -> v6
+   writeStart[7] -> v7
+   writeStart[8] -> v8
+   writeStart[9] -> v9
+   out -> writeStart + 10

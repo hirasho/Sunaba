@@ -1,0 +1,149 @@
+include "..\memory.txt"
+include "..\utility.txt"
+include "..\system.txt"
+include "..\graphics.txt"
+include "..\input.txt"
+
+#定数
+const N -> 20
+const BALL_MEM_SIZE -> 8 #px,py,vx,vy,fx,fy,radius,color
+const GRAVITY -> 3
+const AIR_REGISTANCE_PERMILL -> 1
+const COLLISION_REACTANCE_PERMILL -> 1000
+const ELASTIC_MODULUS_PERMILL -> 500
+
+#初期化
+System_setResolution(100,100)
+System_disableAutoSync()
+Memory_initialize()
+input -> Input_create()
+
+randMem -> Memory_allocate(1)
+randMem[0] -> 0
+balls -> Memory_allocate(N * BALL_MEM_SIZE)
+
+initializeBalls(balls, randMem)
+
+#メインループ
+while 1
+   Input_update(input)
+   #描画
+   clearScreen(0)
+   i -> 0
+   while i < N
+      Ball_draw(balls + (i * BALL_MEM_SIZE))
+      i -> i + 1
+   System_sync()
+   #衝突
+   i -> 0
+   while i < N
+      j -> i + 1
+      while j < N
+         collideBalls(balls + (i * BALL_MEM_SIZE), balls + (j * BALL_MEM_SIZE))
+	 j -> j + 1
+      i -> i + 1
+   #更新
+   if Input_triggered(input, Input_ENTER)
+      initializeBalls(balls, randMem)
+   i -> 0
+   while i < N
+      Ball_move(balls + (i * BALL_MEM_SIZE))
+      i -> i + 1
+
+Input_destroy(input)
+Memory_deallocate(balls)
+
+#-----------------sub programs-------------------
+
+def collideBalls(b0, b1)
+   dx -> b0[0] - b1[0]
+   dy -> b0[1] - b1[1]
+   distance2 -> (dx * dx) + (dy * dy)
+   rSum -> b0[6] + b1[6]
+   rSum2 -> rSum * rSum
+   hit -> rSum2 > distance2
+   #衝突ベクタは(dx, dy)
+   if hit
+      distance -> sqrt(distance2)
+      if distance != 0
+         displacement -> rSum - distance
+         #ベクタ正規化して長さをdisplacementに
+         vx -> COLLISION_REACTANCE_PERMILL * displacement * dx / distance / 1000
+         vy -> COLLISION_REACTANCE_PERMILL * displacement * dy / distance / 1000
+         b0[4] -> b0[4] + vx
+         b0[5] -> b0[5] + vy
+         b1[4] -> b1[4] - vx
+         b1[5] -> b1[5] - vy
+
+def Ball_initialize(this, randMem)
+   w -> System_screenWidth()
+   h -> System_screenHeight()
+   randMem[0] -> random(randMem[0]) 
+   this[0] -> modulo(abs(randMem[0]), w * 100)
+   randMem[0] -> random(randMem[0]) 
+   this[1] -> modulo(abs(randMem[0]), h * 100)
+   randMem[0] -> random(randMem[0]) 
+   this[2] -> 0
+   this[3] -> 0
+   this[4] -> 0
+   this[5] -> 0
+   this[6] -> modulo(abs(randMem[0]), 1000) + 100 #最低1
+   randMem[0] -> random(randMem[0]) 
+   r -> modulo(abs(randMem[0]), 100)
+   randMem[0] -> random(randMem[0]) 
+   g -> modulo(abs(randMem[0]), 100)
+   randMem[0] -> random(randMem[0]) 
+   b -> modulo(abs(randMem[0]), 100)
+   this[7] -> (r * 10000) + (g * 100) + b
+
+def Ball_draw(this)
+   x -> (this[0] + 50) / 100
+   y -> (this[1] + 50) / 100
+   r -> (this[6] + 50) / 100
+   drawFilledCircle(x, y, r, this[7])
+   # ハイライト
+   r2 -> r / 2
+   drawPoint(x + r2, y - r2, 999999)
+
+def Ball_move(this) #積分と壁衝突
+   r -> this[6]
+   #空気抵抗
+   this[4] -> this[4] - ((this[2] * r * AIR_REGISTANCE_PERMILL) / 1000)
+   this[5] -> this[5] - ((this[3] * r * AIR_REGISTANCE_PERMILL) / 1000)
+   #位置
+   this[0] -> this[0] + this[2]
+   this[1] -> this[1] + this[3]
+   #速度
+   m -> r * r / 10000
+   this[2] -> this[2] + (this[4] / m)
+   this[3] -> this[3] + (this[5] / m)
+   #力初期化
+   this[4] -> 0
+   this[5] -> GRAVITY * m
+
+   #壁衝突
+   w -> System_screenWidth() * 100
+   h -> System_screenHeight() * 100
+   if this[0] < r
+      this[0] -> r
+      this[2] -> -this[2] * ELASTIC_MODULUS_PERMILL / 1000
+
+   if this[0] >= (w - r)
+      this[0] -> (w - r)
+      this[2] -> -this[2] * ELASTIC_MODULUS_PERMILL / 1000
+
+   if this[1] < r
+      this[1] -> r
+      this[2] -> -this[2]
+      this[3] -> -this[3] * ELASTIC_MODULUS_PERMILL / 1000
+
+   if this[1] >= (h - r)
+      this[1] -> (h - r)
+      this[3] -> -this[3] * ELASTIC_MODULUS_PERMILL / 1000
+
+def initializeBalls(balls, randMem)
+   i -> 0
+   while i < N
+      Ball_initialize(balls + (i * BALL_MEM_SIZE), randMem)
+      i -> i + 1
+
