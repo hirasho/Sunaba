@@ -38,22 +38,9 @@ inline bool CodeGenerator::process(Array<wchar_t>* result, const Node* root){
 	tmp.add(L'\0');
 	Array<wchar_t> debugOut;
 	tmp.copyTo(&debugOut);
-	writeToConsole(debugOut.pointer());    
+	writeToConsole(debugOut.pointer());
 #ifndef NDEBUG
-#ifdef __APPLE__
-    Array<wchar_t> outputPath;
-    {
-        char pathBuf[2048] = { 0 };
-        Sunaba::getWorkingDirectory( pathBuf );
-        sprintf( pathBuf, "%s/compiled.txt", pathBuf );
-        pathBuf[ strlen(pathBuf) ] = '\0';
-        convertToUnicode( &outputPath, pathBuf, (int) strlen(pathBuf)+1, false );
-    }
-
-	OutputTextFile outFile( outputPath.pointer() );
-#else
 	OutputTextFile outFile(L"compiled.txt");
-#endif
 	outFile.write(debugOut.pointer(), debugOut.size());
 #endif
 	return true;
@@ -62,10 +49,11 @@ inline bool CodeGenerator::process(Array<wchar_t>* result, const Node* root){
 inline bool CodeGenerator::generateProgram(Tank<wchar_t>* out, const Node* node){
 	ASSERT(node->mType == NODE_PROGRAM);
 	out->addString(L"pop -1 #$mainの戻り値領域\n");
-	out->addString(L"call !main\n"); //main()呼び出し
+	out->addString(L"call func_!main\n"); //main()呼び出し 160413: add等のアセンブラ命令と同名の関数があった時にラベルを命令と間違えて誤作動する問題の緊急回避
+
 	out->addString(L"j !end #プログラム終了点へジャンプ\n"); //プログラム終了点へジャンプ
 	//$mainの情報を足しておく
-	FunctionInfo& mainFuncInfo = mFunctionMap.insert(std::make_pair(RefString(L"!main"), FunctionInfo())).first->second;
+	FunctionInfo& mainFuncInfo = mFunctionMap.insert(FunctionMap::value_type(RefString(L"!main"), FunctionInfo())).first->second;
 
 	//関数情報収集。関数コールを探しだして、見つけ次第、引数、出力、名前についての情報を収集してmapに格納
 	Node* child = node->mChild;
@@ -108,7 +96,7 @@ inline bool CodeGenerator::collectFunctionDefinitionInformation(const Node* node
 	ASSERT(node->mToken);
 	funcName = node->mToken->mString;
 	//関数重複チェック
-	std::pair<FunctionMap::iterator, bool> fp = mFunctionMap.insert(std::make_pair(funcName, FunctionInfo()));
+	std::pair<FunctionMap::iterator, bool> fp = mFunctionMap.insert(FunctionMap::value_type(funcName, FunctionInfo()));
 	if (fp.second == false){ //もうこの関数ある
 		beginError(node);
 		*mMessageStream << L"部分プログラム\"";

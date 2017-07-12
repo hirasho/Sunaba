@@ -5,6 +5,7 @@
 #include "Compiler/CodeGenerator.h"
 #include "Base/Array.h"
 #include "Base/MemoryPool.h"
+#include "Localization.h"
 
 namespace Sunaba{
 
@@ -12,31 +13,32 @@ namespace Sunaba{
 inline bool Compiler::process(
 Array<wchar_t>* result,
 std::wostringstream* messageOut,
-const wchar_t* filename){
+const wchar_t* filename,
+const Localization& loc){
 	MemoryPool memoryPool(1024);
 	//ファイル結合+トークン分解
 	Array<Token> tokens;
 	Tank<String> fullPathFilenames; //エラー表示用のファイル名を保持するTank。
-	if (!Concatenator::process(&tokens, messageOut, filename, &fullPathFilenames, &memoryPool)){
+	if (!Concatenator::process(&tokens, messageOut, filename, &fullPathFilenames, &memoryPool, loc)){
 		return false;
 	}
-	//英語文法主体か日本語文法主体かをここで判別
+	//英語文法主体か非英語文法主体かをここで判別
 	int japaneseCount = 0;
 	int englishCount = 0;
 	for (int i = 0; i < tokens.size(); ++i){
 		TokenType t = tokens[i].mType;
 		if (
-		(t == TOKEN_WHILE_J) ||
-		(t == TOKEN_IF_J) ||
-		(t == TOKEN_DEF_J)){
+		(t == TOKEN_WHILE_POST) ||
+		(t == TOKEN_IF_POST) ||
+		(t == TOKEN_DEF_POST)){
 			++japaneseCount;
 		}else if (
-		(t == TOKEN_WHILE) ||
-		(t == TOKEN_IF) ||
-		(t == TOKEN_DEF)){
+		(t == TOKEN_WHILE_PRE) ||
+		(t == TOKEN_IF_PRE) ||
+		(t == TOKEN_DEF_PRE)){
 			++englishCount;
 		}else if (t == TOKEN_OUT){
-			if (tokens[i].mString == L"出力"){
+			if (tokens[i].mString == loc.outWord){
 				++japaneseCount;
 			}else if (tokens[i].mString == L"out"){
 				++englishCount;
@@ -48,7 +50,7 @@ const wchar_t* filename){
 	bool english = (englishCount >= japaneseCount);
 	//パースします。
 	Node* rootNode = 0;
-	rootNode = Parser::process(tokens, messageOut, &memoryPool, english);
+	rootNode = Parser::process(tokens, messageOut, &memoryPool, english, loc);
 	if (!rootNode){
 		return false;
 	}
@@ -58,5 +60,7 @@ const wchar_t* filename){
 	}
 	return true;
 }
+
+
 
 } //namespace Sunaba

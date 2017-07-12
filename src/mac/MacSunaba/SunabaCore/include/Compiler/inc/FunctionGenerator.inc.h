@@ -46,7 +46,7 @@ inline FunctionGenerator::Block::~Block(){
 }
 
 inline bool FunctionGenerator::Block::addVariable(const RefString& name, bool isArgument){
-	std::pair<VariableMap::iterator, bool> p = mVariables.insert(std::make_pair(name, Variable()));
+	std::pair<VariableMap::iterator, bool> p = mVariables.insert(VariableMap::value_type(name, Variable()));
 	if (!p.second){
 		return false;
 	}else{
@@ -187,6 +187,7 @@ const Node* node){
 	out->add(mName.pointer(), mName.size());
 	out->addString(L"\"の開始\n");
 	//関数開始ラベル
+	out->addString(L"func_"); //160413: add等のアセンブラ命令と同名の関数があった時にラベルを命令と間違えて誤作動する問題の緊急回避
 	out->add(mName.pointer(), mName.size());
 	out->addString(L":\n");
 
@@ -457,7 +458,8 @@ inline bool FunctionGenerator::generateFunction(Tank<wchar_t>* out, const Node* 
 		arg = arg->mBrother;
 	}
 	//call命令生成
-	out->addString(L"call ");
+	out->addString(L"call func_"); //160413: add等のアセンブラ命令と同名の関数があった時にラベルを命令と間違えて誤作動する問題の緊急回避
+
 	out->add(funcName.pointer(), funcName.size());
 	out->addString(L"\n");
 

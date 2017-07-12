@@ -10,10 +10,6 @@ public:
 	void setFrequency(int channel, float frequency);
 	void setDumping(int channel, float dumping);
 	void play(int channel, float amplitude);
-
-#if defined(__APPLE__)
-	void bufferUpdate();
-#endif
 private:
 	class Impl;
 	Impl* mImpl;

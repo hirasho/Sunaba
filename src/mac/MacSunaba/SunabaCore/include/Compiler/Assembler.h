@@ -9,13 +9,15 @@
 namespace Sunaba{
 template<class T> class Array;
 template<class T> class Tank;
+struct Localization;
 
 class Assembler{
 public:
 	static bool process(
 		Array<unsigned>* result,
 		std::wostringstream* messageStream,
-		const Array<wchar_t >& compiled);
+		const Array<wchar_t >& compiled,
+		const Localization&);
 private:
 	enum TokenType{
 		TOKEN_INSTRUCTION,

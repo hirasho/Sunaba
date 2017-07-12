@@ -188,7 +188,6 @@ inline void Machine::threadFunc(){
 					}
 					break;
 				}
-//				execute();
 				executeDecoded(); //最適化版
 			}
 			//無意味な演算でCPUをフル活用するのを止めるための強制スリープ
@@ -203,224 +202,7 @@ inline void Machine::threadFunc(){
 	sync(false); //一回sync。最後のIO命令を反映。
 	mTerminatedEvent.set();
 }
-/*
-inline void Machine::execute(){
-	using namespace std; //hex,decのため
 
-	unsigned inst = static_cast<unsigned>(mMemory[mProgramCounter]);
-	int inst8 = (inst & 0xff000000) >> 24;
-	if (inst & (1 << INSTRUCTION_HEAD_BIT_I)){ //即値ロード
-		int immS = getImmS(inst, IMM_BIT_COUNT_I);
-		push(immS);
-	}else if (inst & (1 << INSTRUCTION_HEAD_BIT_ALU)){ //算術命令
-		inst8 &= 0x78;
-		int op1 = pop(); //先に入れた方が後から出てくるので1,0の順
-		int op0 = pop();
-		switch (inst8){
-			case INSTRUCTION_ADD:
-				push(op0 + op1);
-				break;
-			case INSTRUCTION_SUB:
-				push(op0 - op1);
-				break;
-			case INSTRUCTION_MUL:
-				push(op0 * op1);
-				break;
-			case INSTRUCTION_DIV:
-				if (op1 == 0){
-					beginError();
-					*mMessageStream<< L"0では割れない。" << std::endl;
-				}else{
-					push(op0 / op1);
-				}
-				break;
-			case INSTRUCTION_LT:
-				push((op0 < op1) ? 1 : 0);
-				break;
-			case INSTRUCTION_LE:
-				push((op0 <= op1) ? 1 : 0);
-				break;
-			case INSTRUCTION_EQ:
-				push((op0 == op1) ? 1 : 0);
-				break;
-			case INSTRUCTION_NE:
-				push((op0 != op1) ? 1 : 0);
-				break;
-			default:
-				beginError();
-				*mMessageStream << L"存在しない命令。おそらく壊れている(コード:" << hex << inst << dec << L")" << std::endl;
-				break;
-		}
-	}else if (inst & (1 << INSTRUCTION_HEAD_BIT_LS)){ //ロードストア
-		int immS = getImmS(inst, IMM_BIT_COUNT_LS);
-		inst8 &= 0x38;
-		int op0, op1;
-		switch (inst8){
-			case INSTRUCTION_LD: case INSTRUCTION_FLD:
-				if (inst8 == INSTRUCTION_FLD){
-					op0 = mFramePointer;
-				}else{
-					op0 = pop();
-				}
-				op0 += immS;
-				if (op0 < 0){
-					beginError();
-					*mMessageStream << L"マイナスの番号のメモリを読みとろうとした(番号:" << op0 << L")" << std::endl;
-				}else if (op0 < mProgramBegin){ //正常実行
-					push(mMemory[op0]);
-				}else if (op0 < VM_MEMORY_STACK_BASE){ //プログラム領域
-					beginError();
-					*mMessageStream << L"プログラムが入っているメモリを読みとろうとした(番号:" << op0 << L")" << std::endl;
-				}else if (op0 < VM_MEMORY_IO_BASE){ //スタック。正常実行
-					push(mMemory[op0]);
-				}else if (op0 < VM_MEMORY_IO_READABLE_END){ //読み取り可能メモリ
-//					if (mMemory[VM_MEMORY_DISABLE_AUTO_SYNC] == 0){ //自動sync
-						syncInput(); //入力だけ
-//					}
-					push(mMemory[op0]);
-				}else if (op0 < VM_MEMORY_VRAM_BASE){ //書きこみ専用メモリ
-					beginError();
-					*mMessageStream << L"このあたりのメモリはセットはできるが読み取ることはできない(番号:" << op0 << L")" << std::endl;
-				}else if (op0 < (VM_MEMORY_VRAM_BASE + (mScreenWidth * mScreenHeight))){
-					beginError();
-					*mMessageStream << L"画面メモリは読み取れない(番号:" << op0 << L")" << std::endl;
-				}else{
-					beginError();
-					*mMessageStream << L"メモリ範囲外を読みとろうとした(番号:" << op0 << L")" << std::endl;
-				}
-				break;
-			case INSTRUCTION_ST: case INSTRUCTION_FST:
-				op1 = pop();
-				if (inst8 == INSTRUCTION_FST){
-					op0 = mFramePointer;
-				}else{
-					op0 = pop();
-				}
-				op0 += immS;
-				if (op0 < 0){ //負アドレス
-					beginError();
-					*mMessageStream << L"マイナスの番号のメモリを変えようとした(番号:" << op0 << L")" << std::endl;
-				}else if (op0 < mProgramBegin){ //正常実行
-					mMemory[op0] = op1;
-				}else if (op0 < VM_MEMORY_STACK_BASE){ //プログラム領域
-					beginError();
-					*mMessageStream << L"プログラムが入っているメモリに" << op1 << L"をセットしようとした(番号:" << op0 << L")" << std::endl;
-				}else if (op0 < VM_MEMORY_IO_BASE){ //スタック。正常実行
-					mMemory[op0] = op1;
-				}else if (op0 < VM_MEMORY_IO_WRITABLE_BEGIN){ //IOのうち書きこみ不可能領域
-					beginError();
-					*mMessageStream << L"このあたりのメモリは読み取れはするが、セットはできない(番号:" << op0 << L")" << std::endl;
-				}else if (op0 == VM_MEMORY_SYNC){ //vsync待ち検出
-					sync(true); //op1は見ていない。なんでもいい。
-				}else if (op0 == VM_MEMORY_DISABLE_AUTO_SYNC){ //自動SYNCモード
-					mMemory[op0] = (op1 == 0) ? 0 : 1;
-				}else if (op0 == VM_MEMORY_DRAW_CHAR){ //デバグ文字出力
-					if (op1 == L'\n'){
-						*mMessageStream << std::endl;
-					}else{
-						*mMessageStream << static_cast<wchar_t>(op1);
-						mCharDrawn = true;
-					}
-				}else if (op0 == VM_MEMORY_BREAK){ //ブレークポイント
-					sync(false); //同期を走らせて
-					mMemory[op0] = op1; //値書きかえ
-				}else if (op0 == VM_MEMORY_SET_SCREEN_WIDTH){
-					if (op1 <= 0){
-						beginError();
-						*mMessageStream << L"横解像度として0以下の値を設定した" << std::endl;
-					}else if (op1 > 500){
-						beginError();
-						*mMessageStream << L"横解像度の最大は500" << std::endl;
-					}
-					mMemory[op0] = op1;
-				}else if (op0 == VM_MEMORY_SET_SCREEN_HEIGHT){
-					if (op1 <= 0){
-						beginError();
-						*mMessageStream << L"縦解像度として0以下の値を設定した" << std::endl;
-					}else if (op1 > 500){
-						beginError();
-						*mMessageStream << L"縦解像度の最大は500" << std::endl;
-					}
-					mMemory[op0] = op1;
-				}else if ((op0 >= VM_MEMORY_SET_SOUND_FREQUENCY0) && (op0 <= VM_MEMORY_SET_SOUND_AMPLITUDE2)){
-					mMemory[op0] = op1;
-				}else if (op0 < VM_MEMORY_VRAM_BASE){ //IO書き込み領域からVRAMまで
-					beginError();
-					*mMessageStream << L"このあたりのメモリは使えない(番号:" << op0 << L")" << std::endl;
-				}else if (op0 < (VM_MEMORY_VRAM_BASE + (mScreenWidth * mScreenHeight))){ //VRAM書き込み
-					mMemory[op0] = op1;
-					//自動sync
-					if (mMemory[VM_MEMORY_DISABLE_AUTO_SYNC] == 0){ 
-						sync(true);
-					}
-				}else{
-					beginError();
-					*mMessageStream << L"メモリ範囲外をいじろうとした(番号:" << op0 << L")" << std::endl;
-				}
-				break;
-			default: 
-				beginError();
-				*mMessageStream << L"存在しない命令。おそらく壊れている(コード:" << hex << inst << dec << L")" << std::endl;
-				break;	
-		}
-	}else{ //分岐、関数コール、スタック操作系
-		int op0;
-		int immU, immS;
-		inst8 &= 0x1c;
-		switch (inst8){
-			case INSTRUCTION_J:
-				immU = getImmU(inst, IMM_BIT_COUNT_FLOW);
-				mProgramCounter = immU - 1 + mProgramBegin; //絶対アドレス。後で足されるので1引いておく
-				break;
-			case INSTRUCTION_BZ:
-				immU = getImmU(inst, IMM_BIT_COUNT_FLOW);
-				op0 = pop();
-				if (op0 == 0){
-					mProgramCounter = immU - 1 + mProgramBegin; //絶対アドレス。後で足されるので1引いておく
-				}
-				break;
-			case INSTRUCTION_CALL:
-				immU = getImmU(inst, IMM_BIT_COUNT_FLOW);
-				push(mFramePointer);
-				push(mProgramCounter);
-				mFramePointer = mStackPointer;
-				mProgramCounter = immU - 1 + mProgramBegin; //後で足されるので1引いておく
-				//デバグ情報入れる
-				if (!mDebugInfo.push(immU, mFramePointer)){
-					beginError();
-					*mMessageStream << L"部分プログラムを激しく呼びすぎ。たぶん再帰に間違いがある(命令:" << mProgramCounter << L")" << std::endl;
-				}
-				break;
-			case INSTRUCTION_RET:
-				immS = getImmS(inst, IMM_BIT_COUNT_FLOW);
-				pop(immS);
-				mProgramCounter = pop(); //絶対アドレス。後で+1されるので、それで飛んだアドレスの次になる
-				mFramePointer = pop();
-				if (!mDebugInfo.pop()){
-					beginError();
-					*mMessageStream << L"ret命令が多すぎている。絶対おかしい(命令:" << mProgramCounter << L")" << std::endl;
-				}
-				break;
-			case INSTRUCTION_POP:
-				immS = getImmS(inst, IMM_BIT_COUNT_FLOW);
-				pop(immS);
-				break;
-			default: 
-				beginError();
-				*mMessageStream << L"存在しない命令。Sunaba開発者が何かを間違えている(コード:" << hex << inst << dec << L")" << std::endl;
-				break;
-		}
-	}
-#if 1 //TODO: これでいいよなあ？エラーこいたら上流で止めるわけで、そこでPCが1多くても困らないだろ？
-	++mProgramCounter;
-#else
-	if (!mError){
-		++mProgramCounter;
-	}
-#endif
-	mExecutedInstructionCount += 1.0;
-}
-*/
 inline int Machine::pop(){
 	if (mStackPointer <= VM_MEMORY_STACK_BASE){
 		beginError();
@@ -438,7 +220,7 @@ inline void Machine::pop(int n){ //マイナスならプッシュ
 		*mMessageStream << L"ポップしすぎてスタック領域をはみ出した。" << std::endl;
 	}else if ((mStackPointer - n) >= VM_MEMORY_STACK_END){
 		beginError();
-		*mMessageStream << L"スタックを使い切った。確保する()や名前つきメモリを使いすぎ。" << std::endl;
+		*mMessageStream << L"スタックを使い切った。名前つきメモリを使いすぎ。" << std::endl;
 	}else{
 		mStackPointer -= n;
 		if (mDebugInfo.mMaxStackPointer < mStackPointer){
@@ -450,7 +232,7 @@ inline void Machine::pop(int n){ //マイナスならプッシュ
 inline void Machine::push(int a){
 	if (mStackPointer >= VM_MEMORY_STACK_END){
 		beginError();
-		*mMessageStream << L"スタックを使い切った。確保する()や名前つきメモリを使いすぎ。" << std::endl;
+		*mMessageStream << L"スタックを使い切った。名前つきメモリを使いすぎ。" << std::endl;
 	}else{
 		mMemory[mStackPointer] = a;
 		++mStackPointer;
@@ -649,6 +431,7 @@ inline bool Machine::decode(){
 				*mMessageStream << L"存在しないフロー制御命令。おそらく壊れている(コード:" << hex << inst << dec << L")" << std::endl;
 				return false;
 			}
+			imm;
 			if (inst8 == INSTRUCTION_POP){//popだけ符号つき
 				imm = getImmS(inst, IMM_BIT_COUNT_FLOW);
 			}else{

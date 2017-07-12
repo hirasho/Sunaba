@@ -7,13 +7,9 @@ namespace Sunaba{
 class RefString{
 public:
 	RefString();
-#ifndef __APPLE__
 	explicit RefString(const RefString&);
-#else
-	RefString(const RefString&);
-#endif
 	explicit RefString(const wchar_t*); //NULL終端
-	explicit RefString(const wchar_t* str, int size);
+	RefString(const wchar_t* str, int size);
 	void operator=(const wchar_t*); //NULL終端
 	void operator=(const RefString&);
 	void set(const wchar_t* str, int size);

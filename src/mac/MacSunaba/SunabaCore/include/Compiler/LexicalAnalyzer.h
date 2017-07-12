@@ -5,6 +5,7 @@
 
 namespace Sunaba{
 struct Token;
+struct Localization;
 
 //コンパイラの一部
 class LexicalAnalyzer{
@@ -16,7 +17,8 @@ public:
 		const wchar_t* in,
 		int inSize,
 		const wchar_t* filename,
-		int lineStart);
+		int lineStart,
+		const Localization&);
 private:
 	enum Mode{
 		MODE_NONE, //出力直後
@@ -28,7 +30,7 @@ private:
 		MODE_NAME, //名前[a-zA-Z0-9_全角]の上
 		MODE_STRING_LITERAL, //"文字列"の上
 	};
-	LexicalAnalyzer(std::wostringstream* messageStream, const wchar_t* filename, int lineStart); 
+	LexicalAnalyzer(std::wostringstream* messageStream, const wchar_t* filename, int lineStart, const Localization&);
 	~LexicalAnalyzer();
 	bool process(Array<Token>* out, const wchar_t* in, int inSize);
 	void beginError();
@@ -37,6 +39,7 @@ private:
 	int mLine;
 	int mLineStart;
 	std::wostringstream* mMessageStream; //借り物
+	const Localization* mLocalization; //借り物
 };
 
 } //namespace Sunaba

@@ -10,7 +10,7 @@ inline InputTextFile::InputTextFile(const wchar_t* filename){
 	}
 	const char* data = reinterpret_cast<const char*>(in.data()->pointer());
 	int size = in.data()->size();
-	convertToUnicode(&mText, data, size, false);
+	convertToUnicode(&mText, data, size);
 }
 
 inline bool InputTextFile::isError() const{
@@ -86,7 +86,6 @@ inline void OutputTextFile::write(const wchar_t* text, int size){
 		++src;
 		++dst;
 	}
-#ifdef _WIN32
 	//UCS2-LEに変換
 	Array<unsigned char> bin((dstSize * 2) + 2);
 	bin[0] = 0xff;
@@ -98,11 +97,6 @@ inline void OutputTextFile::write(const wchar_t* text, int size){
 		dst += 2;
 	}
 	mFile->write(bin.pointer(), bin.size());
-#else
-    Array<char> utf8;
-    convertUnicodeToUtf8(&utf8, modified.pointer(), modified.size());
-	mFile->write(reinterpret_cast<unsigned char*>(utf8.pointer()), utf8.size());
-#endif
 	if (mFile->isError()){
 		DELETE(mFile);
 	}

@@ -10,6 +10,7 @@ namespace Sunaba{
 template<class T> class Array;
 struct Node;
 struct Token;
+struct Localization;
 
 class Parser{
 public:
@@ -17,11 +18,13 @@ public:
 		const Array<Token>& in,
 		std::wostringstream* messageStream,
 		MemoryPool*,
-		bool english);
+		bool english,
+		const Localization&);
 private:
 	typedef MemoryPool::AutoDestroyer<Node> AutoNode;
+	typedef std::map<std::wstring, int> ConstMap;
 
-	Parser(std::wostringstream*, MemoryPool*, bool english);
+	Parser(std::wostringstream*, MemoryPool*, bool english, const Localization&);
 	~Parser();
 	StatementType getStatementType(const Array<Token>& in, int pos) const;
 	TermType getTermType(const Array<Token>& in, int pos) const;
@@ -45,9 +48,10 @@ private:
 	void beginError(const Token& token) const;
 
 	MemoryPool* mMemoryPool;
-	std::map<std::wstring, int> mConstMap; //定数マップ。定数のスコープは全体なのでこういうマネができる。
+	ConstMap mConstMap; //定数マップ。定数のスコープは全体なのでこういうマネができる。
 	std::wostringstream* mMessageStream;
 	bool mEnglish;
+	const Localization* mLocalization;
 };
 
 } //namespace Sunaba

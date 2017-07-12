@@ -5,13 +5,15 @@
 
 namespace Sunaba{
 template<class T> class Array;
+struct Localization;
 
 class Compiler{
 public:
 	static bool process(
 		Array<wchar_t>* result,
 		std::wostringstream* messageOut,
-		const wchar_t* filename);
+		const wchar_t* filename,
+		const Localization&);
 };
 
 } //namespace Sunaba

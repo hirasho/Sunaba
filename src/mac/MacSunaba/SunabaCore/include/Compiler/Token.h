@@ -6,15 +6,16 @@
 
 namespace Sunaba{
 class RefString;
+struct Localization;
 
 enum TokenType{
 	//特定の文字列と対応する種類
-	TOKEN_WHILE,
-	TOKEN_WHILE_J, //なかぎり
-	TOKEN_IF,
-	TOKEN_IF_J, //なら
-	TOKEN_DEF,
-	TOKEN_DEF_J, //とは
+	TOKEN_WHILE_PRE,
+	TOKEN_WHILE_POST, //なかぎり
+	TOKEN_IF_PRE,
+	TOKEN_IF_POST, //なら
+	TOKEN_DEF_PRE,
+	TOKEN_DEF_POST, //とは
 	TOKEN_CONST,
 	TOKEN_INCLUDE,
 	TOKEN_LEFT_BRACKET,
@@ -58,11 +59,11 @@ enum OperatorType{
 
 struct Token{
 	Token();
-	TokenType set(const wchar_t* s, int l, TokenType type, int line);
+	TokenType set(const wchar_t* s, int l, TokenType type, int line, const Localization&);
 	void setOperator(OperatorType, int line);
 
 	static bool isOneCharacterDefinedType(wchar_t c);
-	static TokenType getKeywordType(const wchar_t* s, int l);
+	static TokenType getKeywordType(const wchar_t* s, int l, const Localization&);
 
 	//デバグ機能
 	static void toString(std::wostringstream*, const Token*, int count);

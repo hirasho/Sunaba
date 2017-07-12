@@ -7,18 +7,21 @@ inline Node* Parser::process(
 const Array<Token>& in,
 std::wostringstream* messageStream,
 MemoryPool* memoryPool,
-bool english){
-	Parser parser(messageStream, memoryPool, english);
+bool english,
+const Localization& loc){
+	Parser parser(messageStream, memoryPool, english, loc);
 	return parser.parseProgram(in);
 }
 
 inline Parser::Parser(
 std::wostringstream* messageStream, 
 MemoryPool* memoryPool, 
-bool english) : 
+bool english,
+const Localization& loc) : 
 mMemoryPool(memoryPool),
 mMessageStream(messageStream),
-mEnglish(english){
+mEnglish(english),
+mLocalization(&loc){
 }
 
 inline Parser::~Parser(){
@@ -29,10 +32,11 @@ inline Parser::~Parser(){
 //Program : ( Const | FuncDef | Statement )*
 inline Node* Parser::parseProgram(const Array<Token>& in){
 	//定数マップに「メモリ」と「memory」を登録
-	std::pair<std::map<std::wstring, int>::iterator, bool> result;
-	result = mConstMap.insert(std::make_pair(L"メモリ", 0));
+	const wchar_t* memoryWord = mLocalization->memoryWord;
+	std::pair<ConstMap::iterator, bool> result;
+	result = mConstMap.insert(ConstMap::value_type(memoryWord, 0));
 	ASSERT(result.second);
-	result = mConstMap.insert(std::make_pair(L"memory", 0));
+	result = mConstMap.insert(ConstMap::value_type(L"memory", 0));
 	ASSERT(result.second);
 
 	//Programノードを確保
@@ -135,8 +139,8 @@ inline bool Parser::parseConst(const Array<Token>& in, int* pos, bool skip){
 	++(*pos);
 	if (!skip){
 		//定数マップに登録
-		std::pair<std::map<std::wstring, int>::iterator, bool> result = 
-			mConstMap.insert(std::make_pair(constName, constValue));
+		std::pair<ConstMap::iterator, bool> result = 
+			mConstMap.insert(ConstMap::value_type(constName, constValue));
 		if (!result.second){
 			beginError(in[*pos]);
 			*mMessageStream << L"すでに同じ名前の定数がある。" << std::endl;
@@ -151,7 +155,7 @@ inline bool Parser::parseConst(const Array<Token>& in, int* pos, bool skip){
 inline Node* Parser::parseFunctionDefinition(const Array<Token>& in, int* pos){
 	//defスキップ
 	bool defFound = false;
-	if (in[*pos].mType == TOKEN_DEF){
+	if (in[*pos].mType == TOKEN_DEF_PRE){
 		++(*pos);
 		defFound = true;
 	}
@@ -214,7 +218,7 @@ inline Node* Parser::parseFunctionDefinition(const Array<Token>& in, int* pos){
 	}
 	++(*pos);
 
-	if (in[*pos].mType == TOKEN_DEF_J){ //「とは」がある場合、スキップ
+	if (in[*pos].mType == TOKEN_DEF_POST){ //「とは」がある場合、スキップ
 		if (defFound){
 			beginError(in[*pos]);
 			*mMessageStream << L"\"def\"と\"とは\"が両方ある。片方にしてほしい。" << std::endl;
@@ -311,9 +315,9 @@ inline StatementType Parser::getStatementType(const Array<Token>& in, int pos) c
 		beginError(in[pos]);
 		*mMessageStream << L"字下げを間違っているはず。上の行より多くなっていないか。" << std::endl;
 		return STATEMENT_UNKNOWN;
-	}else if ((t == TOKEN_WHILE) || (t == TOKEN_IF)){
+	}else if ((t == TOKEN_WHILE_PRE) || (t == TOKEN_IF_PRE)){
 		return STATEMENT_WHILE_OR_IF;
-	}else if (t == TOKEN_DEF){
+	}else if (t == TOKEN_DEF_PRE){
 		return STATEMENT_DEF;
 	}else if (t == TOKEN_CONST){
 		return STATEMENT_CONST;
@@ -328,9 +332,9 @@ inline StatementType Parser::getStatementType(const Array<Token>& in, int pos) c
 	}
 	if (endPos > pos){
 		t = in[endPos - 1].mType;
-		if ((t == TOKEN_WHILE_J) || (t == TOKEN_IF_J)){
+		if ((t == TOKEN_WHILE_POST) || (t == TOKEN_IF_POST)){
 			return STATEMENT_WHILE_OR_IF;
-		}else if (t == TOKEN_DEF_J){
+		}else if (t == TOKEN_DEF_POST){
 			return STATEMENT_DEF;
 		}
 	}
@@ -441,12 +445,12 @@ inline Node* Parser::parseWhileOrIfStatement(const Array<Token>& in, int* pos){
 	const wchar_t* whileOrIf = 0;
 	AutoNode node(mMemoryPool->create<Node>());
 	//英語版ならすぐ決まる。
-	if (in[*pos].mType == TOKEN_WHILE){
+	if (in[*pos].mType == TOKEN_WHILE_PRE){
 		node->mType = NODE_WHILE_STATEMENT;
 		whileOrIf = L"while";
 		node->mToken = &in[*pos];
 		++(*pos);
-	}else if (in[*pos].mType == TOKEN_IF){
+	}else if (in[*pos].mType == TOKEN_IF_PRE){
 		node->mType = NODE_IF_STATEMENT;
 		whileOrIf = L"if";
 		node->mToken = &in[*pos];
@@ -462,10 +466,10 @@ inline Node* Parser::parseWhileOrIfStatement(const Array<Token>& in, int* pos){
 
 	//日本語版ならここにキーワードがあるはず
 	if (!whileOrIf){ //まだ確定してない
-		if (in[*pos].mType == TOKEN_WHILE_J){
+		if (in[*pos].mType == TOKEN_WHILE_POST){
 			node->mType = NODE_WHILE_STATEMENT;
 			whileOrIf = L"\"なかぎり\"";
-		}else if (in[*pos].mType == TOKEN_IF_J){
+		}else if (in[*pos].mType == TOKEN_IF_POST){
 			node->mType = NODE_IF_STATEMENT;
 			whileOrIf = L"\"なら\"";
 		}

@@ -1,11 +1,15 @@
 ﻿#include "Base/Tank.h"
 #include "Base/Array.h"
+#include "Localization.h"
 
 namespace Sunaba{
 
 //文字置換を行う。
 //\n以外の制御文字と全角スペース->半角スペース
-inline void CharacterReplacer::process(Array<wchar_t>* out, const Array<wchar_t>& in){
+inline void CharacterReplacer::process(
+Array<wchar_t>* out, 
+const Array<wchar_t>& in,
+const Localization& loc){
 	out->setSize(in.size() * 2); //全部2文字に化けるケースに備える
 	int size = in.size();
 	int dst = 0;
@@ -24,6 +28,8 @@ inline void CharacterReplacer::process(Array<wchar_t>* out, const Array<wchar_t>
 				c = (c - L'Ａ') + L'A';
 			}else if ((c >= L'ａ') && (c <= L'ｚ')){ //全角小文字
 				c = (c - L'ａ') + L'a';
+			}else if ((loc.argDelimiter != L'\0') && (c == loc.argDelimiter)){
+				c = L','; //カンマに変換
 			}else{ //その他の全角半角変換
 				switch (c){
 					//0x20-0x2f
@@ -40,7 +46,6 @@ inline void CharacterReplacer::process(Array<wchar_t>* out, const Array<wchar_t>
 					case L'＊': c = L'*'; break;
 					case L'＋': c = L'+'; break;
 					case L'，': c = L','; break;
-					case L'、': c = L','; break; //日本語の「、」もカンマと見做す
 					case L'−': c = L'-'; break;
 					case L'．': c = L'.'; break;
 					case L'／': c = L'/'; break;
@@ -70,6 +75,8 @@ inline void CharacterReplacer::process(Array<wchar_t>* out, const Array<wchar_t>
 					case L'≧': c = L'>'; c2 = L'='; break;
 					case L'→': c = L'-'; c2 = L'>'; break;
 					case L'⇒': c = L'-'; c2 = L'>'; break;
+					case L'≤': c = L'<'; c2 = L'='; break;
+					case L'≥': c = L'>'; c2 = L'='; break;
 					default: break; //変換なし
 				}
 			}

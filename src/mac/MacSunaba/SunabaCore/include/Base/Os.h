@@ -6,20 +6,11 @@ namespace Sunaba{
 template<class T> class Array;
 
 void writeToConsole(const wchar_t* s);
-void writeToConsole(const char* s);
-//何か→Unicode
-void convertToUnicode(Array<wchar_t>* out, const char* in, int inSize, bool outputWithBOM);
-//SJIS→Unicode
-void convertSjisToUnicode(Array<wchar_t>* out, const char* in, int inSize, bool outputWithBOM);
-//Unicode->SJIS
-void convertUnicodeToSjis(Array<char>* out, const wchar_t* in, int inSize);
-//Unicode->Utf8
-void convertUnicodeToUtf8(Array<char>* out, const wchar_t* in, int inSize);
-
-/* 作業用フォルダパスを取得。 MACではユーザーのホームディレクトリとしておく。 */
-void getWorkingDirectory( char* path );
-void makeWorkingFilePath( Array<wchar_t>* out, const char* fileName );
     
+/* 作業用フォルダパスを取得。 MACではユーザーのホームディレクトリとしておく。 */
+void getWorkingDirectory(char* path);
+void makeWorkingFilePath(Array<wchar_t>* out, const char* fileName);
+
 void beginTimer();
 unsigned getTimeInMilliSecond();
 void endTimer();

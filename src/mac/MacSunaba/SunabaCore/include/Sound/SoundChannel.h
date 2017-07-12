@@ -3,8 +3,7 @@
 
 namespace Sunaba{
 
-#if 1 //ベレ
-class SoundChannel{
+class SoundChannel{ //ベレ積分
 public:
 	SoundChannel() :
 	mPulseVelocity(0.f),
@@ -54,54 +53,6 @@ private:
 	float mPosition;
 	float mOldPosition;
 };
-#else
-class SoundChannel{
-public:
-	SoundChannel() :
-	mPulseVelocity(0.f),
-	mSpring(0.f),
-	mFrequency(0.f),
-	mDumping(0.f),
-	mPosition(0.f),
-	mVelocity(0.f){
-	}
-	~SoundChannel(){
-	}
-	void setFrequency(float f, int samplingFrequency){
-		float sqrtK = f * (6.28318530718f / static_cast<float>(samplingFrequency));
-		mSpring = sqrtK * sqrtK;
-		mFrequency = f;
-	}
-	void setDumping(float d){
-		mDumping = d;
-	}
-	void play(float a, int samplingFrequency){
-		float sqrtK = mFrequency * (6.28318530718f / static_cast<float>(samplingFrequency));
-		mPulseVelocity = a * sqrtK;
-	}
-	void startCalculation(){
-		if (mVelocity < 0.f){ //相殺しないように符号を見る。本当は何フレームかかけて元のを減衰させながら加えるべきだが。
-			mVelocity -= mPulseVelocity;
-		}else{
-			mVelocity += mPulseVelocity;
-		}
-		mPulseVelocity = 0.f;
-	}
-	float calculate(){
-		float a = (-mSpring * mPosition) + (-mDumping * mVelocity);
-		mVelocity += a;
-		mPosition += mVelocity;
-		return mPosition;
-	}
-private:
-	float mPulseVelocity;
-	float mSpring;
-	float mFrequency;
-	float mDumping;
-	float mPosition;
-	float mVelocity;
-};
-#endif
 
 } //namespace Sunaba
 

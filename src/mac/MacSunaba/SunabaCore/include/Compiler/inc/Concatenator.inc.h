@@ -9,6 +9,7 @@
 #include "Compiler/CharacterReplacer.h"
 #include "Compiler/CommentRemover.h"
 #include "Compiler/Structurizer.h"
+#include "Localization.h"
 
 namespace Sunaba{
 
@@ -16,18 +17,21 @@ inline Concatenator::Concatenator(
 Tank<String>* fullPathFilenames, 
 std::wostringstream* messageStream,
 const wchar_t* rootFilename,
-MemoryPool* memoryPool) :
+MemoryPool* memoryPool,
+const Localization& loc) :
 mLine(0),
 mFullPathFilenames(fullPathFilenames),
 mMessageStream(messageStream),
 mRootFilename(rootFilename),
-mMemoryPool(memoryPool){
+mMemoryPool(memoryPool),
+mLocalization(&loc){
 }
 
 inline Concatenator::~Concatenator(){
 	mMessageStream = 0;
 	mRootFilename = 0;
 	mMemoryPool = 0;
+	mLocalization = 0;
 }
 
 inline bool Concatenator::process( 
@@ -35,8 +39,9 @@ Array<Token>* tokensOut,
 std::wostringstream* messageStream,
 const wchar_t* rootFilename,
 Tank<String>* fullPathFilenames,
-MemoryPool* memoryPool){
-	Concatenator concatenator(fullPathFilenames, messageStream, rootFilename, memoryPool);
+MemoryPool* memoryPool,
+const Localization& loc){
+	Concatenator concatenator(fullPathFilenames, messageStream, rootFilename, memoryPool, loc);
 	return concatenator.process(tokensOut, rootFilename);
 }
 
@@ -47,7 +52,7 @@ inline bool Concatenator::process(Array<Token>* tokensOut, const wchar_t* filena
 	if (!processFile(filenameToken, mRootFilename)){
 		return false;
 	}
-	mTokens.add()->set(0, 0, TOKEN_END, 0); //ファイル末端
+	mTokens.add()->set(0, 0, TOKEN_END, 0, *mLocalization); //ファイル末端
 	mTokens.copyTo(tokensOut);
 	int n = tokensOut->size();
 	if (n >= 2){ //END以外にもあるなら、Endのファイル名を一個前からもらう
@@ -84,11 +89,6 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 	String* fnStr = mFullPathFilenames->add();
 	fnStr->set(fullPath.pointer(), fullPath.size() - 1); //NULL終端をはずすために-1
 	if (mFilenameSet.find(fnStr) != mFilenameSet.end()){
-/*
-		beginError(filenameToken);
-		mMessageStream->write(filename.pointer(), filename.size());
-		*mMessageStream << L" を2回挿入(include)したが2回目は無視する。" << std::endl;
-*/
 		return true;
 	}
 	mFilenameSet.insert(fnStr);
@@ -110,15 +110,7 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 #ifndef NDEBUG
 	{
 		std::wostringstream s;
-#ifdef __APPLE__
-        {
-            Array<wchar_t> path;
-            makeWorkingFilePath( &path, "log/TabProcessed." );
-            s << path.pointer();
-        }
-#else
-		s << L"log/tabProcessed.";
-#endif
+		s << L"log\\tabProcessed.";
 		int p = getFilenameBegin(filename.pointer(), filename.size());
 		s.write(filename.pointer() + p, filename.size() - p);
 		OutputTextFile o(s.str().c_str());
@@ -128,21 +120,13 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 	//\rなど、文字数を変えない範囲で邪魔なものを取り除く。
 	{
 		Array<wchar_t> tmp;
-		CharacterReplacer::process(&tmp, text);
+		CharacterReplacer::process(&tmp, text, *mLocalization);
 		text.clear();
 		tmp.moveTo(&text);
 #ifndef NDEBUG
 		{
 			std::wostringstream s;
-#ifdef __APPLE__
-            {
-                Array<wchar_t> path;
-                makeWorkingFilePath( &path, "log/replaced." );
-                s << path.pointer();
-            }
-#else
-			s << L"log/replaced.";
-#endif
+			s << L"log\\replaced.";
 			int p = getFilenameBegin(filename.pointer(), filename.size());
 			s.write(filename.pointer() + p, filename.size() - p);
 			OutputTextFile o(s.str().c_str());
@@ -161,13 +145,7 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 #ifndef NDEBUG
 		{
 			std::wostringstream s;
-#ifdef __APPLE__
-            Array<wchar_t> path;
-            makeWorkingFilePath( &path, "log/commentRemoved.");
-            s << path.pointer();
-#else
-			s << L"log/commentRemoved.";
-#endif
+			s << L"log\\commentRemoved.";
 			int p = getFilenameBegin(filename.pointer(), filename.size());
 			s.write(filename.pointer() + p, filename.size() - p);
 			OutputTextFile o(s.str().c_str());
@@ -182,26 +160,20 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 		finalText[i] = text[i];
 	}
 	Array<Token> tokens;
-	if (!LexicalAnalyzer::process(&tokens, mMessageStream, finalText, text.size(), fnStr->pointer(), mLine)){
+	if (!LexicalAnalyzer::process(&tokens, mMessageStream, finalText, text.size(), fnStr->pointer(), mLine, *mLocalization)){
 		return false;
 	}
 #ifndef NDEBUG
 	{
 		std::wostringstream s;
-#ifdef __APPLE__
-        Array<wchar_t> path;
-        makeWorkingFilePath( &path, "log/lexicalAnalyzed." );
-        s << path.pointer();
-#else
-		s << L"log/lexicalAnalyzed.";
-#endif
+		s << L"log\\lexicalAnalyzed.";
 		int p = getFilenameBegin(filename.pointer(), filename.size());
 		s.write(filename.pointer() + p, filename.size() - p);
 		OutputTextFile o(s.str().c_str());
 		s.str(L"");
 		Token::toString(&s, tokens.pointer(), tokens.size());
 		std::wstring ws = s.str();
-		o.write(ws.c_str(), (int)ws.size());
+		o.write(ws.c_str(), ws.size());
 	}
 #endif
 	//全トークンにファイル名を差し込む。そのためにファイル名だけにする。
@@ -212,7 +184,7 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 	}
 	{
 		Array<Token> structurized;
-		if (!Structurizer::process(&structurized, mMessageStream, &tokens)){
+		if (!Structurizer::process(&structurized, mMessageStream, &tokens, *mLocalization)){
 			return false;
 		}
 		tokens.clear();
@@ -220,20 +192,14 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 #ifndef NDEBUG
 		{
 			std::wostringstream s;
-#ifdef __APPLE__
-            Array<wchar_t> path;
-            makeWorkingFilePath( &path, "log/structurized.");
-            s << path.pointer();
-#else
-			s << L"log/structurized.";
-#endif
+			s << L"log\\structurized.";
 			int p = getFilenameBegin(filename.pointer(), filename.size());
 			s.write(filename.pointer() + p, filename.size() - p);
 			OutputTextFile o(s.str().c_str());
 			s.str(L"");
 			Token::toString(&s, tokens.pointer(), tokens.size());
 			std::wstring ws = s.str();
-			o.write(ws.c_str(), (int)ws.size());
+			o.write(ws.c_str(), ws.size());
 		}
 #endif
 	}

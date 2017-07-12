@@ -16,9 +16,10 @@ namespace Sunaba{
 inline bool Structurizer::process(
 Array<Token>* out,
 std::wostringstream* messageStream,
-Array<Token>* in){
+Array<Token>* in,
+const Localization& loc){
 	Structurizer structurizer(messageStream);
-	return structurizer.process(out, in);
+	return structurizer.process(out, in, loc);
 }
 
 inline Structurizer::Structurizer(std::wostringstream* messageStream) : mMessageStream(messageStream){
@@ -33,7 +34,8 @@ inline Structurizer::~Structurizer(){
 //""の中は1トークンになっているので、リテラルの中の改行は無視でき、コメントはすでに捨てられている。
 inline bool Structurizer::process(
 Array<Token>* out,
-Array<Token>* in){
+Array<Token>* in,
+const Localization& loc){
 	Tank<Token> tmp;
 	static const int SPACE_COUNT_STACK_DEPTH = 128;
 	int spaceCountStack[SPACE_COUNT_STACK_DEPTH];
@@ -82,22 +84,22 @@ Array<Token>* in){
 					}
 					spaceCountStack[stackPos] = newCount;
 					++stackPos;
-					tmp.add()->set(0, 0, TOKEN_BLOCK_BEGIN, t->mLine);
+					tmp.add()->set(0, 0, TOKEN_BLOCK_BEGIN, t->mLine, loc);
 				}else if (newCount == oldCount){ //前の文を終了
 					if (statementExist){ //中身が何かあれば
-						tmp.add()->set(0, 0, TOKEN_STATEMENT_END, t->mLine);
+						tmp.add()->set(0, 0, TOKEN_STATEMENT_END, t->mLine, loc);
 						statementExist = false;
 					}
 				}else{ //newCount < oldCount){ ブロック終了トークン挿入
 					if (statementExist){ //中身が何かあれば文末
-						tmp.add()->set(0, 0, TOKEN_STATEMENT_END, t->mLine);
+						tmp.add()->set(0, 0, TOKEN_STATEMENT_END, t->mLine, loc);
 						statementExist = false;
 					}
 					while (newCount < oldCount){
 						--stackPos;
 						ASSERT(stackPos >= 1); //ありえない
 						oldCount = spaceCountStack[stackPos - 1];
-						tmp.add()->set(0, 0, TOKEN_BLOCK_END, t->mLine);
+						tmp.add()->set(0, 0, TOKEN_BLOCK_END, t->mLine, loc);
 					}
 					if (newCount != oldCount){ //ずれてる
 						beginError(*t);
@@ -115,12 +117,12 @@ Array<Token>* in){
 	//もし最後に何かあるなら、最後の文末を追加
 	int lastLine = (*in)[n - 1].mLine;
 	if (statementExist){
-		tmp.add()->set(0, 0, TOKEN_STATEMENT_END, lastLine);
+		tmp.add()->set(0, 0, TOKEN_STATEMENT_END, lastLine, loc);
 	}
 	//ブロック内にいるならブロック終了を補う
 	while (stackPos > 1){
 		--stackPos;
-		tmp.add()->set(0, 0, TOKEN_BLOCK_END, lastLine);
+		tmp.add()->set(0, 0, TOKEN_BLOCK_END, lastLine, loc);
 	}
 	tmp.copyTo(out);
 	return true;

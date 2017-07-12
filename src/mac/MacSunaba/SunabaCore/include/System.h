@@ -2,19 +2,17 @@
 #define INCLUDED_SUNABA_SYSTEM_H
 
 #include <sstream>
+#include "Localization.h"
 
 namespace Sunaba{
 class Graphics;
 class Machine;
-class NetworkManager;
-class Connection;
-class Server;
 class Sound;
 template<class T> class Array;
 
 class System{
 public:
-	System(void* windowHandle);
+	System(void* windowHandle, const wchar_t* langName);
 	~System();
 	void setPictureBoxHandle(void* pictureBoxHandle, int pictureBoxWidth, int pictureBoxHeight);
 	bool restartGraphics();
@@ -30,10 +28,9 @@ public:
 	bool autoSync() const;
 	void requestMemoryWrite(int address, int value);
 	bool requestMemoryFinished() const;
-
 	int memoryValue(int address) const;
+	const Localization* localization() const;
 private:
-
 	Graphics* mGraphics;
 	Machine* mMachine;
 	void* mWindowHandle;
@@ -51,11 +48,12 @@ private:
 	int mMemoryRequestState;
 
 	Sound* mSound;
+	//多言語化
+	Localization mLocalization;
 };
 
 };
 
 #include "inc/System.inc.h"
-
 
 #endif

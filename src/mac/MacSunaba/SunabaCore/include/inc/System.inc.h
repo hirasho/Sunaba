@@ -9,7 +9,7 @@
 
 namespace Sunaba{
 
-inline System::System(void* windowHandle) :
+inline System::System(void* windowHandle, const wchar_t* langName) :
 mGraphics(0),
 mMachine(0),
 mWindowHandle(0),
@@ -24,8 +24,10 @@ mMemoryRequestAddress(0),
 mMemoryRequestValue(0),
 mMemoryRequestState(IoState::MEMORY_REQUEST_NONE),
 mSound(0){
-	mSound = new Sound(IoState::SOUND_CHANNEL_COUNT, windowHandle);
+	STRONG_ASSERT(windowHandle);
+	mLocalization.init(langName);
 	beginTimer();
+	mSound = new Sound(IoState::SOUND_CHANNEL_COUNT, windowHandle); 
 }
 
 inline System::~System(){
@@ -36,6 +38,8 @@ inline System::~System(){
 }
 
 inline bool System::bootProgram(const unsigned char* objectCode, int objectCodeSize){
+	STRONG_ASSERT(mPictureBoxHandle);
+	STRONG_ASSERT(objectCode);
 	DELETE(mMachine);
 	mTerminationMessageDrawn = false;
 	mMachine = new Machine(
@@ -53,11 +57,12 @@ inline bool System::bootProgram(const unsigned char* objectCode, int objectCodeS
 }
 
 inline bool System::bootProgram(const wchar_t* filename){
+	STRONG_ASSERT(filename);
 	Array<wchar_t> compiled;
 	bool ret = false;
-	if (Compiler::process(&compiled, &mMessageStream, filename)){
+	if (Compiler::process(&compiled, &mMessageStream, filename, mLocalization)){
 		Array<unsigned> instructions;
-		if (Assembler::process(&instructions, &mMessageStream, compiled)){
+		if (Assembler::process(&instructions, &mMessageStream, compiled, mLocalization)){
 			//BEに変換
 			Array<unsigned char> objectCode(instructions.size() * 4);
 			for (int i = 0; i < instructions.size(); ++i){
@@ -75,8 +80,8 @@ inline bool System::bootProgram(const wchar_t* filename){
 inline void System::update(Array<unsigned char>* messageOut, int pointerX, int pointerY, const char* keys){
 	std::wstring ws = mMessageStream.str();
 	if (ws.size() > 0){
-		messageOut->setSize( (int) ws.size() * 2 );
-		for( int i = 0; i < static_cast<int>(ws.size()); ++i ) {
+		messageOut->setSize(ws.size() * 2);
+		for (int i = 0; i < static_cast<int>(ws.size()); ++i){
 			(*messageOut)[(2 * i) + 0] = static_cast<unsigned char>((ws[i] >> 8) & 0xff);
 			(*messageOut)[(2 * i) + 1] = static_cast<unsigned char>((ws[i] >> 0) & 0xff);
 		}
@@ -84,7 +89,6 @@ inline void System::update(Array<unsigned char>* messageOut, int pointerX, int p
 		writeToConsole(ws.c_str());
 		mMessageStream.str(L"");
 	}
-
 	//IOメモリを読み書きする間はロック
 	if (mMachine){
 		IoState* io = mMachine->beginSync();
@@ -154,7 +158,6 @@ inline void System::update(Array<unsigned char>* messageOut, int pointerX, int p
 					io->mSoundRequests[i] = 0;
 				}
 			}
-
 			if (io->mScreenSizeChanged){
 				io->mScreenSizeChanged = false;
 				restartGraphics(); //この場でGraphics再起動
@@ -187,11 +190,11 @@ inline int System::screenHeight() const{
 	}
 }
 
-inline int System::framePerSecond() const{
+int System::framePerSecond() const{
 	return mFramePerSecond;
 }
 
-inline int System::calculationTimePercent() const{
+int System::calculationTimePercent() const{
 	return mCalculationTimePercent;
 }
 
@@ -231,7 +234,6 @@ inline int System::memoryValue(int address) const{
 
 inline bool System::restartGraphics(){
 	STRONG_ASSERT(mMachine);
-#ifdef _WIN32
 	STRONG_ASSERT(mPictureBoxHandle);
 	DELETE(mGraphics);
 	int w = mMachine->screenWidth();
@@ -240,25 +242,21 @@ inline bool System::restartGraphics(){
 	if (mGraphics->isError()){
 		DELETE(mGraphics);
 	}
-#elif __APPLE__
-    DELETE(mGraphics);
-	int w = mMachine->screenWidth();
-	int h = mMachine->screenHeight();
-	mGraphics = new Graphics(mPictureBoxHandle, w, h, mPictureBoxWidth, mPictureBoxHeight);
-    if( mGraphics->isError() ) {
-        DELETE(mGraphics);
-    }
-#endif
 	return (mGraphics != 0);
 }
 
 inline void System::setPictureBoxHandle(void* pictureBoxHandle, int pbw, int pbh){
+	STRONG_ASSERT(pictureBoxHandle);
 	mPictureBoxHandle = pictureBoxHandle;
 	mPictureBoxWidth = pbw;
 	mPictureBoxHeight = pbh;
 	if (mMachine){
 		restartGraphics();
 	}
+}
+
+inline const Localization* System::localization() const{
+	return &mLocalization;
 }
 
 }

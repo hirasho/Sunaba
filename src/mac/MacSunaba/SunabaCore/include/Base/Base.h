@@ -27,5 +27,5 @@ void writeLog(const char* filename, int line, const char* message);
 #endif //NDEBUG
 
 #include <new> //placement new
-#include <string.h>
+
 #endif

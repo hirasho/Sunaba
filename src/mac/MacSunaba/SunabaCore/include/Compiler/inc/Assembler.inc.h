@@ -7,13 +7,14 @@ namespace Sunaba{
 inline bool Assembler::process(
 Array<unsigned>* result,
 std::wostringstream* messageStream,
-const Array<wchar_t>& compiled){
+const Array<wchar_t>& compiled,
+const Localization& loc){
 	//タブ処理
 	Array<wchar_t> tabProcessed;
 	TabProcessor::process(&tabProcessed, compiled);
 	//読めるテキストが来たケースに備えて念のため文字置換
 	Array<wchar_t> replaced;
-	CharacterReplacer::process(&replaced, tabProcessed);
+	CharacterReplacer::process(&replaced, tabProcessed, loc);
 	//コメントを削除する。行数は変えない。
 	Array<wchar_t> commentRemoved;
 	CommentRemover::process(&commentRemoved, replaced);
@@ -45,7 +46,8 @@ inline Assembler::~Assembler(){
 	mMessageStream = 0;
 }
 
-inline Assembler::Label::Label() : mId( -1 ), mAddress( -1 ){}
+inline Assembler::Label::Label() : mId(-1), mAddress(-1){
+}
 
 inline Assembler::Token::Token() : 
 mType(TOKEN_UNKNOWN), 
@@ -145,8 +147,8 @@ inline void Assembler::collectLabel(const Array<Token>& in){
 			Label label;
 			label.mId = labelId;
 			++labelId;
-			LabelNameMap::const_iterator it = mLabelNameMap.insert(std::make_pair(t0.mString, label)).first;
-			mLabelIdMap.insert(std::make_pair(label.mId, &(it->second)));
+			LabelNameMap::const_iterator it = mLabelNameMap.insert(LabelNameMap::value_type(t0.mString, label)).first;
+			mLabelIdMap.insert(LabelIdMap::value_type(label.mId, &(it->second)));
 			//次のトークンが存在しないか、改行である必要がある。ラベルに続けて書くのは遺法
 			ASSERT((i == (tokenCount - 1)) || (in[i + 1].mType == TOKEN_NEWLINE));
 		}

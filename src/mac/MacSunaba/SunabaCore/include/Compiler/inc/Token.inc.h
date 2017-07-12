@@ -1,5 +1,6 @@
 ﻿#include "Base/RefString.h"
 #include "Machine/Instruction.h"
+#include "Localization.h"
 
 namespace Sunaba{
 
@@ -11,7 +12,7 @@ mLine(0),
 mFilename(0){
 }
 
-inline TokenType Token::set(const wchar_t* s, int l, TokenType type, int line){
+inline TokenType Token::set(const wchar_t* s, int l, TokenType type, int line, const Localization& loc){
 	mString.set(s, l);
 	mLine = line;
 	if ( //自動挿入トークン(Structurizerからしか呼ばれない)
@@ -39,7 +40,7 @@ inline TokenType Token::set(const wchar_t* s, int l, TokenType type, int line){
 					mType = TOKEN_LARGE_NUMBER;
 				}
 			}else{ //数字じゃない場合、
-				mType = getKeywordType(s, l);
+				mType = getKeywordType(s, l, loc);
 				if (mType == TOKEN_UNKNOWN){
 					mType = TOKEN_NAME; //わからないので名前
 				}
@@ -110,6 +111,7 @@ inline std::wstring Token::toString() const{
 	return s.str();
 }
 
+//デバグ用なので日本語のみ対応
 inline void Token::toString(std::wostringstream* s) const{
 	if (mType == TOKEN_OPERATOR){
 		switch (mOperator){
@@ -131,12 +133,12 @@ inline void Token::toString(std::wostringstream* s) const{
 		s->write(mString.pointer(), mString.size());
 	}else{
 		switch (mType){
-			case TOKEN_WHILE: *s << "while"; break;
-			case TOKEN_IF: *s << L"if"; break;
-			case TOKEN_WHILE_J: *s << L"なかぎり"; break;
-			case TOKEN_IF_J: *s << L"なら"; break;
-			case TOKEN_DEF: *s << L"def"; break;
-			case TOKEN_DEF_J: *s << L"とは"; break;
+			case TOKEN_WHILE_PRE: *s << "while"; break;
+			case TOKEN_IF_PRE: *s << L"if"; break;
+			case TOKEN_WHILE_POST: *s << L"なかぎり"; break;
+			case TOKEN_IF_POST: *s << L"なら"; break;
+			case TOKEN_DEF_PRE: *s << L"def"; break;
+			case TOKEN_DEF_POST: *s << L"とは"; break;
 			case TOKEN_CONST: *s << L"定数"; break;
 			case TOKEN_INCLUDE: *s << L"挿入"; break;
 			case TOKEN_STATEMENT_END: *s << L"行末"; break;
@@ -155,26 +157,38 @@ inline void Token::toString(std::wostringstream* s) const{
 	}
 }
 
-inline TokenType Token::getKeywordType(const wchar_t* s, int l){
+inline TokenType Token::getKeywordType(const wchar_t* s, int l, const Localization& loc){
 	RefString t(s, l);
 	TokenType r = TOKEN_UNKNOWN;
 	if (t == L"while"){
-		r = TOKEN_WHILE;
-	}else if ((t == L"なかぎり") || (t == L"な限り")){
-		r = TOKEN_WHILE_J;
+		r = TOKEN_WHILE_PRE;
+	}else if ((t == loc.whileWord0) || (loc.whileWord1 && (t == loc.whileWord1))){ //whileWord1はないことがある
+		if (loc.whileAtHead){
+			r = TOKEN_WHILE_PRE;
+		}else{
+			r = TOKEN_WHILE_POST;
+		}
 	}else if (t == L"if"){
-		r = TOKEN_IF;
-	}else if (t == L"なら"){
-		r = TOKEN_IF_J;
+		r = TOKEN_IF_PRE;
+	}else if (t == loc.ifWord){
+		if (loc.ifAtHead){
+			r = TOKEN_IF_PRE;
+		}else{
+			r = TOKEN_IF_POST;
+		}
 	}else if (t == L"def"){
-		r = TOKEN_DEF;
-	}else if (t == L"とは"){
-		r = TOKEN_DEF_J;
-	}else if ((t == L"const") || (t == L"定数")){
+		r = TOKEN_DEF_PRE;
+	}else if (t == loc.defWord){
+		if (loc.defAtHead){
+			r = TOKEN_DEF_PRE;
+		}else{
+			r = TOKEN_DEF_POST;
+		}
+	}else if ((t == L"const") || (t == loc.constWord)){
 		r = TOKEN_CONST;
-	}else if ((t == L"include") || (t == L"挿入")){
+	}else if ((t == L"include") || (t == loc.includeWord)){
 		r = TOKEN_INCLUDE;
-	}else if ((t == L"出力") || (t == L"out")){
+	}else if ((t == L"out") || (t == loc.outWord)){
 		r = TOKEN_OUT;
 	}
 	return r;

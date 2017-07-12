@@ -12,6 +12,7 @@ struct Token;
 class String;
 class StringPointerLess;
 class MemoryPool;
+struct Localization;
 
 class Concatenator{
 public:
@@ -20,7 +21,8 @@ public:
 		std::wostringstream* messageStream,
 		const wchar_t* rootFilename,
 		Tank<String>* fullPathFilenames,
-		MemoryPool*);
+		MemoryPool*,
+		const Localization&);
 private:
 	typedef std::set<const String*, StringPointerLess> FilenameSet;
 	 
@@ -28,7 +30,8 @@ private:
 		Tank<String>* fullPathFilenames, 
 		std::wostringstream* messageStream,
 		const wchar_t* rootFilename,
-		MemoryPool*);
+		MemoryPool*,
+		const Localization&);
 	~Concatenator();
 	bool process(Array<Token>* tokensOut, const wchar_t* filename);
 	bool processFile(const Token& filenameToken, const wchar_t* parentFullPath);
@@ -41,6 +44,7 @@ private:
 	Tank<Token> mTokens;
 	std::wostringstream* mMessageStream; //借り物
 	MemoryPool* mMemoryPool; //借り物
+	const Localization* mLocalization; //借り物
 };
 
 } //namespace Sunaba

@@ -1,5 +1,6 @@
 ﻿#include "Compiler/Token.h"
 #include "Base/Tank.h"
+#include "Localization.h"
 
 namespace Sunaba{
 
@@ -10,23 +11,27 @@ std::wostringstream* messageStream,
 const wchar_t* in,
 int inSize,
 const wchar_t* filename,
-int lineStart){
-	LexicalAnalyzer analyzer(messageStream, filename, lineStart);
+int lineStart,
+const Localization& loc){
+	LexicalAnalyzer analyzer(messageStream, filename, lineStart, loc);
 	return analyzer.process(out, in, inSize);
 }
 
 inline LexicalAnalyzer::LexicalAnalyzer( 
 std::wostringstream* messageStream,
 const wchar_t* filename,
-int lineStart) :
+int lineStart,
+const Localization& loc) :
 mFilename(filename), 
 mLine(1),
 mLineStart(lineStart),
-mMessageStream(messageStream){
+mMessageStream(messageStream),
+mLocalization(&loc){
 }
 
 inline LexicalAnalyzer::~LexicalAnalyzer(){
 	mMessageStream = 0;
+	mLocalization = 0;
 }
 
 //最後に改行があると仮定して動作する。前段で改行文字を後ろにつけること。
@@ -78,6 +83,7 @@ const wchar_t* in,
 int inSize){
 	STRONG_ASSERT(in[inSize - 1] == L'\n');
 	Tank<Token> tmp;
+	const Localization& loc = *mLocalization; //短縮
 
 	int s = inSize;
 	int mode = MODE_LINE_BEGIN;
@@ -91,7 +97,7 @@ int inSize){
 		switch (mode){
 			case MODE_NONE:
 				if (Token::isOneCharacterDefinedType(c)){
-					tmp.add()->set(in + i, 1, TOKEN_UNKNOWN, mLine);
+					tmp.add()->set(in + i, 1, TOKEN_UNKNOWN, mLine, loc);
 				}else if (c == L'-'){ //-が来た
 					mode = MODE_MINUS; //判断保留
 				}else if (c == L'!'){ //!が来た
@@ -131,7 +137,7 @@ int inSize){
 					begin = i + 1;
 				}else{
 					//トークンを出力して、MODE_NONEでもう一度回す。第二引数のlはスペースの数で重要。
-					tmp.add()->set(0, l, TOKEN_LINE_BEGIN, mLine);
+					tmp.add()->set(0, l, TOKEN_LINE_BEGIN, mLine, loc);
 					mode = MODE_NONE;
 					advance = false;
 				}
@@ -142,7 +148,7 @@ int inSize){
 					mode = MODE_NONE;
 				}else{
 					beginError();
-					*mMessageStream << L"\'!\'の後は\'=\'しか来ないはずだが、\'" << c << L"\'がある。\"!=\"と間違えてないか？" << std::endl;
+					*mMessageStream << L"\'!\'の後は\'=\'しか来ないはずだが、\'" << c << L"\'がある。\"!=\"と間違えてないか？" << std::endl; 
 					return false;
 				}
 				break;
@@ -170,7 +176,7 @@ int inSize){
 				if (isInName(c)){ //識別子の中身。
 					; //継続
 				}else{ //他の場合、全て出力
-					TokenType type = tmp.add()->set(in + begin, l, TOKEN_UNKNOWN, mLine);
+					TokenType type = tmp.add()->set(in + begin, l, TOKEN_UNKNOWN, mLine, loc);
 					if (type == TOKEN_UNKNOWN){
 						beginError();
 						*mMessageStream << L"解釈できない文字列( ";
@@ -188,7 +194,7 @@ int inSize){
 				break;
 			case MODE_STRING_LITERAL:
 				if (c == L'"'){ //終わった
-					tmp.add()->set(in + begin, l, TOKEN_STRING_LITERAL, mLine);
+					tmp.add()->set(in + begin, l, TOKEN_STRING_LITERAL, mLine, loc);
 					mode = MODE_NONE;
 				}else{
 					; //継続
@@ -196,7 +202,7 @@ int inSize){
 				break;
 			case MODE_MINUS:
 				if (c == L'>'){
-					tmp.add()->set(0, 0, TOKEN_SUBSTITUTION, mLine);
+					tmp.add()->set(0, 0, TOKEN_SUBSTITUTION, mLine, loc);
 					mode = MODE_NONE;
 				}else{ //その他の場合-を出力して、MODE_NONEでもう一度回す
 					tmp.add()->setOperator(OPERATOR_MINUS, mLine);
@@ -216,7 +222,7 @@ int inSize){
 	//文字列が終わっていなければ
 	if (mode == MODE_STRING_LITERAL){
 		beginError();
-		*mMessageStream << literalBeginLine << L"行目の文字列(\"\"ではさまれたもの)が終わらないままファイルが終わった。" << std::endl;
+		*mMessageStream << literalBeginLine << L"行目の文字列(\"\"ではさまれたもの)が終わらないままファイルが終わった。" << std::endl; 
 		return false;
 	}
 	//配列に移す

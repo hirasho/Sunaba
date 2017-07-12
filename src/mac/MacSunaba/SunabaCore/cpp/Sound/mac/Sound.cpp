@@ -5,6 +5,7 @@
 
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
+#include <cstring>
 
 namespace Sunaba {
     class Sound::Impl{
@@ -36,7 +37,7 @@ namespace Sunaba {
             
             for( int i = 0; i < BUFFER_COUNT; ++i ) {
                 mBuffers[i] = new short[BUFFER_SIZE];
-                memset( mBuffers[i], 0, BUFFER_SIZE * sizeof(short) );
+                std::memset( mBuffers[i], 0, BUFFER_SIZE * sizeof(short) );
             }
             for( int i = 0; i < BUFFER_COUNT; ++i ) {
                 ALenum format = AL_FORMAT_MONO16; // 16bit モノラル.
@@ -94,7 +95,7 @@ namespace Sunaba {
             alGetSourcei( mMasteringVoice, AL_SOURCE_STATE, &state );
             if( state != AL_PLAYING ) {
                 alSourcePlay( mMasteringVoice );
-                writeToConsole( "drop..?\n" );
+                writeToConsole( L"drop..?\n" );
             }
 
             ++mBufferIndex;
@@ -277,10 +278,10 @@ namespace Sunaba {
         mImpl->play(channel, strength);
     }
 
-    void Sound::bufferUpdate() {
+ //   void Sound::bufferUpdate() {
         // mImpl->bufferUpdate();
         // use Threading..
-    }
+ //   }
 }
 
 #if 0
