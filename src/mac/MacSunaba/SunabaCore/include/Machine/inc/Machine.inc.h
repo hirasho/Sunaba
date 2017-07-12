@@ -431,7 +431,6 @@ inline bool Machine::decode(){
 				*mMessageStream << L"存在しないフロー制御命令。おそらく壊れている(コード:" << hex << inst << dec << L")" << std::endl;
 				return false;
 			}
-			imm;
 			if (inst8 == INSTRUCTION_POP){//popだけ符号つき
 				imm = getImmS(inst, IMM_BIT_COUNT_FLOW);
 			}else{

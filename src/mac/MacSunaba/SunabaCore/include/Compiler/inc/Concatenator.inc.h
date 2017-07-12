@@ -173,7 +173,7 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 		s.str(L"");
 		Token::toString(&s, tokens.pointer(), tokens.size());
 		std::wstring ws = s.str();
-		o.write(ws.c_str(), ws.size());
+		o.write(ws.c_str(), static_cast<int>(ws.size()));
 	}
 #endif
 	//全トークンにファイル名を差し込む。そのためにファイル名だけにする。
@@ -199,7 +199,7 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 			s.str(L"");
 			Token::toString(&s, tokens.pointer(), tokens.size());
 			std::wstring ws = s.str();
-			o.write(ws.c_str(), ws.size());
+			o.write(ws.c_str(), static_cast<int>(ws.size()));
 		}
 #endif
 	}

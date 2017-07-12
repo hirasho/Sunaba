@@ -38,7 +38,9 @@ inline System::~System(){
 }
 
 inline bool System::bootProgram(const unsigned char* objectCode, int objectCodeSize){
+#ifdef _WIN32
 	STRONG_ASSERT(mPictureBoxHandle);
+#endif
 	STRONG_ASSERT(objectCode);
 	DELETE(mMachine);
 	mTerminationMessageDrawn = false;
@@ -80,7 +82,7 @@ inline bool System::bootProgram(const wchar_t* filename){
 inline void System::update(Array<unsigned char>* messageOut, int pointerX, int pointerY, const char* keys){
 	std::wstring ws = mMessageStream.str();
 	if (ws.size() > 0){
-		messageOut->setSize(ws.size() * 2);
+		messageOut->setSize(static_cast<int>(ws.size()) * 2);
 		for (int i = 0; i < static_cast<int>(ws.size()); ++i){
 			(*messageOut)[(2 * i) + 0] = static_cast<unsigned char>((ws[i] >> 8) & 0xff);
 			(*messageOut)[(2 * i) + 1] = static_cast<unsigned char>((ws[i] >> 0) & 0xff);
@@ -190,11 +192,11 @@ inline int System::screenHeight() const{
 	}
 }
 
-int System::framePerSecond() const{
+inline int System::framePerSecond() const{
 	return mFramePerSecond;
 }
 
-int System::calculationTimePercent() const{
+inline int System::calculationTimePercent() const{
 	return mCalculationTimePercent;
 }
 
@@ -234,7 +236,9 @@ inline int System::memoryValue(int address) const{
 
 inline bool System::restartGraphics(){
 	STRONG_ASSERT(mMachine);
-	STRONG_ASSERT(mPictureBoxHandle);
+#ifdef _WIN32
+    STRONG_ASSERT(mPictureBoxHandle);
+#endif
 	DELETE(mGraphics);
 	int w = mMachine->screenWidth();
 	int h = mMachine->screenHeight();
