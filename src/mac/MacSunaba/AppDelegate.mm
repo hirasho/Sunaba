@@ -244,9 +244,9 @@ void setBootProgramPath( const char* path ) {
   //[aCenter addObserver: self selector: @selector(applicationWillTerminate:) name:@"NSApplicationWillTerminateNotification" object: NSApp ];
   NSNotificationCenter* aCenter = [NSNotificationCenter defaultCenter];
   [aCenter addObserver:self selector:@selector(windowResized:) name:NSWindowDidResizeNotification object:[self  window]];
-  [self locateComponent];
   self->viewSize = 100;
   self->viewSizeScale = 3;
+  [self locateComponent];
 }
 
 - (void) locateComponent
@@ -256,7 +256,7 @@ void setBootProgramPath( const char* path ) {
   const int MARGIN = 10;
   // 最大300x300 の中で横方向センタリングする。
   int ofs = 0.5 * (MAX_GLVIEW_SIZE - viewSize * viewSizeScale);
-  glviewOrigin.x = frame.size.width - MARGIN - MAX_GLVIEW_SIZE + ofs;
+  glviewOrigin.x = frame.size.width - MARGIN - (viewSize * viewSizeScale);
   glviewOrigin.y = MARGIN;
   //[self.glview setFrameOrigin:glviewOrigin];
   [self.glview setFrame: CGRectMake(glviewOrigin.x, glviewOrigin.y, viewSize * viewSizeScale, viewSize * viewSizeScale)];

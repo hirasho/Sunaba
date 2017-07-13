@@ -77,7 +77,7 @@ public:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mTextureWidthPow2, mTextureHeightPow2, 0, GL_RGBA, GL_UNSIGNED_BYTE, mVram);
-        
+		
 #if 0 // 今コントロールのサイズを指定していないので・・・無効化しておく
 		//radeonのバグへの対処としてビューポートを明に指定
 		glViewport(0, 0, mScreenWidth, mScreenHeight);
@@ -138,8 +138,8 @@ public:
         // Objective-C/C++ 側でコンテキストセットを読んでおく.
         //
         setContextMyGLView();
-        
-		glDisable(GL_BLEND); //おかしなドライバ対応
+  
+        glDisable(GL_BLEND); //おかしなドライバ対応
 		glDisable(GL_CULL_FACE); //おかしなドライバ対応
 		glDisable(GL_SCISSOR_TEST); //おかしなドライバ対応
 		glDisable(GL_STENCIL_TEST); //おかしなドライバ対応
@@ -147,11 +147,11 @@ public:
 		glBindTexture(GL_TEXTURE_2D, mScreenTexture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mTextureWidthPow2, mTextureHeightPow2, 0, GL_RGBA, GL_UNSIGNED_BYTE, mVram);
 		//デバグ用真赤塗り。そんなに重くないよね？理想的には無駄負荷。
-		glClearColor(1.f, 0.f, 0.f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT);
+//		glClearColor(1.f, 0.f, 0.f, 1.f);
+//		glClear(GL_COLOR_BUFFER_BIT);
 
 		// 本体描画
-		float x0 = -1.0f;
+		float x0 = -1.f;
 		float y0 = 1.f;
 		float x1 = 1.f;
 		float y1 = -1.f;
@@ -179,18 +179,18 @@ public:
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointer(2, GL_FLOAT, 0, vertics);
         glTexCoordPointer(2, GL_FLOAT, 0, texVertics);
-
-        glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glFlush();
-
+		
         //エラー出てる？
+/*
         GLenum error = glGetError();
         if (error != GL_NO_ERROR){
             std::ostringstream oss;
             oss << "OpenGL ERROR(" << std::hex << error << std::dec << ")" << std::endl;
             WRITE_LOG(oss.str().c_str());
         }
+*/
         flushContentMyGLView();
 
 		adjastFrameRate();

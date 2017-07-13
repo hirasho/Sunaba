@@ -21,27 +21,30 @@ static NSOpenGLContext* pContextGL;
     if( self == nil ) {
       return nil;
     }
-    
-    NSOpenGLPixelFormatAttribute attrib[] = {
-      NSOpenGLPFAWindow,
-      NSOpenGLPFADoubleBuffer,
-      NSOpenGLPFADepthSize, 24,
-      NSOpenGLPFAColorSize, 24,
-      NSOpenGLPFAAlphaSize, 8,
-      NSOpenGLPFANoRecovery,
-      NSOpenGLPFAAccelerated,
-      0,
+
+    NSOpenGLPixelFormatAttribute attribs[] =
+    {
+		NSOpenGLPFAAccelerated,
+		NSOpenGLPFANoRecovery,
+		NSOpenGLPFADoubleBuffer,
+		NSOpenGLPFAColorSize, 24,
+		NSOpenGLPFADepthSize, 16,
+		0
     };
-    NSOpenGLPixelFormat* fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes: attrib ];
+	
+    NSOpenGLPixelFormat* fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes: attribs ];
     _context = [[NSOpenGLContext alloc] initWithFormat: fmt shareContext:nil ];
-    [_context makeCurrentContext];
     pContextGL = _context;
-    
+	  
     if( pContextGL ) {
-      glClearColor( 0.0f,0.0f,0.0f,0.0f);
+      [_context makeCurrentContext];
+      glClearColor( 0.0f,0.0f,0.0f,1.0f);
       glClearDepth( 1.0f );
       isFirst = YES;
-    }
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	  glFlush();
+      [pContextGL flushBuffer];
+	}
   }
   return self;
 }
@@ -58,9 +61,10 @@ static NSOpenGLContext* pContextGL;
 -(void) drawRect:(NSRect)dirtyRect
 {
   if( isFirst ) {
-    glClearColor( 0.0f,1.0f,0.0f,0.0f);
+    glClearColor( 0.0f,0.0f,0.0f,1.0f);
     glClearDepth( 1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glFlush();
     [pContextGL flushBuffer];
     isFirst = NO;
   }
