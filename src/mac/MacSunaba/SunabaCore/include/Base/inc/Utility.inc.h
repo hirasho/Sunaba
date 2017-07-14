@@ -399,15 +399,20 @@ inline void makeAbsoluteFilename(Array<wchar_t>* out, const wchar_t* basePath, c
 			(*out)[pos + 1 + i] = filename[i];
 		}
 	}
-#ifdef _WIN32
-	//最後にスラッシュをバックスラッシュに
 	l = out->size();
 	for (int i = 0; i < l; ++i){
+#ifdef _WIN32
+		//最後にスラッシュをバックスラッシュに
 		if ((*out)[i] == L'/'){
 			(*out)[i] = L'\\';
 		}
-	}
+#else
+		// 最後にバックスラッシュをスラッシュに
+		if ((*out)[i] == L'\\'){
+			(*out)[i] = L'/';
+		}
 #endif
+	}
 }
 
 inline int getFilenameBegin(const wchar_t* filename, int filenameSize){
@@ -426,6 +431,7 @@ inline int getFilenameBegin(const wchar_t* filename, int filenameSize){
 
 inline bool isAbsoluteFilename(const wchar_t* filename){
 	bool r = false;
+#ifdef _WIN32
 	if (isAlphabet(filename[0])){ //最初の文字がアルファベットで、
 		if (filename[1] == L':'){ //セミコロンがあれば、絶対パス
 			r = true;
@@ -436,9 +442,11 @@ inline bool isAbsoluteFilename(const wchar_t* filename){
 		   r = true;
 	   }
 	}
+#else
     if (filename[0] == L'/'){ // スラッシュで始まればもう絶対パス
         r = true;
     }
+#endif
 	return r;
 }
 

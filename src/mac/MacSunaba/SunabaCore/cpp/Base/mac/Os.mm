@@ -298,6 +298,13 @@ InputFile::InputFile(const wchar_t* filename) : mImpl(0){
 #else
     Array<char> utf8FileName;
     convertUnicodeToUtf8( &utf8FileName, filename, getStringSize(filename) );
+	for (int i = 0; i < utf8FileName.size(); ++i)
+	{
+		if (utf8FileName[i] == '\\')
+		{
+			utf8FileName[i] = '/';
+		}
+	}
     
     FILE* fp = fopen( utf8FileName.pointer(), "rb" );
     if( fp == NULL ) {

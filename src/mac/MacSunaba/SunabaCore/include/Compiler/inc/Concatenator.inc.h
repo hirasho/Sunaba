@@ -73,18 +73,27 @@ inline bool Concatenator::processFile(const Token& filenameToken, const wchar_t*
 		tmpFilename[i] = filename[i];
 	}
 	tmpFilename[l] = L'\0';
-	if (checkExtension(tmpFilename.pointer(), L"")){ //拡張子ないなら.txtを補う
-		tmpFilename[l + 0] = L'.';
-		tmpFilename[l + 1] = L't';
-		tmpFilename[l + 2] = L'x';
-		tmpFilename[l + 3] = L't';
-		tmpFilename[l + 4] = L'\0';
-	}else{
-		tmpFilename.setSize(l + 1);
-	}
+
 	Array<wchar_t> fullPath;
 	makeAbsoluteFilename(&fullPath, parentFullPath, tmpFilename.pointer());
-
+	// ファイルがあるか?
+	if (fileExist(fullPath.pointer()) == false)
+	{
+		if (checkExtension(tmpFilename.pointer(), L"")){ //拡張子ないなら.txtを補う
+			tmpFilename[l + 0] = L'.';
+			tmpFilename[l + 1] = L't';
+			tmpFilename[l + 2] = L'x';
+			tmpFilename[l + 3] = L't';
+			tmpFilename[l + 4] = L'\0';
+		}
+		makeAbsoluteFilename(&fullPath, parentFullPath, tmpFilename.pointer());
+		if (fileExist(fullPath.pointer()) == false)
+		{
+			beginError(filenameToken);
+			*mMessageStream << fullPath.pointer() << L"を開けない。あるのか確認せよ。" << std::endl;
+			return false;
+		}
+	}
 	//同じファイルを読んだことがないかフルパスでチェック。エラーにはせず、素通り。
 	String* fnStr = mFullPathFilenames->add();
 	fnStr->set(fullPath.pointer(), fullPath.size() - 1); //NULL終端をはずすために-1
