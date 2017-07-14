@@ -450,6 +450,52 @@ inline bool isAbsoluteFilename(const wchar_t* filename){
 	return r;
 }
 
+/*
+0 cr
+1 non cr
+
+0,cr,0 LF
+0,lf,1 LF
+0,*,1 LF,*
+1,cr,0 
+1,*,1 *
+*/
+inline void convertNewLine(Array<wchar_t>* inOut){
+	int dst = 0;
+	int size = inOut->size();
+	bool prevIsCr = false;
+	for (int i = 0; i < size; ++i){
+		wchar_t c = (*inOut)[i];
+		if (prevIsCr){
+			(*inOut)[dst] = L'\n'; //何にせよ改行吐く
+			++dst;
+			if (c == L'\r'){
+				; //何もしない
+			}else if (c == L'\n'){
+				prevIsCr = false;
+			}else{
+				(*inOut)[dst] = c;
+				++dst;
+				prevIsCr = false;
+			}
+		}else{
+			if (c == L'\r'){
+				prevIsCr = true;
+			}else{
+				(*inOut)[dst] = c;
+				++dst;
+			}
+		}
+	}
+	if (prevIsCr)
+	{
+		(*inOut)[dst] = L'\n';
+		++dst;
+	}
+	ASSERT(dst <= size);
+	inOut->setSize(dst);	
+}
+
 inline void convertSjisToUnicode(Array<wchar_t>* out, const char* in, int inSize){
 	static const unsigned short table[] = {
 		33088, 12288, 

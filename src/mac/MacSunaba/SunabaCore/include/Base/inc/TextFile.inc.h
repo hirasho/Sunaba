@@ -11,6 +11,7 @@ inline InputTextFile::InputTextFile(const wchar_t* filename){
 	const char* data = reinterpret_cast<const char*>(in.data()->pointer());
 	int size = in.data()->size();
 	convertToUnicode(&mText, data, size);
+	convertNewLine(&mText);
 }
 
 inline bool InputTextFile::isError() const{
