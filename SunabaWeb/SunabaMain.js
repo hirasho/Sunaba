@@ -98,7 +98,7 @@ HLib.Gpu = function(arg){
       canvas = document.getElementById(canvas);
    }
    var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl'); //後ろはIE用
-   this.mGl = gl; 
+   this.mGl = gl;
    //drawFullScreen用のデータ用意
    var vbData = new Float32Array(3 * 4); //3頂点4スカラ
    HLib.copyArray(vbData, 0, [-1, 3, 0, -arg.vEnd], 0, 4); //左上
@@ -178,7 +178,7 @@ HLib.Gpu.prototype.draw = function(){
 //Shaderクラス。programを保持。頂点とフラグメントをセットにして生成する。
 HLib.Shader = function(arg){
    //メンバ変数
-   this.mGlObject = null; //program 
+   this.mGlObject = null; //program
    this.mGl = arg.gpu.getGl();
    //処理本体
    var gl = this.mGl;
@@ -206,7 +206,7 @@ HLib.Shader = function(arg){
    gl.attachShader(this.mGlObject, fs);
    gl.linkProgram(this.mGlObject);
    gl.validateProgram(this.mGlObject);
-   msg = gl.getProgramInfoLog(this.mGlObject); 
+   msg = gl.getProgramInfoLog(this.mGlObject);
    if (msg.length > 0){
       throw msg;
    }
@@ -222,7 +222,7 @@ HLib.Texture = function(arg){
    //メンバ変数
    this.name = arg.name || ''; //名前。主にデバグ用。
    if (
-   (HLib.isPowerOf2(arg.width) === false) || 
+   (HLib.isPowerOf2(arg.width) === false) ||
    (HLib.isPowerOf2(arg.height) === false)){
       throw 'MyLib.Texture() : サイズは2の累乗にしてね！'
    }
@@ -284,15 +284,15 @@ Sunaba.MAX_ABS_NUMBER = 2147483647; //2^31 - 1
 
 //識別子に含まれる文字か否か
 Sunaba.isInName = function(code){
-   return (code === '@'.charCodeAt()) || 
-      (code === '$'.charCodeAt()) || 
-      (code === '&'.charCodeAt()) || 
-      (code === '?'.charCodeAt()) || 
-      (code === '_'.charCodeAt()) || 
-      (code === '\''.charCodeAt()) || 
-      ((code >= 'a'.charCodeAt()) && (code <= 'z'.charCodeAt())) || 
-      ((code >= 'A'.charCodeAt()) && (code <= 'Z'.charCodeAt())) || 
-      ((code >= '0'.charCodeAt()) && (code <= '9'.charCodeAt())) || 
+   return (code === '@'.charCodeAt()) ||
+      (code === '$'.charCodeAt()) ||
+      (code === '&'.charCodeAt()) ||
+      (code === '?'.charCodeAt()) ||
+      (code === '_'.charCodeAt()) ||
+      (code === '\''.charCodeAt()) ||
+      ((code >= 'a'.charCodeAt()) && (code <= 'z'.charCodeAt())) ||
+      ((code >= 'A'.charCodeAt()) && (code <= 'Z'.charCodeAt())) ||
+      ((code >= '0'.charCodeAt()) && (code <= '9'.charCodeAt())) ||
       (code >= 0x100); //マルチバイト文字は全てオーケー。半角相当品がある全角は置換済み。
 };
 
@@ -398,7 +398,7 @@ Sunaba.Parser.prototype.parseProgram = function(){
    var memoryWord = this.mLocale.memoryWord;
    this.mConstants[memoryWord] = 0;
    var node = {type:'PROGRAM', child:null, brother:null};
-   //定数全て処理 
+   //定数全て処理
    var tokens = this.mTokens;
    var n = tokens.length;
    this.mPos = 0;
@@ -557,7 +557,7 @@ Sunaba.Parser.prototype.parseFunctionDefinition = function(){
       return null;
    }
    this.mPos += 1;
-      
+
    //とは
    t = tokens[this.mPos];
    if (t.type === 'DEF_POST'){
@@ -622,7 +622,7 @@ Sunaba.Parser.prototype.parseStatement = function(){
          return null;
       }
       t = this.mTokens[this.mPos];
-      if (t.type !== ';'){ //文終わってないぞ 
+      if (t.type !== ';'){ //文終わってないぞ
          if (t.type === '{'){
             this.errorMessage += '行' + t.line + ': 部分プログラムを作ろうとした？それは部分プログラムの外で「def」なり「とは」なりを使ってね。それとも、次の行の字下げが多すぎただけ？';
          }else{
@@ -775,7 +775,7 @@ Sunaba.Parser.parseWhileOrIfStatement = function(){
          node.type = 'WHILE';
       }else if (t.type === 'IF_POST'){
          node.type = 'IF';
-      } 
+      }
       this.mPos += 1;
    }
    //ブロックがあるなら処理
@@ -789,7 +789,7 @@ Sunaba.Parser.parseWhileOrIfStatement = function(){
          if (t.type === '}'){
             this.mPos += 1;
             break;
-         }else if (t.type === 'CONST'){ 
+         }else if (t.type === 'CONST'){
             this.errorMessage += '行' + t.line + ': 繰り返しや条件実行の中で定数は作れない。';
             return null;
          }else{
@@ -864,7 +864,7 @@ Sunaba.Parser.prototype.parseOut = function(){
    this.mPos += 1;
    return node;
 };
-      
+
 //Expression : expression +|-|*|/|<|>|≤|≥|≠|= expression
 Sunaba.Parser.prototype.parseExpression = function(){
    //左結合の木をボトムアップで作る。途中で回転することもある。
@@ -875,12 +875,12 @@ Sunaba.Parser.prototype.parseExpression = function(){
    }
    //演算子がつながる限りループ
    var t = this.mTokens[this.mPos];
-   while (t.type === 'OPERATOR'){ 
+   while (t.type === 'OPERATOR'){
       var node = {
-         type:'EXPRESSION', 
-         token:t, 
+         type:'EXPRESSION',
+         token:t,
          operator:t.operator,
-         child:null, 
+         child:null,
          brother:null};
       this.mPos += 1;
       t = this.mTokens[this.mPos];
@@ -906,8 +906,8 @@ Sunaba.Parser.prototype.parseExpression = function(){
       //最適化。定数の使い勝手向上のために必須 TODO:a + 2 + 3がa+5にならないよねこれ
       var preComputed = null;
       if ((left.type === 'NUMBER') && (right.type === 'NUMBER')){
-         var a = left.number; 
-         var b = right.number;         
+         var a = left.number;
+         var b = right.number;
          if (node.operator === '+'){
             preComputed = a + b;
          }else if (node.operator === '-'){
@@ -938,7 +938,7 @@ Sunaba.Parser.prototype.parseExpression = function(){
       //現ノードを左の子として継続
       left = node;
    }
-   return left; 
+   return left;
 };
 
 Sunaba.Parser.prototype.getTermType = function(){
@@ -1017,7 +1017,7 @@ Sunaba.Parser.prototype.parseFunction = function(){
 
    //(
    t = this.mTokens[this.mPos];
-   HLib.assert(t.type === '('); 
+   HLib.assert(t.type === '(');
    this.mPos += 1;
 
    //引数ありか、なしか
@@ -1050,13 +1050,13 @@ Sunaba.Parser.prototype.parseFunction = function(){
       this.errorMessage += '行' + t.line + ': 部分プログラムの入力が")"で終わるはずだが、「' + t.string + '」がある。';
       return null;
    }
-   this.mPos += 1; 
+   this.mPos += 1;
    return node;
 };
-    
+
 //Sunaba.Compiler
 Sunaba.Compiler = function(){
-}; 
+};
 
 //SPEC_CHANGE:タブは8個のスペースとして解釈する
 //全角スペースは半角2個へ
@@ -1089,7 +1089,7 @@ Sunaba.Compiler.unifySpace = function(code){
 1 \rの上
 
 [モード遷移]
-0 \r 1 
+0 \r 1
 0 * 0 out(*)
 1 \n 0 out(\n)
 1 \r 1 out(\n)
@@ -1102,7 +1102,7 @@ Sunaba.Compiler.unifyNewLine = function(code){
    var l = code.length;
    var SPACE = ' '.charCodeAt();
    var CR = '\r'.charCodeAt();
-   var LF = '\n'.charCodeAt(); 
+   var LF = '\n'.charCodeAt();
    for (i = 0; i < l; i += 1){
       var c = code[i];
       if (mode === 0){
@@ -1148,11 +1148,11 @@ Sunaba.Compiler.replaceChar = function(code, loc){
       var c = code[i];
       var o = null; //出力文字
       if ((c >= u('Ａ')) && (c <= u('Ｚ'))){
-         o = u('A') + (c - u('Ａ')); 
+         o = u('A') + (c - u('Ａ'));
       }else if ((c >= u('ａ')) && (c <= u('ｚ'))){
-         o = u('a') + (c - u('ｚ')); 
+         o = u('a') + (c - u('ｚ'));
       }else if ((c >= u('０')) && (c <= u('９'))){
-         o = u('0') + (c - u('０')); 
+         o = u('0') + (c - u('０'));
       }else if (c === u('\n')){ //改行は残す
          o = c;
       }else if ((c < 0x20) || (c === 0x7f)){
@@ -1225,9 +1225,9 @@ Sunaba.Compiler.replaceChar = function(code, loc){
       }else if (c === u('～')){ //0x7e
          o = u('~');
       //その他
-      }else if (c === u('×')){ 
+      }else if (c === u('×')){
          o = u('*');
-      }else if (c === u('÷')){ 
+      }else if (c === u('÷')){
          o = u('/');
       }else if (c === u('≧')){  //日本特有のものを世界的にメジャーなものに変換
          o = u('≥');
@@ -1334,7 +1334,7 @@ Sunaba.Compiler.removeSingleLineComment = function(code){
 0 初期
 1 /
 2 /* コメント中
-3 /* ... * 
+3 /* ... *
 */
 Sunaba.Compiler.removeMultiLineComment = function(code){
    var r = [];
@@ -1501,7 +1501,7 @@ Sunaba.Compiler.structurize = function(tokens){
    var spaceCountStackPos = 1;
    var parenLevel = 0;
    var braceLevel = 0;
-   var n = tokens.length; 
+   var n = tokens.length;
    var i;
    var msg = null;
    var prevT = null;
@@ -1663,7 +1663,7 @@ Sunaba.assemble = function(codeString){
    }
    //完成!
    return {
-      errorMessage:assembler.errorMessage, 
+      errorMessage:assembler.errorMessage,
       instructions:assembler.instructions};
 };
 
@@ -1678,7 +1678,7 @@ Sunaba.Assembler = function(){
 };
 
 /*
-モード 
+モード
 0 : 空白の上
 1 : 文字列の上
 
@@ -1799,10 +1799,10 @@ Sunaba.Assembler.prototype.parseInstruction = function(){
    var name = t.string;
    var inst = {name:name, line:t.line, imm:-0x7fffffff, label:''};
    if ( //ラベルオペランド
-   (name === 'j') || 
-   (name === 'bz') || 
+   (name === 'j') ||
+   (name === 'bz') ||
    (name === 'call')){
-      var op = tokens[this.mPos]; 
+      var op = tokens[this.mPos];
       this.mPos += 1;
       if (op.type !== 'NAME'){
          this.errorMessage = '行' + t.line + ': 命令「' + name + '」は入力値としてラベル名を取るが、「' + op.string + '」がある。';
@@ -1810,14 +1810,14 @@ Sunaba.Assembler.prototype.parseInstruction = function(){
       }
       inst.label = op.string;
    }else if ( //数値オペランド
-   (name === 'ld') || 
-   (name === 'fld') || 
-   (name === 'st') || 
-   (name === 'fst') || 
-   (name === 'i') || 
-   (name === 'pop') || 
+   (name === 'ld') ||
+   (name === 'fld') ||
+   (name === 'st') ||
+   (name === 'fst') ||
+   (name === 'i') ||
+   (name === 'pop') ||
    (name === 'ret')){
-      var op = tokens[this.mPos]; 
+      var op = tokens[this.mPos];
       this.mPos += 1;
       if (op.type !== 'NUMBER'){
          this.errorMessage = '行' + t.line + ': 命令「' + name + '」は入力値として数値を取るが、「' + op.string + '」がある。';
@@ -1869,7 +1869,7 @@ Sunaba.Machine = function(instructions){
    this.mProgramBegin = M.FREE_AND_PROGRAM_SIZE - instCount;
    this.mProgramCounter = this.mProgramBegin;
    this.mStackPointer = Mm.STACK_BASE;
-   this.mFramePointer = Mm.STACK_BASE; 
+   this.mFramePointer = Mm.STACK_BASE;
    this.mMemory[Mm.FREE_REGION_END] = this.mProgramBegin;
    this.mMemory[Mm.GET_SCREEN_WIDTH] = this.mMemory[Mm.SET_SCREEN_WIDTH] = this.screenWidth;
    this.mMemory[Mm.GET_SCREEN_HEIGHT] = this.mMemory[Mm.SET_SCREEN_HEIGHT] = this.screenHeight;
@@ -1900,7 +1900,7 @@ Sunaba.Machine = function(instructions){
    Mm.IO_WRITABLE_BEGIN = Mm.IO_BASE + M.IO_WRITABLE_OFFSET;
    //READアドレス
    var ioReadTable = [
-      'POINTER_X', 
+      'POINTER_X',
       'POINTER_Y',
       'BUTTON_LEFT',
       'BUTTON_RIGHT',
@@ -2030,6 +2030,7 @@ Sunaba.Machine.prototype.popN = function(n){
 
 Sunaba.Machine.prototype.executeInstruction = function(){
    var Mm = Sunaba.Machine.Memory;
+   var inst = this.mInstructions[this.mProgramCounter - this.mProgramBegin];
    var name = inst.name;
    var imm = inst.imm;
    var op0, op1;
@@ -2126,7 +2127,7 @@ Sunaba.Machine.prototype.executeInstruction = function(){
          this.error = true;
          this.message = '行' + inst.line + ': このあたりのメモリはセットはできない(番号:' << op0 << ')';
       }else if (op0 === Mm.SYNC){
-         this.waitDisplay = true; 
+         this.waitDisplay = true;
       }else if (op0 === Mm.DISABLE_AUTO_SYNC){
          this.mMemory[op0] = op1; //単に入れておくだけ。
       }else if (op0 === Mm.DRAW_CHAR){
@@ -2200,9 +2201,9 @@ Sunaba.Machine.prototype.executeInstruction = function(){
    gpu.setShader(shader);
 
    var input = {
-      x:0, 
-      y:0, 
-      buttonLeft:0, 
+      x:0,
+      y:0,
+      buttonLeft:0,
       buttonRight:0,
       up:0,
       down:0,
@@ -2324,7 +2325,7 @@ Sunaba.Machine.prototype.executeInstruction = function(){
       var x = e.clientX - rect.left;
       var y = e.clientY - rect.top;
       input.x = x;
-      input.y = y; 
+      input.y = y;
    };
    var onMouseDown = function(e){
       if (e.button === 1){
@@ -2358,7 +2359,7 @@ Sunaba.Machine.prototype.executeInstruction = function(){
          var x = touch.clientX - rect.left;
          var y = touch.clientY - rect.top;
          input.x = x;
-         input.y = y; 
+         input.y = y;
       }
    };
 
