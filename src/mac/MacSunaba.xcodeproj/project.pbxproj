@@ -42,7 +42,6 @@
 		43146F1B196A7B6B003FE70A /* Os.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Os.mm; path = mac/Os.mm; sourceTree = "<group>"; };
 		43146F1D196A7C4E003FE70A /* Sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sound.cpp; path = mac/Sound.cpp; sourceTree = "<group>"; };
 		43146F1F196A7C7F003FE70A /* Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Graphics.cpp; path = mac/Graphics.cpp; sourceTree = "<group>"; };
-		A209D6C218347266009A8FFB /* sjisToUnicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sjisToUnicode.h; sourceTree = "<group>"; };
 		A20A6F9F1835E22A00B8F7B5 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		A2334581182B7D7300DA7962 /* MyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyView.h; sourceTree = "<group>"; };
 		A2334582182B7E2800DA7962 /* MyView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MyView.mm; sourceTree = "<group>"; };
@@ -278,7 +277,6 @@
 		A2ABF6F31828B6C300228181 /* inc */ = {
 			isa = PBXGroup;
 			children = (
-				A209D6C218347266009A8FFB /* sjisToUnicode.h */,
 				A2ABF6F41828B6C300228181 /* Array.inc.h */,
 				A2ABF6F51828B6C300228181 /* MemoryPool.inc.h */,
 				A2ABF6F61828B6C300228181 /* RefString.inc.h */,

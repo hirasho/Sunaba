@@ -23,7 +23,9 @@ mCalculationTimePercent(0),
 mMemoryRequestAddress(0),
 mMemoryRequestValue(0),
 mMemoryRequestState(IoState::MEMORY_REQUEST_NONE),
-mSound(0){
+mSound(0),
+mObjectCode(0),
+mObjectCodeSize(0){
 	STRONG_ASSERT(windowHandle);
 	mLocalization.init(langName);
 	beginTimer();
@@ -34,6 +36,7 @@ inline System::~System(){
 	DELETE(mMachine);
 	DELETE(mGraphics);
 	DELETE(mSound);
+	DELETE_ARRAY(mObjectCode);
 	endTimer();
 }
 
@@ -42,6 +45,18 @@ inline bool System::bootProgram(const unsigned char* objectCode, int objectCodeS
 	STRONG_ASSERT(mPictureBoxHandle);
 #endif
 	STRONG_ASSERT(objectCode);
+
+	// 前にもらったものと同一か判定する
+	bool isSameProgram = false;
+	if ((mObjectCodeSize == objectCodeSize) && mObjectCode){
+		isSameProgram = (std::memcmp(mObjectCode, objectCode, objectCodeSize) == 0);
+	}
+	DELETE_ARRAY(mObjectCode);
+	mObjectCode = new unsigned char[objectCodeSize];
+	std::memcpy(mObjectCode, objectCode, objectCodeSize);
+	mObjectCodeSize = objectCodeSize;
+
+
 	DELETE(mMachine);
 	mTerminationMessageDrawn = false;
 	mMachine = new Machine(
@@ -52,7 +67,11 @@ inline bool System::bootProgram(const unsigned char* objectCode, int objectCodeS
 		mMessageStream << L"指定されたプログラムを開始できなかった。" << std::endl;
 		DELETE(mMachine);
 	}else{
-		mMessageStream << L"プログラムを開始！" << std::endl;
+		if (isSameProgram){
+			mMessageStream << L"同じプログラムを再起動(セーブした?)" << std::endl;
+		}else{
+			mMessageStream << L"新たなプログラムを起動" << std::endl;
+		}
 	}
 	restartGraphics();
 	return (mMachine != 0);

@@ -188,6 +188,7 @@ void setBootProgramPath( const char* path ) {
     default:
       break;
   }
+printf("down : %d\n", keyCode);
   if( index > 0 ) {
     keys[index] = 1;
   }
@@ -225,6 +226,7 @@ void setBootProgramPath( const char* path ) {
     default:
       break;
   }
+printf("up : %d\n", keyCode);
   if( index > 0 ) {
     keys[index] = 0;
   }
