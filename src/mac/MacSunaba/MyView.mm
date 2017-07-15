@@ -156,7 +156,6 @@
 
 -(void) keyDown:(NSEvent *)theEvent
 {
-printf("view down %d\n", theEvent.keyCode);
     AppDelegate* delegate = [NSApp delegate];
     if( delegate ) {
         [delegate keyDown: theEvent];
@@ -165,7 +164,6 @@ printf("view down %d\n", theEvent.keyCode);
 
 -(void) keyUp:(NSEvent *)theEvent
 {
-printf("view up %d\n", theEvent.keyCode);
     AppDelegate* delegate = [NSApp delegate];
     if( delegate ) {
         [delegate keyUp: theEvent];
