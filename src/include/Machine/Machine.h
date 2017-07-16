@@ -164,7 +164,6 @@ private:
 	unsigned mTimeArray[TIME_ARRAY_COUNT * 2];
 	int mTimeArrayPosition;
 	int mTimeArrayValidCount;
-	unsigned mLastSyncEndTime;
 
 	//最適化実行
 	struct DecodedInst{

@@ -6,6 +6,10 @@ namespace Sunaba{
 template<class T> class Array;
 
 void writeToConsole(const wchar_t* s);
+    
+/* 作業用フォルダパスを取得。 MACではユーザーのホームディレクトリとしておく。 */
+void getWorkingDirectory(char* path);
+void makeWorkingFilePath(Array<wchar_t>* out, const char* fileName);
 
 void beginTimer();
 unsigned getTimeInMilliSecond();

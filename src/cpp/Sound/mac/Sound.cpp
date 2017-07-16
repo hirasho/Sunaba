@@ -1,4 +1,291 @@
-﻿#ifdef SUNABA_USE_XAUDIO2
+#include "Base/Base.h"
+#include "Sound/Sound.h"
+#include "Sound/SoundChannel.h"
+#include "Base/Os.h"
+
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
+#include <cstring>
+
+namespace Sunaba {
+    class Sound::Impl{
+    public:
+        enum{
+            FREQUENCY = 48000,
+            BUFFER_SIZE = FREQUENCY / 15,
+            BUFFER_COUNT = 2,
+        };
+
+        Impl( int channelCount, void* ) :
+        mDevice(NULL),
+        mContext(NULL),
+        mBufferIndex(0),
+        mChannels(0),
+        mChannelCount(0),
+        mDropCount(0),
+        mEnabled(false){
+            mDevice = alcOpenDevice( NULL );
+            mContext = alcCreateContext( mDevice, NULL );
+            alcMakeContextCurrent( mContext );
+
+            alGenSources( 1, &mMasteringVoice );
+            alGenBuffers( 2, mSourceVoice );
+            
+            mChannelCount = channelCount;
+            mChannels = new SoundChannel[mChannelCount];
+            mFreeBuffIndex = 0;
+            
+            for( int i = 0; i < BUFFER_COUNT; ++i ) {
+                mBuffers[i] = new short[BUFFER_SIZE];
+                std::memset( mBuffers[i], 0, BUFFER_SIZE * sizeof(short) );
+            }
+            for( int i = 0; i < BUFFER_COUNT; ++i ) {
+                ALenum format = AL_FORMAT_MONO16; // 16bit モノラル.
+                ALsizei size  = sizeof(short) * BUFFER_SIZE;
+                ALsizei sampling = FREQUENCY;
+                alBufferData( mSourceVoice[i], format, mBuffers[i], size, sampling );
+                alSourceQueueBuffers( mMasteringVoice, 1, &mSourceVoice[i] );
+            }
+            alSourcePlay( mMasteringVoice );
+            mPrevFeedTime = getTimeInMilliSecond();
+            //スレッド用意.
+            mFeedingThread.start(this);
+            mEnabled = true;
+        }
+
+        ~Impl() {
+            if( !mEnabled ) { //初期化そもそもしてないから抜ける。
+                return;
+            }
+            mEndRequestEvent.set();
+            mFeedingThread.wait();
+            
+            delete[] mChannels;
+            mChannels = 0;
+
+            alcMakeContextCurrent( mContext );
+            alSourceStop( mMasteringVoice );
+            alDeleteSources( 1, &mMasteringVoice );
+            alDeleteBuffers( 2, mSourceVoice );
+
+            alcMakeContextCurrent( NULL );
+            alcDestroyContext( mContext );
+            alcCloseDevice( mDevice );
+            mDevice = NULL;
+        }
+
+        void feedData() {
+            ASSERT( mEnabled );
+            for( int i = 0; i < mChannelCount; ++i ) {
+                mChannels[i].startCalculation();
+            }
+
+            alcMakeContextCurrent( mContext );
+            
+            short* data = mBuffers[mBufferIndex];
+            fill( data, BUFFER_SIZE );
+            
+            ALenum format = AL_FORMAT_MONO16;
+            ALsizei size = sizeof(short) * BUFFER_SIZE;
+            ALsizei sampling = FREQUENCY;
+            alBufferData( mSourceVoice[mBufferIndex], format, data, size, sampling );
+            alSourceQueueBuffers( mMasteringVoice, 1, &(mSourceVoice[mBufferIndex]) );
+            
+            ALint state = 0;
+            alGetSourcei( mMasteringVoice, AL_SOURCE_STATE, &state );
+            if( state != AL_PLAYING ) {
+                alSourcePlay( mMasteringVoice );
+                writeToConsole( L"drop..?\n" );
+            }
+
+            ++mBufferIndex;
+            if( mBufferIndex == BUFFER_COUNT ) {
+                mBufferIndex = 0;
+            }
+        }
+
+        void setFrequency( int c, float f){
+            if( !mEnabled ) {
+                return;
+            }
+            ASSERT( c < mChannelCount );
+            mChannels[c].setFrequency( f, FREQUENCY );
+        }
+        void setDumping( int c, float d){
+            if( !mEnabled ) {
+                return;
+            }
+            ASSERT( c < mChannelCount );
+            d *= (48000.0f / static_cast<float>(FREQUENCY));
+            mChannels[c].setDumping(d);
+        }
+        void play( int c, float s ){
+            if( !mEnabled ){
+                return;
+            }
+            ASSERT( c < mChannelCount );
+            mChannels[c].play( s, FREQUENCY );
+        }
+        void fill(short* data, int count ) {
+            for( int i = 0; i < count; ++i ) {
+                float p = 0.f;
+                for( int j = 0; j < mChannelCount; ++j ) {
+                    p += mChannels[j].calculate();
+                    if( p > 0.f ) {
+                        p = p / (1.f + p);
+                    } else if( p < 0.f ) {
+                        p = -p / (-1.f + p );
+                    }
+                    ASSERT( p < 1.f && p > -1.0f );
+                }
+                *data = static_cast<short>( p * 32767.f );
+                ++data;
+            }
+        }
+
+        void bufferUpdate() {
+            // 空きバッファ（使用完了）があるか？
+            int freeBuf = 0;
+            alGetSourcei( mMasteringVoice, AL_BUFFERS_PROCESSED, &freeBuf );
+            if( freeBuf ) {
+                unsigned int freeId = mBufferIndex;
+                alSourceUnqueueBuffers( mMasteringVoice, 1, &(mSourceVoice[freeId]) );
+                feedData();
+            }
+        }
+        void feed() {
+            unsigned int time = getTimeInMilliSecond();
+            int freeBufferCount = 0;
+
+            alcMakeContextCurrent( mContext );
+            
+            alGetSourcei( mMasteringVoice, AL_BUFFERS_PROCESSED, &freeBufferCount );
+            if( freeBufferCount == 0 ) {
+                return; /* 空バッファがないので次回. */
+            }
+            if( time == mPrevFeedTime ) {
+                return;
+            }
+            
+            /* 空バッファをキューから外す. */
+            alSourceUnqueueBuffers( mMasteringVoice, 1, &(mSourceVoice[mFreeBuffIndex]) );
+            
+            
+            unsigned int timeDiff = static_cast<unsigned int>( time - mPrevFeedTime );
+            mPrevFeedTime = time;
+            
+            int t = (FREQUENCY * timeDiff) + mDelayedSampleCount;
+            int totalSrcWriteSize = t / 1000;
+            mDelayedSampleCount = t -= (totalSrcWriteSize * 1000);
+            int srcBufferSize = BUFFER_SIZE;
+            if( totalSrcWriteSize > srcBufferSize ) { //処理落ち。仕方ない.
+                totalSrcWriteSize = srcBufferSize;
+                ++mDropCount;
+            }
+            
+            for( int i = 0; i < mChannelCount; ++i ) {
+                mChannels[i].startCalculation();
+            }
+
+            short* data = mBuffers[ mFreeBuffIndex ];
+            fill( data, totalSrcWriteSize );
+            alBufferData( mSourceVoice[ mFreeBuffIndex ], AL_FORMAT_MONO16, data, sizeof(short)*totalSrcWriteSize, FREQUENCY );
+            alSourceQueueBuffers( mMasteringVoice, 1, &(mSourceVoice[mFreeBuffIndex]) );
+
+            ALint state = 0;
+            alGetSourcei( mMasteringVoice, AL_SOURCE_STATE, &state );
+            if( state != AL_PLAYING ) {
+                alSourcePlay( mMasteringVoice );
+            }
+
+            mFreeBuffIndex = 1 - mFreeBuffIndex;
+        }
+
+        class FeedingThread : public Thread{
+        public:
+            FeedingThread() : Thread(true), mImpl(0) {
+            }
+            void start( Sound::Impl* soundImpl ) {
+                mImpl = soundImpl;
+                Thread::start();
+            }
+            virtual void operator()() {
+                mImpl->feedThreadFunc();
+            }
+        private:
+            Sound::Impl* mImpl;
+        };
+
+        void feedThreadFunc() {
+            bool foreverTrue = true;
+            int stopCount = 0;
+            while( foreverTrue ) {
+                if( mEndRequestEvent.isSet() ) {
+                    for( int i = 0; i < mChannelCount; ++i ){
+                        mChannels[i].setDumping(0.01f);
+                    }
+                    ++stopCount;
+                    if( stopCount == 20 ) {
+                        // Buffer->Stop();
+                        break;
+                    }
+                }
+                feed();
+                sleepMilliSecond( 5 );
+            }
+            
+        }
+
+        ALCdevice* mDevice;
+        ALCcontext* mContext;
+        /* AL流儀ではなく XAudio2 の命名に合わせておく. */
+        ALuint     mSourceVoice[2]; 
+        ALuint     mMasteringVoice;
+        
+        short* mBuffers[BUFFER_COUNT];
+        int    mBufferIndex;
+        SoundChannel* mChannels;
+        int    mChannelCount;
+        bool   mEnabled;
+        unsigned int mPrevFeedTime;
+        unsigned int mDropCount;
+        unsigned int mDelayedSampleCount;
+
+        int    mFreeBuffIndex;
+        
+        FeedingThread mFeedingThread;
+        Event  mEndRequestEvent;
+    };
+    
+    Sound::Sound(int channelCount, void* windowHandle) : mImpl(0){
+        mImpl = new Impl(channelCount, windowHandle);
+    }
+    
+    Sound::~Sound(){
+        DELETE(mImpl);
+        mImpl = 0;
+    }
+    
+    void Sound::setFrequency(int channel, float frequency){
+        mImpl->setFrequency(channel, frequency);
+    }
+    
+    void Sound::setDumping(int channel, float dumping){
+        mImpl->setDumping(channel, dumping);
+    }
+    
+    void Sound::play(int channel, float strength){
+        mImpl->play(channel, strength);
+    }
+
+ //   void Sound::bufferUpdate() {
+        // mImpl->bufferUpdate();
+        // use Threading..
+ //   }
+}
+
+#if 0
+#ifdef SUNABA_USE_XAUDIO2
 #include <Xaudio2.h>
 #pragma comment(lib, "xapobase.lib")
 #undef DELETE
@@ -251,17 +538,17 @@ public:
 		if (FAILED(hr)){
 			WRITE_LOG("DirectSoundCreate8 failed");
 			if (hr == DSERR_ALLOCATED){
-				WRITE_LOG("\tDSERR_ALLOCATED");
+				WRITE_LOG("¥tDSERR_ALLOCATED");
 			}else if (hr == DSERR_INVALIDPARAM){
-				WRITE_LOG("\tDSERR_INVALIDPARAM");
+				WRITE_LOG("¥tDSERR_INVALIDPARAM");
 			}else if (hr == DSERR_NOAGGREGATION){
-				WRITE_LOG("\tDSERR_NOAGGREGATION");
+				WRITE_LOG("¥tDSERR_NOAGGREGATION");
 			}else if (hr == DSERR_NODRIVER){
-				WRITE_LOG("\tDSERR_NODRIVER");
+				WRITE_LOG("¥tDSERR_NODRIVER");
 			}else if (hr == DSERR_OUTOFMEMORY){
-				WRITE_LOG("\tDSERR_OUTOFMEMORY");
+				WRITE_LOG("¥tDSERR_OUTOFMEMORY");
 			}else{
-				WRITE_LOG("\tunknown error.");
+				WRITE_LOG("¥tunknown error.");
 			}
 			return;
 		}
@@ -269,15 +556,15 @@ public:
 		if (FAILED(hr)){
 			WRITE_LOG("IDirectSound8::SetCooperativeLevel failed");
 			if (hr == DSERR_ALLOCATED){
-				WRITE_LOG("\tDSERR_ALLOCATED");
+				WRITE_LOG("¥tDSERR_ALLOCATED");
 			}else if (hr == DSERR_INVALIDPARAM){
-				WRITE_LOG("\tDSERR_INVALIDPARAM");
+				WRITE_LOG("¥tDSERR_INVALIDPARAM");
 			}else if (hr == DSERR_UNINITIALIZED){
-				WRITE_LOG("\tDSERR_UNINITIALIZED");
+				WRITE_LOG("¥tDSERR_UNINITIALIZED");
 			}else if (hr == DSERR_UNSUPPORTED){
-				WRITE_LOG("\tDSERR_UNSUPPORTED");
+				WRITE_LOG("¥tDSERR_UNSUPPORTED");
 			}else{
-				WRITE_LOG("\tunknown error.");
+				WRITE_LOG("¥tunknown error.");
 			}
 			return;
 		}
@@ -291,29 +578,29 @@ public:
 		if (FAILED(hr)){
 			WRITE_LOG("IDirectSound8::CreateSoundBuffer failed");
 			if (hr == DSERR_ALLOCATED){
-				WRITE_LOG("\tDSERR_ALLOCATED");
+				WRITE_LOG("¥tDSERR_ALLOCATED");
 			}else if (hr == DSERR_BADFORMAT){
-				WRITE_LOG("\tDSERR_BADFORMAT");
+				WRITE_LOG("¥tDSERR_BADFORMAT");
 			}else if (hr == DSERR_BUFFERTOOSMALL){
-				WRITE_LOG("\tDSERR_BUFFERTOOSMALL");
+				WRITE_LOG("¥tDSERR_BUFFERTOOSMALL");
 			}else if (hr == DSERR_CONTROLUNAVAIL){
-				WRITE_LOG("\tDSERR_CONTROLUNAVAIL");
+				WRITE_LOG("¥tDSERR_CONTROLUNAVAIL");
 			}else if (hr == DSERR_DS8_REQUIRED){
-				WRITE_LOG("\tDSERR_DS8_REQUIED");
+				WRITE_LOG("¥tDSERR_DS8_REQUIED");
 			}else if (hr == DSERR_INVALIDCALL){
-				WRITE_LOG("\tDSERR_INVALIDCALL");
+				WRITE_LOG("¥tDSERR_INVALIDCALL");
 			}else if (hr == DSERR_INVALIDPARAM){
-				WRITE_LOG("\tDSERR_INVALIDPARAM");
+				WRITE_LOG("¥tDSERR_INVALIDPARAM");
 			}else if (hr == DSERR_NOAGGREGATION){
-				WRITE_LOG("\tDSERR_NOAGGREGATION");
+				WRITE_LOG("¥tDSERR_NOAGGREGATION");
 			}else if (hr == DSERR_OUTOFMEMORY){
-				WRITE_LOG("\tDSERR_OUTOFMEMORY");
+				WRITE_LOG("¥tDSERR_OUTOFMEMORY");
 			}else if (hr == DSERR_UNINITIALIZED){
-				WRITE_LOG("\tDSERR_UNINITIALIZED");
+				WRITE_LOG("¥tDSERR_UNINITIALIZED");
 			}else if (hr == DSERR_UNSUPPORTED){
-				WRITE_LOG("\tDSERR_UNSUPPORTED");
+				WRITE_LOG("¥tDSERR_UNSUPPORTED");
 			}else{
-				WRITE_LOG("\tunknown error.");
+				WRITE_LOG("¥tunknown error.");
 			}
 			return;
 		}
@@ -616,3 +903,6 @@ void Sound::play(int channel, float strength){
 }
 
 } //namespace Sunaba
+
+
+#endif

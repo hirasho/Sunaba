@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		43146F1C196A7B6B003FE70A /* Os.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43146F1B196A7B6B003FE70A /* Os.mm */; };
-		43146F1E196A7C4E003FE70A /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43146F1D196A7C4E003FE70A /* Sound.cpp */; };
-		43146F20196A7C7F003FE70A /* Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 43146F1F196A7C7F003FE70A /* Graphics.cpp */; };
+		1D243FB61F1AE881003E220A /* Os.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D243FB51F1AE881003E220A /* Os.mm */; };
+		1D243FB81F1AE893003E220A /* Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1D243FB71F1AE893003E220A /* Graphics.cpp */; };
+		1D243FBA1F1AE8A2003E220A /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1D243FB91F1AE8A2003E220A /* Sound.cpp */; };
+		1D243FBC1F1AE98F003E220A /* include in Resources */ = {isa = PBXBuildFile; fileRef = 1D243FBB1F1AE98F003E220A /* include */; };
 		A20A6FA01835E22A00B8F7B5 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20A6F9F1835E22A00B8F7B5 /* OpenAL.framework */; };
 		A2334583182B7E2800DA7962 /* MyView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2334582182B7E2800DA7962 /* MyView.mm */; };
 		A23345C9182CD31F00DA7962 /* SunabaWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = A23345C8182CD31F00DA7962 /* SunabaWrapper.mm */; };
@@ -39,10 +40,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		43146F1B196A7B6B003FE70A /* Os.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Os.mm; path = mac/Os.mm; sourceTree = "<group>"; };
-		43146F1D196A7C4E003FE70A /* Sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sound.cpp; path = mac/Sound.cpp; sourceTree = "<group>"; };
-		43146F1F196A7C7F003FE70A /* Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Graphics.cpp; path = mac/Graphics.cpp; sourceTree = "<group>"; };
-		A209D6C218347266009A8FFB /* sjisToUnicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sjisToUnicode.h; sourceTree = "<group>"; };
+		1D243FB51F1AE881003E220A /* Os.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Os.mm; path = ../../../../../cpp/Base/mac/Os.mm; sourceTree = "<group>"; };
+		1D243FB71F1AE893003E220A /* Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Graphics.cpp; path = ../../../../../cpp/Graphics/mac/Graphics.cpp; sourceTree = "<group>"; };
+		1D243FB91F1AE8A2003E220A /* Sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sound.cpp; path = ../../../../../cpp/Sound/mac/Sound.cpp; sourceTree = "<group>"; };
+		1D243FBB1F1AE98F003E220A /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; name = include; path = ../include; sourceTree = "<group>"; };
 		A20A6F9F1835E22A00B8F7B5 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		A2334581182B7D7300DA7962 /* MyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyView.h; sourceTree = "<group>"; };
 		A2334582182B7E2800DA7962 /* MyView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MyView.mm; sourceTree = "<group>"; };
@@ -69,61 +70,6 @@
 		A2ABF6E21828B3C700228181 /* MacSunabaTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MacSunabaTests.m; sourceTree = "<group>"; };
 		A2ABF6EC1828B68700228181 /* MyGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyGLView.h; sourceTree = "<group>"; };
 		A2ABF6ED1828B68700228181 /* MyGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MyGLView.mm; sourceTree = "<group>"; };
-		A2ABF6F11828B6C300228181 /* Array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Array.h; sourceTree = "<group>"; };
-		A2ABF6F21828B6C300228181 /* Base.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = Base.h; sourceTree = "<group>"; };
-		A2ABF6F41828B6C300228181 /* Array.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Array.inc.h; sourceTree = "<group>"; };
-		A2ABF6F51828B6C300228181 /* MemoryPool.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryPool.inc.h; sourceTree = "<group>"; };
-		A2ABF6F61828B6C300228181 /* RefString.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RefString.inc.h; sourceTree = "<group>"; };
-		A2ABF6F71828B6C300228181 /* String.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = String.inc.h; sourceTree = "<group>"; };
-		A2ABF6F81828B6C300228181 /* Tank.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tank.inc.h; sourceTree = "<group>"; };
-		A2ABF6F91828B6C300228181 /* TextFile.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFile.inc.h; sourceTree = "<group>"; };
-		A2ABF6FA1828B6C300228181 /* Utility.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utility.inc.h; sourceTree = "<group>"; };
-		A2ABF6FB1828B6C300228181 /* MemoryPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryPool.h; sourceTree = "<group>"; };
-		A2ABF6FC1828B6C300228181 /* Os.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = Os.h; sourceTree = "<group>"; };
-		A2ABF6FD1828B6C300228181 /* RefString.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = RefString.h; sourceTree = "<group>"; };
-		A2ABF6FE1828B6C300228181 /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = String.h; sourceTree = "<group>"; };
-		A2ABF6FF1828B6C300228181 /* Tank.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tank.h; sourceTree = "<group>"; };
-		A2ABF7001828B6C300228181 /* TextFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextFile.h; sourceTree = "<group>"; };
-		A2ABF7011828B6C300228181 /* Utility.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = Utility.h; sourceTree = "<group>"; };
-		A2ABF7031828B6C300228181 /* Assembler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Assembler.h; sourceTree = "<group>"; };
-		A2ABF7041828B6C300228181 /* CharacterReplacer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharacterReplacer.h; sourceTree = "<group>"; };
-		A2ABF7051828B6C300228181 /* CodeGenerator.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = CodeGenerator.h; sourceTree = "<group>"; };
-		A2ABF7061828B6C300228181 /* CommentRemover.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentRemover.h; sourceTree = "<group>"; };
-		A2ABF7071828B6C300228181 /* Compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Compiler.h; sourceTree = "<group>"; };
-		A2ABF7081828B6C300228181 /* Concatenator.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = Concatenator.h; sourceTree = "<group>"; };
-		A2ABF7091828B6C300228181 /* FunctionGenerator.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = FunctionGenerator.h; sourceTree = "<group>"; };
-		A2ABF70A1828B6C300228181 /* FunctionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FunctionInfo.h; sourceTree = "<group>"; };
-		A2ABF70C1828B6C300228181 /* Assembler.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Assembler.inc.h; sourceTree = "<group>"; };
-		A2ABF70D1828B6C300228181 /* CharacterReplacer.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharacterReplacer.inc.h; sourceTree = "<group>"; };
-		A2ABF70E1828B6C300228181 /* CodeGenerator.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CodeGenerator.inc.h; sourceTree = "<group>"; };
-		A2ABF70F1828B6C300228181 /* CommentRemover.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentRemover.inc.h; sourceTree = "<group>"; };
-		A2ABF7101828B6C300228181 /* Compiler.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Compiler.inc.h; sourceTree = "<group>"; };
-		A2ABF7111828B6C300228181 /* Concatenator.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Concatenator.inc.h; sourceTree = "<group>"; };
-		A2ABF7121828B6C300228181 /* FunctionGenerator.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FunctionGenerator.inc.h; sourceTree = "<group>"; };
-		A2ABF7131828B6C300228181 /* FunctionInfo.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FunctionInfo.inc.h; sourceTree = "<group>"; };
-		A2ABF7141828B6C300228181 /* LexicalAnalyzer.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexicalAnalyzer.inc.h; sourceTree = "<group>"; };
-		A2ABF7151828B6C300228181 /* Node.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.inc.h; sourceTree = "<group>"; };
-		A2ABF7161828B6C300228181 /* Parser.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Parser.inc.h; sourceTree = "<group>"; };
-		A2ABF7171828B6C300228181 /* Structurizer.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Structurizer.inc.h; sourceTree = "<group>"; };
-		A2ABF7181828B6C300228181 /* TabProcessor.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabProcessor.inc.h; sourceTree = "<group>"; };
-		A2ABF7191828B6C300228181 /* Token.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Token.inc.h; sourceTree = "<group>"; };
-		A2ABF71A1828B6C300228181 /* LexicalAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LexicalAnalyzer.h; sourceTree = "<group>"; };
-		A2ABF71B1828B6C300228181 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
-		A2ABF71C1828B6C300228181 /* Parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Parser.h; sourceTree = "<group>"; };
-		A2ABF71D1828B6C300228181 /* Structurizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Structurizer.h; sourceTree = "<group>"; };
-		A2ABF71E1828B6C300228181 /* TabProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabProcessor.h; sourceTree = "<group>"; };
-		A2ABF71F1828B6C300228181 /* Token.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = Token.h; sourceTree = "<group>"; };
-		A2ABF7211828B6C300228181 /* Graphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Graphics.h; sourceTree = "<group>"; };
-		A2ABF7231828B6C300228181 /* System.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = System.inc.h; sourceTree = "<group>"; };
-		A2ABF7261828B6C300228181 /* Instruction.inc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Instruction.inc.h; sourceTree = "<group>"; };
-		A2ABF7271828B6C300228181 /* IoState.inc.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = IoState.inc.h; sourceTree = "<group>"; };
-		A2ABF7281828B6C300228181 /* Machine.inc.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = Machine.inc.h; sourceTree = "<group>"; };
-		A2ABF7291828B6C300228181 /* Instruction.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = Instruction.h; sourceTree = "<group>"; };
-		A2ABF72A1828B6C300228181 /* IoState.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = IoState.h; sourceTree = "<group>"; };
-		A2ABF72B1828B6C300228181 /* Machine.h */ = {isa = PBXFileReference; fileEncoding = 2147483649; lastKnownFileType = sourcecode.c.h; path = Machine.h; sourceTree = "<group>"; };
-		A2ABF7361828B6C300228181 /* Sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sound.h; sourceTree = "<group>"; };
-		A2ABF7371828B6C300228181 /* SoundChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundChannel.h; sourceTree = "<group>"; };
-		A2ABF7381828B6C300228181 /* System.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 2147483649; path = System.h; sourceTree = "<group>"; };
 		A2ABF7391828B6E800228181 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -153,6 +99,7 @@
 		A2ABF6AC1828B3C700228181 = {
 			isa = PBXGroup;
 			children = (
+				1D243FBB1F1AE98F003E220A /* include */,
 				A2ABF6BE1828B3C700228181 /* MacSunaba */,
 				A2ABF6DC1828B3C700228181 /* MacSunabaTests */,
 				A2ABF6B71828B3C700228181 /* Frameworks */,
@@ -194,7 +141,6 @@
 		A2ABF6BE1828B3C700228181 /* MacSunaba */ = {
 			isa = PBXGroup;
 			children = (
-				A2ABF6EF1828B6C300228181 /* include */,
 				A2ABF73B1828B70800228181 /* Base */,
 				A2ABF7401828B70800228181 /* Graphics */,
 				A2ABF7461828B70800228181 /* Sound */,
@@ -243,146 +189,10 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		A2ABF6EF1828B6C300228181 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				A2ABF6F01828B6C300228181 /* Base */,
-				A2ABF7021828B6C300228181 /* Compiler */,
-				A2ABF7201828B6C300228181 /* Graphics */,
-				A2ABF7221828B6C300228181 /* inc */,
-				A2ABF7241828B6C300228181 /* Machine */,
-				A2ABF7351828B6C300228181 /* Sound */,
-				A2ABF7381828B6C300228181 /* System.h */,
-			);
-			name = include;
-			path = SunabaCore/include;
-			sourceTree = "<group>";
-		};
-		A2ABF6F01828B6C300228181 /* Base */ = {
-			isa = PBXGroup;
-			children = (
-				A2ABF6F11828B6C300228181 /* Array.h */,
-				A2ABF6F21828B6C300228181 /* Base.h */,
-				A2ABF6F31828B6C300228181 /* inc */,
-				A2ABF6FB1828B6C300228181 /* MemoryPool.h */,
-				A2ABF6FC1828B6C300228181 /* Os.h */,
-				A2ABF6FD1828B6C300228181 /* RefString.h */,
-				A2ABF6FE1828B6C300228181 /* String.h */,
-				A2ABF6FF1828B6C300228181 /* Tank.h */,
-				A2ABF7001828B6C300228181 /* TextFile.h */,
-				A2ABF7011828B6C300228181 /* Utility.h */,
-			);
-			path = Base;
-			sourceTree = "<group>";
-		};
-		A2ABF6F31828B6C300228181 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				A209D6C218347266009A8FFB /* sjisToUnicode.h */,
-				A2ABF6F41828B6C300228181 /* Array.inc.h */,
-				A2ABF6F51828B6C300228181 /* MemoryPool.inc.h */,
-				A2ABF6F61828B6C300228181 /* RefString.inc.h */,
-				A2ABF6F71828B6C300228181 /* String.inc.h */,
-				A2ABF6F81828B6C300228181 /* Tank.inc.h */,
-				A2ABF6F91828B6C300228181 /* TextFile.inc.h */,
-				A2ABF6FA1828B6C300228181 /* Utility.inc.h */,
-			);
-			path = inc;
-			sourceTree = "<group>";
-		};
-		A2ABF7021828B6C300228181 /* Compiler */ = {
-			isa = PBXGroup;
-			children = (
-				A2ABF7031828B6C300228181 /* Assembler.h */,
-				A2ABF7041828B6C300228181 /* CharacterReplacer.h */,
-				A2ABF7051828B6C300228181 /* CodeGenerator.h */,
-				A2ABF7061828B6C300228181 /* CommentRemover.h */,
-				A2ABF7071828B6C300228181 /* Compiler.h */,
-				A2ABF7081828B6C300228181 /* Concatenator.h */,
-				A2ABF7091828B6C300228181 /* FunctionGenerator.h */,
-				A2ABF70A1828B6C300228181 /* FunctionInfo.h */,
-				A2ABF70B1828B6C300228181 /* inc */,
-				A2ABF71A1828B6C300228181 /* LexicalAnalyzer.h */,
-				A2ABF71B1828B6C300228181 /* Node.h */,
-				A2ABF71C1828B6C300228181 /* Parser.h */,
-				A2ABF71D1828B6C300228181 /* Structurizer.h */,
-				A2ABF71E1828B6C300228181 /* TabProcessor.h */,
-				A2ABF71F1828B6C300228181 /* Token.h */,
-			);
-			path = Compiler;
-			sourceTree = "<group>";
-		};
-		A2ABF70B1828B6C300228181 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				A2ABF70C1828B6C300228181 /* Assembler.inc.h */,
-				A2ABF70D1828B6C300228181 /* CharacterReplacer.inc.h */,
-				A2ABF70E1828B6C300228181 /* CodeGenerator.inc.h */,
-				A2ABF70F1828B6C300228181 /* CommentRemover.inc.h */,
-				A2ABF7101828B6C300228181 /* Compiler.inc.h */,
-				A2ABF7111828B6C300228181 /* Concatenator.inc.h */,
-				A2ABF7121828B6C300228181 /* FunctionGenerator.inc.h */,
-				A2ABF7131828B6C300228181 /* FunctionInfo.inc.h */,
-				A2ABF7141828B6C300228181 /* LexicalAnalyzer.inc.h */,
-				A2ABF7151828B6C300228181 /* Node.inc.h */,
-				A2ABF7161828B6C300228181 /* Parser.inc.h */,
-				A2ABF7171828B6C300228181 /* Structurizer.inc.h */,
-				A2ABF7181828B6C300228181 /* TabProcessor.inc.h */,
-				A2ABF7191828B6C300228181 /* Token.inc.h */,
-			);
-			path = inc;
-			sourceTree = "<group>";
-		};
-		A2ABF7201828B6C300228181 /* Graphics */ = {
-			isa = PBXGroup;
-			children = (
-				A2ABF7211828B6C300228181 /* Graphics.h */,
-			);
-			path = Graphics;
-			sourceTree = "<group>";
-		};
-		A2ABF7221828B6C300228181 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				A2ABF7231828B6C300228181 /* System.inc.h */,
-			);
-			path = inc;
-			sourceTree = "<group>";
-		};
-		A2ABF7241828B6C300228181 /* Machine */ = {
-			isa = PBXGroup;
-			children = (
-				A2ABF7251828B6C300228181 /* inc */,
-				A2ABF7291828B6C300228181 /* Instruction.h */,
-				A2ABF72A1828B6C300228181 /* IoState.h */,
-				A2ABF72B1828B6C300228181 /* Machine.h */,
-			);
-			path = Machine;
-			sourceTree = "<group>";
-		};
-		A2ABF7251828B6C300228181 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				A2ABF7261828B6C300228181 /* Instruction.inc.h */,
-				A2ABF7271828B6C300228181 /* IoState.inc.h */,
-				A2ABF7281828B6C300228181 /* Machine.inc.h */,
-			);
-			path = inc;
-			sourceTree = "<group>";
-		};
-		A2ABF7351828B6C300228181 /* Sound */ = {
-			isa = PBXGroup;
-			children = (
-				A2ABF7361828B6C300228181 /* Sound.h */,
-				A2ABF7371828B6C300228181 /* SoundChannel.h */,
-			);
-			path = Sound;
-			sourceTree = "<group>";
-		};
 		A2ABF73B1828B70800228181 /* Base */ = {
 			isa = PBXGroup;
 			children = (
-				43146F1B196A7B6B003FE70A /* Os.mm */,
+				1D243FB51F1AE881003E220A /* Os.mm */,
 			);
 			name = Base;
 			path = SunabaCore/cpp/Base;
@@ -391,7 +201,7 @@
 		A2ABF7401828B70800228181 /* Graphics */ = {
 			isa = PBXGroup;
 			children = (
-				43146F1F196A7C7F003FE70A /* Graphics.cpp */,
+				1D243FB71F1AE893003E220A /* Graphics.cpp */,
 			);
 			name = Graphics;
 			path = SunabaCore/cpp/Graphics;
@@ -400,7 +210,7 @@
 		A2ABF7461828B70800228181 /* Sound */ = {
 			isa = PBXGroup;
 			children = (
-				43146F1D196A7C4E003FE70A /* Sound.cpp */,
+				1D243FB91F1AE8A2003E220A /* Sound.cpp */,
 			);
 			name = Sound;
 			path = SunabaCore/cpp/Sound;
@@ -450,7 +260,7 @@
 		A2ABF6AD1828B3C700228181 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = library;
 				TargetAttributes = {
 					A2ABF6D51828B3C700228181 = {
@@ -485,6 +295,7 @@
 				A2ABF6C31828B3C700228181 /* InfoPlist.strings in Resources */,
 				A2ABF6D11828B3C700228181 /* Images.xcassets in Resources */,
 				A2ABF6C91828B3C700228181 /* Credits.rtf in Resources */,
+				1D243FBC1F1AE98F003E220A /* include in Resources */,
 				A2ABF6CF1828B3C700228181 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -507,11 +318,11 @@
 				A2334583182B7E2800DA7962 /* MyView.mm in Sources */,
 				A23345C9182CD31F00DA7962 /* SunabaWrapper.mm in Sources */,
 				A2ABF6CC1828B3C700228181 /* AppDelegate.mm in Sources */,
-				43146F1C196A7B6B003FE70A /* Os.mm in Sources */,
-				43146F1E196A7C4E003FE70A /* Sound.cpp in Sources */,
+				1D243FBA1F1AE8A2003E220A /* Sound.cpp in Sources */,
 				A2ABF6EE1828B68700228181 /* MyGLView.mm in Sources */,
-				43146F20196A7C7F003FE70A /* Graphics.cpp in Sources */,
 				A2ABF6C51828B3C700228181 /* main.mm in Sources */,
+				1D243FB81F1AE893003E220A /* Graphics.cpp in Sources */,
+				1D243FB61F1AE881003E220A /* Os.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -581,13 +392,19 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = SUNABA_USE_PSEUDO_SOCKET;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -598,11 +415,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/MacSunaba/SunabaCore/include",
+					"$(PROJECT_DIR)/../include",
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -620,14 +437,19 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = SUNABA_USE_PSEUDO_SOCKET;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -636,11 +458,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"$(PROJECT_DIR)/MacSunaba/SunabaCore/include",
+					"$(PROJECT_DIR)/../include",
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -656,6 +479,7 @@
 				INFOPLIST_FILE = "MacSunaba/MacSunaba-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = "Private.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -672,6 +496,7 @@
 				INFOPLIST_FILE = "MacSunaba/MacSunaba-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "-DNDEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = "Private.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -693,6 +518,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "MacSunabaTests/MacSunabaTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "Private.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -711,6 +537,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MacSunaba/MacSunaba-Prefix.pch";
 				INFOPLIST_FILE = "MacSunabaTests/MacSunabaTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "Private.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;

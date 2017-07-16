@@ -68,8 +68,7 @@ mCharDrawn(false),
 mMessageStream(messageStream),
 mExecutedInstructionCount(0.0),
 mTimeArrayPosition(0),
-mTimeArrayValidCount(0),
-mLastSyncEndTime(0){
+mTimeArrayValidCount(0){
 	for (int i = 0; i < TIME_ARRAY_COUNT; ++i){
 		mTimeArray[(i * 2) + 0] = mTimeArray[(i * 2) + 1] = 0;
 	}
@@ -162,7 +161,6 @@ inline int Machine::outputValue(){
 }
 
 inline void Machine::threadFunc(){
-	mLastSyncEndTime = getTimeInMilliSecond();
 	sync(true); //一回sync。起動直後に押されたキーを反映させる。vsyncしないとUIからの入力が来ない
 	bool end = false;
 	while (!end){
@@ -189,13 +187,6 @@ inline void Machine::threadFunc(){
 					break;
 				}
 				executeDecoded(); //最適化版
-			}
-			//無意味な演算でCPUをフル活用するのを止めるための強制スリープ
-			//VSYnc待ちsyncがないまま一定以上時間が経つと無理矢理寝かせる。
-			unsigned time = getTimeInMilliSecond();
-			if ((time - mLastSyncEndTime) >= BUSY_SLEEP_THRESHOLD){
-				sleepMilliSecond(BUSY_SLEEP_THRESHOLD);
-				mLastSyncEndTime = time;
 			}
 		}
 	}
@@ -264,7 +255,6 @@ inline void Machine::sync(bool waitVSync){
 		int averageSyncWait = 0;
 		int averageSyncInterval = 0;
 		unsigned syncEndTime = getTimeInMilliSecond();
-		mLastSyncEndTime = syncEndTime;
 		if (mTimeArrayValidCount >= 1){
 			//平均フレーム時間を計算
 			int oldestIndex = mTimeArrayPosition - mTimeArrayValidCount;
@@ -431,7 +421,6 @@ inline bool Machine::decode(){
 				*mMessageStream << L"存在しないフロー制御命令。おそらく壊れている(コード:" << hex << inst << dec << L")" << std::endl;
 				return false;
 			}
-			imm;
 			if (inst8 == INSTRUCTION_POP){//popだけ符号つき
 				imm = getImmS(inst, IMM_BIT_COUNT_FLOW);
 			}else{
@@ -445,7 +434,6 @@ inline bool Machine::decode(){
 
 inline void Machine::executeDecoded(){
 	using namespace std; //hex,decのため
-
 	const DecodedInst& decoded = mDecodedInsts[mProgramCounter - mProgramBegin];
 	int inst = decoded.mInst;
 	int imm = decoded.mImm;
@@ -622,7 +610,7 @@ inline void Machine::executeDecoded(){
 			//デバグ情報入れる
 			if (!mDebugInfo.push(imm, mFramePointer)){
 				beginError();
-				*mMessageStream << L"部分プログラムを激しく呼びすぎ。たぶん再帰に間違いがある(命令:" << mProgramCounter << L")" << std::endl;
+				*mMessageStream << L"部分プログラムを激しく呼びすぎ。たぶん再帰に間違いがある(命令:" <<  mProgramCounter << L")" << std::endl;
 			}
 		}else{ //INSTRUCTION_RET
 			pop(imm);

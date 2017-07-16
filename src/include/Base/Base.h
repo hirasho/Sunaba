@@ -13,8 +13,8 @@ void writeLog(const char* filename, int line, const char* message);
 #define STRONG_ASSERT_MSG(exp, msg) ((!!(exp)) || (Sunaba::die( __FILE__, __LINE__, #msg), 0))
 #define WRITE_LOG(msg) {Sunaba::writeLog(__FILE__, __LINE__, msg);}
 #define HALT(msg) {Sunaba::die(__FILE__, __LINE__, #msg);}
-#define DELETE(x) {delete (x); (x) = 0;}
-#define DELETE_ARRAY(x) {delete[] (x); (x) = 0;}
+#define DELETE(x) {if (x){ delete (x); (x) = 0;}}
+#define DELETE_ARRAY(x) {if (x){ delete[] (x); (x) = 0;}}
 #define OPERATOR_DELETE(x) {operator delete((x)); (x) = 0;}
 
 //デバグとリリースで分岐するもの

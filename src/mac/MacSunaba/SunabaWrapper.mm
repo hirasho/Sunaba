@@ -13,14 +13,18 @@
 
 static Sunaba::System* gpSystem = NULL;
 
-bool compileFromPath( const char* filePath, Sunaba::Array<unsigned int>* instructions, std::string& resultMsg );
+bool compileFromPath(
+    const char* filePath,
+    Sunaba::Array<unsigned int>* instructions,
+    const Sunaba::Localization&,
+    std::string& resultMsg );
 
 @implementation SunabaWrapper
 
 -(id) init
 {
     if( gpSystem == NULL ) {
-        gpSystem = new Sunaba::System( NULL );
+        gpSystem = new Sunaba::System( NULL, L"japanese" );
     }
     return self;
 }
@@ -28,11 +32,11 @@ bool compileFromPath( const char* filePath, Sunaba::Array<unsigned int>* instruc
 -(BOOL) compileAndExecute:(const char *)filePath
 {
     if( gpSystem == NULL ) {
-        gpSystem = new Sunaba::System( NULL );
+        gpSystem = new Sunaba::System( NULL, L"japanese" );
     }
     std::string msg;
     Sunaba::Array<unsigned int> sunabaInstructions;
-    BOOL ret = ( compileFromPath(filePath, &sunabaInstructions, msg) ? YES : NO );
+    BOOL ret = ( compileFromPath(filePath, &sunabaInstructions, *(gpSystem->localization()), msg) ? YES : NO );
     
     AppDelegate* delegate = (AppDelegate*)[[NSApplication sharedApplication] delegate];
     if( delegate ) {
@@ -127,17 +131,21 @@ bool compileFromPath( const char* filePath, Sunaba::Array<unsigned int>* instruc
 }
 @end
 
-bool compileFromPath( const char* filePath, Sunaba::Array<unsigned int>* instructions, std::string& msg ) {
+bool compileFromPath(
+const char* filePath,
+Sunaba::Array<unsigned int>* instructions,
+const Sunaba::Localization& loc,
+std::string& msg ) {
     Sunaba::Array<wchar_t> tmpPath;
     Sunaba::Array<wchar_t> compiled;
     std::wostringstream messageOut;
     int len = (int)strlen(filePath)+1;
-    Sunaba::convertToUnicode( &tmpPath, filePath, len, false );
+    Sunaba::convertToUnicode( &tmpPath, filePath, len);
     
-    bool bRet = Sunaba::Compiler::process( &compiled, &messageOut, tmpPath.pointer() );
+    bool bRet = Sunaba::Compiler::process( &compiled, &messageOut, tmpPath.pointer(), loc);
     if( bRet ) {
         
-        bRet = Sunaba::Assembler::process( instructions,  &messageOut, compiled );
+        bRet = Sunaba::Assembler::process( instructions,  &messageOut, compiled, loc );
         if( bRet ) {
             
         }
@@ -150,4 +158,3 @@ bool compileFromPath( const char* filePath, Sunaba::Array<unsigned int>* instruc
     msg = std::string(convMsg.pointer());
     return bRet;
 }
-
