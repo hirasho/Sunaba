@@ -534,42 +534,52 @@ inline bool FunctionGenerator::generateSubstitution(Tank<wchar_t>* out, const No
 
 //第一項、第二項、第二項オペレータ、第三項、第三項オペレータ...という具合に実行
 inline bool FunctionGenerator::generateExpression(Tank<wchar_t>* out, const Node* node){
-	//解決されて単項になっていれば、そのままgenerateTermに丸投げ
+	//解決されて単項になっていれば、そのままgenerateTermに丸投げ。ただし単項マイナスはここで処理。
+	bool ret = false;
 	if (node->mType != NODE_EXPRESSION){
-		return generateTerm(out, node);
+		ret = generateTerm(out, node);
+	}else{
+		if (node->mNegation){
+			out->addString(L"i 0 #()に対する単項マイナス用\n"); //0をプッシュ
+		}
+		//項は必ず二つある。
+		ASSERT(node->mChild);
+		ASSERT(node->mChild->mBrother);
+		if (!generateTerm(out, node->mChild)){
+			return false;
+		}
+		if (!generateTerm(out, node->mChild->mBrother)){
+			return false;
+		}
+		//演算子を適用
+		const wchar_t* opStr = 0;
+		switch (node->mOperator){
+			case OPERATOR_PLUS: opStr = L"add"; break;
+			case OPERATOR_MINUS: opStr = L"sub"; break;
+			case OPERATOR_MUL: opStr = L"mul"; break;
+			case OPERATOR_DIV: opStr = L"div"; break;
+			case OPERATOR_LT: opStr = L"lt"; break;
+			case OPERATOR_LE: opStr = L"le"; break;
+			case OPERATOR_EQ: opStr = L"eq"; break;
+			case OPERATOR_NE: opStr = L"ne"; break;
+			default: ASSERT(false); break; //これはParserのバグ。とりわけ、LE、GEは前の段階でGT,LTに変換されていることに注意
+		}
+		out->addString(opStr);
+		out->addString(L"\n");
+		//単項マイナスがある場合、ここで減算
+		if (node->mNegation){
+			out->addString(L"sub #()に対する単項マイナス用\n");
+		}
+		ret = true;
 	}
-	//項は必ず二つある。
-	ASSERT(node->mChild);
-	ASSERT(node->mChild->mBrother);
-	if (!generateTerm(out, node->mChild)){
-		return false;
-	}
-	if (!generateTerm(out, node->mChild->mBrother)){
-		return false;
-	}
-	//演算子を適用
-	const wchar_t* opStr = 0;
-	switch (node->mOperator){
-		case OPERATOR_PLUS: opStr = L"add"; break;
-		case OPERATOR_MINUS: opStr = L"sub"; break;
-		case OPERATOR_MUL: opStr = L"mul"; break;
-		case OPERATOR_DIV: opStr = L"div"; break;
-		case OPERATOR_LT: opStr = L"lt"; break;
-		case OPERATOR_LE: opStr = L"le"; break;
-		case OPERATOR_EQ: opStr = L"eq"; break;
-		case OPERATOR_NE: opStr = L"ne"; break;
-		default: ASSERT(false); break; //これはParserのバグ。とりわけ、LE、GEは前の段階でGT,LTに変換されていることに注意
-	}
-	out->addString(opStr);
-	out->addString(L"\n");
-	return true;
+	return ret;
 }
 
 //右辺値。
 inline bool FunctionGenerator::generateTerm(Tank<wchar_t>* out, const Node* node){
-	//マイナスがついていれば、まず0をプッシュ。後でここから引く。
+	//単項マイナス処理0から引く
 	if (node->mNegation){
-		out->addString(L"i 0\n"); //0をプッシュ
+		out->addString(L"i 0 #単項マイナス用\n"); //0をプッシュ
 	}
 	wchar_t numberBuffer[16];
 	//タイプで分岐
@@ -642,9 +652,9 @@ inline bool FunctionGenerator::generateTerm(Tank<wchar_t>* out, const Node* node
 			out->addString(L"\n");
 		}
 	}
-	//終わった後、減算
+	//単項マイナスがある場合、ここで減算
 	if (node->mNegation){
-		out->addString(L"sub\n");
+		out->addString(L"sub #単項マイナス用\n");
 	}
 	return true;
 }
