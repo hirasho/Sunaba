@@ -46,6 +46,9 @@ private:
 	int mMemoryRequestAddress;
 	int mMemoryRequestValue;
 	int mMemoryRequestState;
+	//最後に受け取ったobjectCodeを持っておく。同じものが来た場合はメッセージを少し変える。
+	unsigned char* mObjectCode;
+	int mObjectCodeSize;
 
 	Sound* mSound;
 	//多言語化

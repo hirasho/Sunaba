@@ -23,7 +23,9 @@ mCalculationTimePercent(0),
 mMemoryRequestAddress(0),
 mMemoryRequestValue(0),
 mMemoryRequestState(IoState::MEMORY_REQUEST_NONE),
-mSound(0){
+mSound(0),
+mObjectCode(0),
+mObjectCodeSize(0){
 	STRONG_ASSERT(windowHandle);
 	mLocalization.init(langName);
 	beginTimer();
@@ -34,12 +36,27 @@ inline System::~System(){
 	DELETE(mMachine);
 	DELETE(mGraphics);
 	DELETE(mSound);
+	DELETE_ARRAY(mObjectCode);
 	endTimer();
 }
 
 inline bool System::bootProgram(const unsigned char* objectCode, int objectCodeSize){
+#ifdef _WIN32
 	STRONG_ASSERT(mPictureBoxHandle);
+#endif
 	STRONG_ASSERT(objectCode);
+
+	// 前にもらったものと同一か判定する
+	bool isSameProgram = false;
+	if ((mObjectCodeSize == objectCodeSize) && mObjectCode){
+		isSameProgram = (std::memcmp(mObjectCode, objectCode, objectCodeSize) == 0);
+	}
+	DELETE_ARRAY(mObjectCode);
+	mObjectCode = new unsigned char[objectCodeSize];
+	std::memcpy(mObjectCode, objectCode, objectCodeSize);
+	mObjectCodeSize = objectCodeSize;
+
+
 	DELETE(mMachine);
 	mTerminationMessageDrawn = false;
 	mMachine = new Machine(
@@ -50,7 +67,11 @@ inline bool System::bootProgram(const unsigned char* objectCode, int objectCodeS
 		mMessageStream << L"指定されたプログラムを開始できなかった。" << std::endl;
 		DELETE(mMachine);
 	}else{
-		mMessageStream << L"プログラムを開始！" << std::endl;
+		if (isSameProgram){
+			mMessageStream << L"同じプログラムを再起動(セーブした?)" << std::endl;
+		}else{
+			mMessageStream << L"新たなプログラムを起動" << std::endl;
+		}
 	}
 	restartGraphics();
 	return (mMachine != 0);
@@ -80,7 +101,7 @@ inline bool System::bootProgram(const wchar_t* filename){
 inline void System::update(Array<unsigned char>* messageOut, int pointerX, int pointerY, const char* keys){
 	std::wstring ws = mMessageStream.str();
 	if (ws.size() > 0){
-		messageOut->setSize(ws.size() * 2);
+		messageOut->setSize(static_cast<int>(ws.size()) * 2);
 		for (int i = 0; i < static_cast<int>(ws.size()); ++i){
 			(*messageOut)[(2 * i) + 0] = static_cast<unsigned char>((ws[i] >> 8) & 0xff);
 			(*messageOut)[(2 * i) + 1] = static_cast<unsigned char>((ws[i] >> 0) & 0xff);
@@ -190,11 +211,11 @@ inline int System::screenHeight() const{
 	}
 }
 
-int System::framePerSecond() const{
+inline int System::framePerSecond() const{
 	return mFramePerSecond;
 }
 
-int System::calculationTimePercent() const{
+inline int System::calculationTimePercent() const{
 	return mCalculationTimePercent;
 }
 
@@ -234,7 +255,9 @@ inline int System::memoryValue(int address) const{
 
 inline bool System::restartGraphics(){
 	STRONG_ASSERT(mMachine);
-	STRONG_ASSERT(mPictureBoxHandle);
+#ifdef _WIN32
+    STRONG_ASSERT(mPictureBoxHandle);
+#endif
 	DELETE(mGraphics);
 	int w = mMachine->screenWidth();
 	int h = mMachine->screenHeight();

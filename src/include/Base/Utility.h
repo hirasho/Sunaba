@@ -41,6 +41,10 @@ int roundUpToPow2(int);
 void convertToUnicode(Array<wchar_t>* out, const char* in, int inSize);
 //SJIS->Unicode
 void convertSjisToUnicode(Array<wchar_t>* out, const char* in, int inSize);
+//Unicode->Utf8
+void convertUnicodeToUtf8(Array<char>* out, const wchar_t* in, int inSize);
+//CR,CRLF -> LF
+void convertNewLine(Array<wchar_t>* inOut);
 
 int readS4(const unsigned char*);
 int readS2(const unsigned char*);

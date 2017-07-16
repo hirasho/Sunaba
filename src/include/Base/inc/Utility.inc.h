@@ -399,12 +399,19 @@ inline void makeAbsoluteFilename(Array<wchar_t>* out, const wchar_t* basePath, c
 			(*out)[pos + 1 + i] = filename[i];
 		}
 	}
-	//最後にスラッシュをバックスラッシュに
 	l = out->size();
 	for (int i = 0; i < l; ++i){
+#ifdef _WIN32
+		//最後にスラッシュをバックスラッシュに
 		if ((*out)[i] == L'/'){
 			(*out)[i] = L'\\';
 		}
+#else
+		// 最後にバックスラッシュをスラッシュに
+		if ((*out)[i] == L'\\'){
+			(*out)[i] = L'/';
+		}
+#endif
 	}
 }
 
@@ -424,6 +431,7 @@ inline int getFilenameBegin(const wchar_t* filename, int filenameSize){
 
 inline bool isAbsoluteFilename(const wchar_t* filename){
 	bool r = false;
+#ifdef _WIN32
 	if (isAlphabet(filename[0])){ //最初の文字がアルファベットで、
 		if (filename[1] == L':'){ //セミコロンがあれば、絶対パス
 			r = true;
@@ -434,7 +442,58 @@ inline bool isAbsoluteFilename(const wchar_t* filename){
 		   r = true;
 	   }
 	}
+#else
+    if (filename[0] == L'/'){ // スラッシュで始まればもう絶対パス
+        r = true;
+    }
+#endif
 	return r;
+}
+
+/*
+0 cr
+1 non cr
+
+0,cr,0 LF
+0,lf,1 LF
+0,*,1 LF,*
+1,cr,0 
+1,*,1 *
+*/
+inline void convertNewLine(Array<wchar_t>* inOut){
+	int dst = 0;
+	int size = inOut->size();
+	bool prevIsCr = false;
+	for (int i = 0; i < size; ++i){
+		wchar_t c = (*inOut)[i];
+		if (prevIsCr){
+			(*inOut)[dst] = L'\n'; //何にせよ改行吐く
+			++dst;
+			if (c == L'\r'){
+				; //何もしない
+			}else if (c == L'\n'){
+				prevIsCr = false;
+			}else{
+				(*inOut)[dst] = c;
+				++dst;
+				prevIsCr = false;
+			}
+		}else{
+			if (c == L'\r'){
+				prevIsCr = true;
+			}else{
+				(*inOut)[dst] = c;
+				++dst;
+			}
+		}
+	}
+	if (prevIsCr)
+	{
+		(*inOut)[dst] = L'\n';
+		++dst;
+	}
+	ASSERT(dst <= size);
+	inOut->setSize(dst);	
 }
 
 inline void convertSjisToUnicode(Array<wchar_t>* out, const char* in, int inSize){
@@ -4231,5 +4290,58 @@ inline void convertToUnicode(Array<wchar_t>* out, const char* in, int inSize){
 		convertUtf8ToUnicode(out, in, inSize); //とりあえずUTF-8とみなす
 	}
 }
-
+    
+inline void convertUnicodeToUtf8( Array<char>* out, const wchar_t* in, int inSize )
+{
+        // Sunabaは内部が wchar_t に格納された UTF16 で動いている.
+        // そのため、ここでは UTF16 , BOM なし でという条件で変換を行う.
+        int utf8Length = 0;
+        int instrCount = 0;
+        const wchar_t* wc = in;
+        /* UTF8としての長さをカウント. */
+        while( *wc != '\0' && instrCount < inSize ) {
+            unsigned code = static_cast<unsigned>( *wc );
+            if( code < 0x80 ) {
+                utf8Length += 1; // ASCII
+            } else if( code < 0x800 ) {
+                utf8Length += 2;
+            } else {
+                if( !(code < 0xD800u || code >= 0xE000u) ) {
+                    /* ここは未サポート */
+                    printf( "Illegal.\n" );
+                }
+                utf8Length += 3;
+            }
+            ++instrCount;
+            wc++;
+        }
+        
+        /* UTF8を格納 */
+        out->setSize( utf8Length+1 );
+        wc = in;
+        (*out)[ utf8Length ] = '\0';
+        int n = 0;
+        instrCount = 0;
+        while( *wc != '\0' && instrCount < inSize ) {
+            unsigned code = static_cast<unsigned>( *wc );
+            if( code < 0x80u ) {
+                (*out)[n++] = static_cast<char>( code & 0x7Fu );
+            } else if( code < 0x800 ) {
+                (*out)[n++] = static_cast<char>( 0xC0u | ((code & 0x7C0u) >> 6) );
+                (*out)[n++] = static_cast<char>( 0x80u | (code & 0x3Fu) );
+            } else {
+                if( !(code < 0xD800u || code >= 0xE000u) ) {
+                    printf( "Illegal.\n" );
+                }
+                (*out)[n++] = static_cast<char>( 0xE0u | ((code & 0xF000u) >> 12));
+                (*out)[n++] = static_cast<char>( 0x80u | ((code & 0xFC0u) >> 6 ));
+                (*out)[n++] = static_cast<char>( 0x80u | ( code & 0x3fu ) );
+            }
+            wc++;
+            instrCount++;
+        }
+        (*out)[n] = '\0';
+    }
+    
+    
 } //namespace Sunaba

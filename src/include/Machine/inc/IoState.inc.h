@@ -1,4 +1,7 @@
-﻿namespace Sunaba{
+﻿
+#include <cstring>
+
+namespace Sunaba{
 
 //IoState
 inline IoState::IoState() : 
@@ -30,7 +33,7 @@ inline IoState::~IoState(){
 inline void IoState::allocateMemoryCopy(int memorySize, int ioOffset, int vramOffset){ 
 	DELETE_ARRAY(mMemoryCopy);
 	mMemoryCopy = new int[memorySize];
-	memset(mMemoryCopy, 0, memorySize * sizeof(int));
+    std::memset(mMemoryCopy, 0, memorySize * sizeof(int));
 	mMemorySize = memorySize;
 	mIoOffset = ioOffset;
 	mVramOffset = vramOffset;
