@@ -717,7 +717,7 @@ inline Node* Parser::parseTerm(const Array<Token>& in, int* pos){
 		if (node->mType == NODE_NUMBER){
 			node->mNumber *= -1;
 		}else{
-			node->mNegation = true;
+			node->mNegation = !node->mNegation;
 		}
 	}
 	return node;

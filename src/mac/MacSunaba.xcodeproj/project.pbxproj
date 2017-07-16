@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D243FB61F1AE881003E220A /* Os.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D243FB51F1AE881003E220A /* Os.mm */; };
 		1D243FB81F1AE893003E220A /* Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1D243FB71F1AE893003E220A /* Graphics.cpp */; };
 		1D243FBA1F1AE8A2003E220A /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1D243FB91F1AE8A2003E220A /* Sound.cpp */; };
 		1D243FBC1F1AE98F003E220A /* include in Resources */ = {isa = PBXBuildFile; fileRef = 1D243FBB1F1AE98F003E220A /* include */; };
+		1D79AD131F1B58A8001A19F0 /* Os.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D79AD121F1B58A8001A19F0 /* Os.mm */; };
 		A20A6FA01835E22A00B8F7B5 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20A6F9F1835E22A00B8F7B5 /* OpenAL.framework */; };
 		A2334583182B7E2800DA7962 /* MyView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2334582182B7E2800DA7962 /* MyView.mm */; };
 		A23345C9182CD31F00DA7962 /* SunabaWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = A23345C8182CD31F00DA7962 /* SunabaWrapper.mm */; };
@@ -40,10 +40,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1D243FB51F1AE881003E220A /* Os.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Os.mm; path = ../../../../../cpp/Base/mac/Os.mm; sourceTree = "<group>"; };
 		1D243FB71F1AE893003E220A /* Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Graphics.cpp; path = ../../../../../cpp/Graphics/mac/Graphics.cpp; sourceTree = "<group>"; };
 		1D243FB91F1AE8A2003E220A /* Sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sound.cpp; path = ../../../../../cpp/Sound/mac/Sound.cpp; sourceTree = "<group>"; };
 		1D243FBB1F1AE98F003E220A /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; name = include; path = ../include; sourceTree = "<group>"; };
+		1D79AD121F1B58A8001A19F0 /* Os.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Os.mm; path = ../../../../../cpp/Base/mac/Os.mm; sourceTree = "<group>"; };
 		A20A6F9F1835E22A00B8F7B5 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		A2334581182B7D7300DA7962 /* MyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyView.h; sourceTree = "<group>"; };
 		A2334582182B7E2800DA7962 /* MyView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MyView.mm; sourceTree = "<group>"; };
@@ -192,7 +192,7 @@
 		A2ABF73B1828B70800228181 /* Base */ = {
 			isa = PBXGroup;
 			children = (
-				1D243FB51F1AE881003E220A /* Os.mm */,
+				1D79AD121F1B58A8001A19F0 /* Os.mm */,
 			);
 			name = Base;
 			path = SunabaCore/cpp/Base;
@@ -322,7 +322,7 @@
 				A2ABF6EE1828B68700228181 /* MyGLView.mm in Sources */,
 				A2ABF6C51828B3C700228181 /* main.mm in Sources */,
 				1D243FB81F1AE893003E220A /* Graphics.cpp in Sources */,
-				1D243FB61F1AE881003E220A /* Os.mm in Sources */,
+				1D79AD131F1B58A8001A19F0 /* Os.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
