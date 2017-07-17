@@ -1,0 +1,48 @@
+body{
+ background: #def;
+ background: linear-gradient(#ffffff, #ddffee);
+ background-attachment: fixed;
+ max-width: 60em;
+}
+ul li{
+ line-height: 1.25em;
+}
+p{
+ text-indent: 1em;
+}
+dt{
+ font-weight: bold; 
+}
+h1{ 
+ border-radius: 1em; 
+ border: medium solid #bbddcc;
+ background: #ddffee;
+ padding: 0.5em;
+ text-shadow: 0.2em 0.2em 0.1em #cccccc;
+ text-align: center;
+}
+div.affiLeft{
+ display: inline;
+ float: left;
+ margin-right: 1em;
+}
+h2{ 
+ clear: both;
+ border-radius: 1em; 
+ border: medium solid #bbddcc;
+ background: #ddffee;
+ padding: 0.5em;
+ text-shadow: 0.1em 0.1em 0.1em #aaaaaa;
+}
+pre.code{ 
+ border-radius: 0.25em; 
+ border: medium solid #ddffee;
+ background: #f0fff8;
+ line-height: 1.25em;
+ padding-left: 0.5em;
+ color: #004422;
+}
+footer{
+ padding-top: 0.5em;
+ border-top: medium ridge #ddffee;
+}
