@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F6B7C751-7F9E-4EB0-AB8C-BD921CE433E0}</ProjectGuid>
+    <RootNamespace>SunabaLib</RootNamespace>
+    <Keyword>ManagedCProj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.26419.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)obj\Debug\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(ProjectName)\Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.15063.0\um\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(ProjectName)\Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.15063.0\um\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\include;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;SUNABA_USE_DSOUND;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Shlwapi.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AssemblyDebug>true</AssemblyDebug>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\include;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;SUNABA_USE_DSOUND;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Shlwapi.lib;User32.lib;Gdi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+    <Reference Include="System.Data">
+      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\Base\Array.h" />
+    <ClInclude Include="..\include\Base\Base.h" />
+    <ClInclude Include="..\include\Base\inc\Array.inc.h" />
+    <ClInclude Include="..\include\Base\inc\MemoryPool.inc.h" />
+    <ClInclude Include="..\include\Base\inc\RefString.inc.h" />
+    <ClInclude Include="..\include\Base\inc\String.inc.h" />
+    <ClInclude Include="..\include\Base\inc\Tank.inc.h" />
+    <ClInclude Include="..\include\Base\inc\TextFile.inc.h" />
+    <ClInclude Include="..\include\Base\inc\Utility.inc.h" />
+    <ClInclude Include="..\include\Base\MemoryPool.h" />
+    <ClInclude Include="..\include\Base\Os.h" />
+    <ClInclude Include="..\include\Base\RefString.h" />
+    <ClInclude Include="..\include\Base\String.h" />
+    <ClInclude Include="..\include\Base\Tank.h" />
+    <ClInclude Include="..\include\Base\TextFile.h" />
+    <ClInclude Include="..\include\Base\Utility.h" />
+    <ClInclude Include="..\include\Compiler\Assembler.h" />
+    <ClInclude Include="..\include\Compiler\CharacterReplacer.h" />
+    <ClInclude Include="..\include\Compiler\CodeGenerator.h" />
+    <ClInclude Include="..\include\Compiler\CommentRemover.h" />
+    <ClInclude Include="..\include\Compiler\Compiler.h" />
+    <ClInclude Include="..\include\Compiler\Concatenator.h" />
+    <ClInclude Include="..\include\Compiler\FunctionGenerator.h" />
+    <ClInclude Include="..\include\Compiler\FunctionInfo.h" />
+    <ClInclude Include="..\include\Compiler\inc\Assembler.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\CharacterReplacer.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\CodeGenerator.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\CommentRemover.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\Compiler.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\Concatenator.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\FunctionGenerator.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\FunctionInfo.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\LexicalAnalyzer.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\Node.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\Parser.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\Structurizer.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\TabProcessor.inc.h" />
+    <ClInclude Include="..\include\Compiler\inc\Token.inc.h" />
+    <ClInclude Include="..\include\Compiler\LexicalAnalyzer.h" />
+    <ClInclude Include="..\include\Compiler\Node.h" />
+    <ClInclude Include="..\include\Compiler\Parser.h" />
+    <ClInclude Include="..\include\Compiler\Structurizer.h" />
+    <ClInclude Include="..\include\Compiler\TabProcessor.h" />
+    <ClInclude Include="..\include\Compiler\Token.h" />
+    <ClInclude Include="..\include\Graphics\Graphics.h" />
+    <ClInclude Include="..\include\inc\Localization.chinese.inc.h" />
+    <ClInclude Include="..\include\inc\Localization.japanese.inc.h" />
+    <ClInclude Include="..\include\inc\Localization.korean.inc.h" />
+    <ClInclude Include="..\include\inc\System.inc.h" />
+    <ClInclude Include="..\include\Localization.h" />
+    <ClInclude Include="..\include\Machine\inc\Instruction.inc.h" />
+    <ClInclude Include="..\include\Machine\inc\IoState.inc.h" />
+    <ClInclude Include="..\include\Machine\inc\Machine.inc.h" />
+    <ClInclude Include="..\include\Machine\Instruction.h" />
+    <ClInclude Include="..\include\Machine\IoState.h" />
+    <ClInclude Include="..\include\Machine\Machine.h" />
+    <ClInclude Include="..\include\Sound\Sound.h" />
+    <ClInclude Include="..\include\Sound\SoundChannel.h" />
+    <ClInclude Include="..\include\System.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SunabaLib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\cpp\Base\pc\Os.cpp" />
+    <ClCompile Include="..\cpp\Graphics\pc\Graphics.cpp" />
+    <ClCompile Include="..\cpp\Sound\pc\Sound.cpp" />
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="SunabaLib.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,3 +1,0 @@
-D:\Sunaba\extra\src\SunabaImageConverter\obj\Release\ResolveAssemblyReference.cache
-D:\Sunaba\extra\src\SunabaImageConverter\obj\Release\SunabaImageConverter.exe
-D:\Sunaba\extra\SunabaImageConverter.exe

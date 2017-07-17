@@ -2,7 +2,6 @@
 #include <windows.h>
 #include <process.h>
 #include <Shlwapi.h>
-#include <MMSystem.h>
 #undef DELETE
 #include <cstdlib>
 #include <locale.h>
@@ -12,38 +11,30 @@
 #include "Base/Os.h"
 #include "Base/Utility.h"
 
-#ifndef SUNABA_USE_CLI
-extern HWND gWindowHandle;
-#endif
+double gRcpPerformanceFrequency;
 
 namespace Sunaba{
 
 void writeToConsole(const wchar_t* s){
-#ifdef SUNABA_USE_CLI
 	System::String^ refS = gcnew System::String(s);
 	System::Diagnostics::Debug::Write(refS);
-#else
-	OutputDebugStringW(s);
-#endif
 }
 
 void writeToConsole(const char* s){
 	Array<wchar_t> converted;
 	convertSjisToUnicode(&converted, s, std::strlen(s));
-	writeToConsole(converted.pointer());
+	Array<wchar_t> nullTerminated;
+	nullTerminated.setSize(converted.size() + 1);
+	for (int i = 0; i < converted.size(); ++i){
+		nullTerminated[i] = converted[i];
+	}
+	nullTerminated[converted.size()] = L'\0';
+	writeToConsole(nullTerminated.pointer());
 }
 
 void die(const char* filename, int line, const char* message){
 	writeLog(filename, line, message);
-
-#ifdef SUNABA_USE_CLI
 	System::Diagnostics::Debug::Assert(false);
-#else
-	if (gWindowHandle){
-		MessageBoxA(gWindowHandle, s.c_str(), "致命的エラー", MB_OK | MB_ICONERROR);
-	}
-	::DebugBreak();
-#endif
 }
 
 void writeLog(const char* filename, int line, const char* message){
@@ -56,17 +47,8 @@ void writeLog(const char* filename, int line, const char* message){
 
 void writeLog(const char* message){
 	writeToConsole(message);
-	bool append = false;
-	if (fileExist(L"SunabaSystemError.txt")){
-		append = true;
-	}
 	OutputFile f(L"SunabaSystemError.txt", true);
 	if (!(f.isError())){
-		if (append){
-			const char* newLine = "----begin appending---\n";
-			int l = std::strlen(newLine);
-			f.write(reinterpret_cast<const unsigned char*>(newLine), l);
-		}
 		int l = 0;
 		while (message[l]){
 			++l;
@@ -74,16 +56,24 @@ void writeLog(const char* message){
 		f.write(reinterpret_cast<const unsigned char*>(message), l);
 	}
 }
+
 void beginTimer(){
-	timeBeginPeriod(1);
+	LARGE_INTEGER t;
+	BOOL r = QueryPerformanceFrequency(&t);
+	if (r == FALSE){
+		writeLog("QueryPerformanceFrequency() failed.\r\n");
+	}
+	gRcpPerformanceFrequency = 1.0 / static_cast<double>(t.QuadPart);
 }
 
 unsigned getTimeInMilliSecond(){
-	return timeGetTime();
+	LARGE_INTEGER t;
+	QueryPerformanceCounter(&t);
+	double f = static_cast<double>(t.QuadPart) * gRcpPerformanceFrequency;
+	return static_cast<unsigned>((f * 1000.0) + 500.0);
 }
 
 void endTimer(){
-	timeEndPeriod(1);
 }
 
 void sleepMilliSecond(int t){

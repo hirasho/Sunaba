@@ -4308,7 +4308,7 @@ inline void convertUnicodeToUtf8( Array<char>* out, const wchar_t* in, int inSiz
             } else {
                 if( !(code < 0xD800u || code >= 0xE000u) ) {
                     /* ここは未サポート */
-                    printf( "Illegal.\n" );
+//                    printf( "Illegal.\n" );
                 }
                 utf8Length += 3;
             }
@@ -4331,7 +4331,7 @@ inline void convertUnicodeToUtf8( Array<char>* out, const wchar_t* in, int inSiz
                 (*out)[n++] = static_cast<char>( 0x80u | (code & 0x3Fu) );
             } else {
                 if( !(code < 0xD800u || code >= 0xE000u) ) {
-                    printf( "Illegal.\n" );
+//                    printf( "Illegal.\n" );
                 }
                 (*out)[n++] = static_cast<char>( 0xE0u | ((code & 0xF000u) >> 12));
                 (*out)[n++] = static_cast<char>( 0x80u | ((code & 0xFC0u) >> 6 ));

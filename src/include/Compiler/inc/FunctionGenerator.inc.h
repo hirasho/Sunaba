@@ -688,7 +688,7 @@ const Node* node){
 				out->addString(L"fld ");
 				out->addString(numberBuffer);
 				out->addString(L" #ポインタ\"");
-				RefString name(node->mToken->mString);
+//				RefString name(node->mToken->mString);
 				out->add(name.pointer(), name.size());
 				out->addString(L"\"からロード\n");
 				if (node->mChild){ //変数インデクス

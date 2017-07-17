@@ -1,0 +1,48 @@
+ImageRuntimeVersion: v4.0.30319
+Assembly SunabaLib, Version=1.0.*, Culture=ロケールに依存しない言語 (ロケールに依存しない国): 
+	hash=SHA1, flags=PublicKey
+Assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Assembly System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089: 
+	hash=None, flags=None
+Class SunabaLib.SunabaSystem: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(IntPtr, System.String): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Interfaces:
+    System.IDisposable
+  Methods:
+    setPictureBoxHandle(IntPtr, Int32, Int32): PrivateScope, Public, HideBySig
+    end(): PrivateScope, Public, HideBySig
+    bootProgram(String): PrivateScope, Public, HideBySig
+    bootProgram(Byte[]): PrivateScope, Public, HideBySig
+    update(Char[]&, Int32, Int32, SByte[]): PrivateScope, Public, HideBySig
+    screenWidth(): PrivateScope, Public, HideBySig
+    screenHeight(): PrivateScope, Public, HideBySig
+    framePerSecond(): PrivateScope, Public, HideBySig
+    calculationTimePercent(): PrivateScope, Public, HideBySig
+    requestAutoSync(Boolean(HasFieldMarshal)): PrivateScope, Public, HideBySig
+    requestAutoSyncFinished(): PrivateScope, Public, HideBySig
+    autoSync(): PrivateScope, Public, HideBySig
+    requestMemoryWrite(Int32, Int32): PrivateScope, Public, HideBySig
+    requestMemoryFinished(): PrivateScope, Public, HideBySig
+    memoryValue(Int32): PrivateScope, Public, HideBySig
+    Dispose(): PrivateScope, Public, Final, Virtual, HideBySig
+Struct SunabaLib.SunabaSystem+Key: AutoLayout, AnsiClass, Class, NestedPublic, Sealed, BeforeFieldInit
+  :System.Enum
+  Fields:
+    Int32 value__ : Public, SpecialName, RTSpecialName
+    Key KEY_UNKNOWN = -1 : Public, Static, Literal, HasDefault
+    Key KEY_LBUTTON = 0 : Public, Static, Literal, HasDefault
+    Key KEY_RBUTTON = 1 : Public, Static, Literal, HasDefault
+    Key KEY_UP = 2 : Public, Static, Literal, HasDefault
+    Key KEY_DOWN = 3 : Public, Static, Literal, HasDefault
+    Key KEY_LEFT = 4 : Public, Static, Literal, HasDefault
+    Key KEY_RIGHT = 5 : Public, Static, Literal, HasDefault
+    Key KEY_SPACE = 6 : Public, Static, Literal, HasDefault
+    Key KEY_ENTER = 7 : Public, Static, Literal, HasDefault
+    Key KEY_COUNT = 8 : Public, Static, Literal, HasDefault
+Class SunabaLib.Compiler: AutoLayout, AnsiClass, Class, Public, BeforeFieldInit
+    Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
+  Methods:
+    compile(UInt32[]&, Char[]&, String, String): PrivateScope, Public, Static, HideBySig

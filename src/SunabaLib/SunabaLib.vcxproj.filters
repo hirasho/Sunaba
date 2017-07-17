@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Base">
+      <UniqueIdentifier>{1139016c-cb40-4920-81e0-130ba8ddc902}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\inc">
+      <UniqueIdentifier>{2ef1003d-1048-4ae1-b6c2-edb86f1e95cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compiler">
+      <UniqueIdentifier>{b357c8da-5b02-4ed8-8412-3182d3e09fc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compiler\inc">
+      <UniqueIdentifier>{742976a2-ae5f-4d72-b1d0-c7acb346c646}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{7aafc25d-56a0-4985-8ada-828428907293}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Machine">
+      <UniqueIdentifier>{cfe7696a-7ac0-4058-8c8d-d7b7ff7aab30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Machine\inc">
+      <UniqueIdentifier>{4c735774-3a02-47a0-94d0-39df2ace622d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{d41f96be-2186-41c8-8519-2fefa10da003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Localizations">
+      <UniqueIdentifier>{f4b6a1c3-2d18-4153-a59f-ab30862ed8c8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\Base\Array.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\Base.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\MemoryPool.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\Os.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\RefString.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\String.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\Tank.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\TextFile.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\Utility.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\inc\Array.inc.h">
+      <Filter>Base\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\inc\MemoryPool.inc.h">
+      <Filter>Base\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\inc\RefString.inc.h">
+      <Filter>Base\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\inc\String.inc.h">
+      <Filter>Base\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\inc\Tank.inc.h">
+      <Filter>Base\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\inc\TextFile.inc.h">
+      <Filter>Base\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Base\inc\Utility.inc.h">
+      <Filter>Base\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\Assembler.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\CharacterReplacer.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\CodeGenerator.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\CommentRemover.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\Compiler.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\Concatenator.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\FunctionGenerator.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\FunctionInfo.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\LexicalAnalyzer.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\Node.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\Parser.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\Structurizer.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\TabProcessor.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\Token.h">
+      <Filter>Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\Assembler.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\CharacterReplacer.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\CodeGenerator.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\CommentRemover.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\Compiler.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\Concatenator.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\FunctionGenerator.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\FunctionInfo.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\LexicalAnalyzer.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\Node.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\Parser.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\Structurizer.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\TabProcessor.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Compiler\inc\Token.inc.h">
+      <Filter>Compiler\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Graphics\Graphics.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Machine\Instruction.h">
+      <Filter>Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Machine\IoState.h">
+      <Filter>Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Machine\Machine.h">
+      <Filter>Machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Machine\inc\Instruction.inc.h">
+      <Filter>Machine\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Machine\inc\IoState.inc.h">
+      <Filter>Machine\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Machine\inc\Machine.inc.h">
+      <Filter>Machine\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Sound\Sound.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Sound\SoundChannel.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inc\Localization.chinese.inc.h">
+      <Filter>Localizations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inc\Localization.japanese.inc.h">
+      <Filter>Localizations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inc\Localization.korean.inc.h">
+      <Filter>Localizations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Localization.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SunabaLib.h" />
+    <ClInclude Include="..\include\System.h" />
+    <ClInclude Include="..\include\inc\System.inc.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\cpp\Base\pc\Os.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpp\Graphics\pc\Graphics.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpp\Sound\pc\Sound.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="SunabaLib.cpp" />
+  </ItemGroup>
+</Project>
