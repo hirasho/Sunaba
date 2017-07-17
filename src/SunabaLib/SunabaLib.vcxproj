@@ -44,13 +44,13 @@
     <_ProjectFileVersion>15.0.26419.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)obj\Debug\</OutDir>
+    <OutDir>$(SolutionDir)obj\$(ProjectName)\Debug\</OutDir>
     <IntDir>$(SolutionDir)obj\$(ProjectName)\Debug\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.15063.0\um\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)..\</OutDir>
+    <OutDir>$(SolutionDir)obj\$(ProjectName)\Release\</OutDir>
     <IntDir>$(SolutionDir)obj\$(ProjectName)\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.15063.0\um\x86;$(LibraryPath)</LibraryPath>
