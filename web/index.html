@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8"><title>プログラミング言語Sunaba</title>
+</head>
+<body>
+  <h1>プログラミング言語Sunaba(すなば)</h1>
+
+  <div>
+    <canvas id="screen" width="400" height="400" style="background-color: #000; display:none;"></canvas>
+    <canvas id="screen2" width="400" height="400" style="background-color: #000;"></canvas>
+  </div>
+  
+  <textarea id="code" cols="80" rows="12">
+メモリ[65050] → 999999
+  </textarea>
+  
+  <div>
+    <input type="button" id="runButton" value="実行">
+    <input type="button" id="stopButton" value="中止">
+  </div>
+
+  <div>
+    メッセージ
+    <input type="button" id="clearButton" value="クリア"><br>
+    <textarea id="message" readonly cols="80" rows="12"></textarea>
+  </div>
+
+  <script src="dist/main.js"></script>
+</body>
+</html>
