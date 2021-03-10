@@ -318,7 +318,7 @@ void setBootProgramPath( const char* path ) {
   NSAttributedString* str = [[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:msg] ];
   [self.textView.textStorage appendAttributedString: str];
   [self.textView.textStorage endEditing];
-  
+  [self.textView setTextColor:NSColor.textColor];
   // 最終行の付近にスクロール.
   [self.textView autoscroll: nil ];
 }

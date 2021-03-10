@@ -23,6 +23,18 @@ static NSOpenGLContext* pContextGL;
     }
 
     NSOpenGLPixelFormatAttribute attribs[] =
+	{
+		NSOpenGLPFADoubleBuffer,
+		NSOpenGLPFADepthSize, 24,
+		// Must specify the 3.2 Core Profile to use OpenGL 3.2
+#if ESSENTIAL_GL_PRACTICES_SUPPORT_GL3
+		NSOpenGLPFAOpenGLProfile,
+		NSOpenGLProfileVersion3_2Core,
+#endif
+		0
+	};
+/*
+    NSOpenGLPixelFormatAttribute attribs[] =
     {
 		NSOpenGLPFAAccelerated,
 		NSOpenGLPFANoRecovery,
@@ -31,13 +43,19 @@ static NSOpenGLContext* pContextGL;
 		NSOpenGLPFADepthSize, 16,
 		0
     };
-	
+*/
     NSOpenGLPixelFormat* fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes: attribs ];
+
+    [self setPixelFormat:fmt];
+    
     _context = [[NSOpenGLContext alloc] initWithFormat: fmt shareContext:nil ];
+
+    [self setOpenGLContext:_context];
+
     pContextGL = _context;
-	  
+
     if( pContextGL ) {
-      [_context makeCurrentContext];
+	  [[self openGLContext] makeCurrentContext];
       glClearColor( 0.0f,0.0f,0.0f,1.0f);
       glClearDepth( 1.0f );
       isFirst = YES;
@@ -46,6 +64,8 @@ static NSOpenGLContext* pContextGL;
       [pContextGL flushBuffer];
 	}
   }
+
+
   return self;
 }
 
@@ -61,6 +81,7 @@ static NSOpenGLContext* pContextGL;
 -(void) drawRect:(NSRect)dirtyRect
 {
   if( isFirst ) {
+//	[[self openGLContext] makeCurrentContext];
     glClearColor( 0.0f,0.0f,0.0f,1.0f);
     glClearDepth( 1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

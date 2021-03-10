@@ -10,7 +10,7 @@
 #import <OpenGL/OpenGL.h>
 #import <OpenGL/gl.h>
 
-@interface MyGLView : NSView
+@interface MyGLView : NSOpenGLView
 {
     NSOpenGLContext* _context;
     NSTrackingArea*  _tracking;

@@ -35,6 +35,5 @@ int main(int argc, const char * argv[])
             setBootProgramPath( path );
         }
     }
-    
     return NSApplicationMain(argc, argv);
 }

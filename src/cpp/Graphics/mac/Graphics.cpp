@@ -65,9 +65,8 @@ public:
 		int pixelCount = mTextureWidthPow2 * mTextureHeightPow2;
 		mVram = new int[pixelCount];
 		memset(mVram, 0, pixelCount * 4);
-        
-        setContextMyGLView();
 
+        setContextMyGLView();
 		glEnable(GL_TEXTURE_2D); //念のため
 		glGenTextures(1, &mScreenTexture);
 		glBindTexture(GL_TEXTURE_2D, mScreenTexture);
@@ -77,7 +76,6 @@ public:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mTextureWidthPow2, mTextureHeightPow2, 0, GL_RGBA, GL_UNSIGNED_BYTE, mVram);
-		
 #if 0 // 今コントロールのサイズを指定していないので・・・無効化しておく
 		//radeonのバグへの対処としてビューポートを明に指定
 		glViewport(0, 0, mScreenWidth, mScreenHeight);
@@ -183,14 +181,13 @@ public:
         glFlush();
 		
         //エラー出てる？
-/*
         GLenum error = glGetError();
         if (error != GL_NO_ERROR){
             std::ostringstream oss;
             oss << "OpenGL ERROR(" << std::hex << error << std::dec << ")" << std::endl;
             WRITE_LOG(oss.str().c_str());
         }
-*/
+
         flushContentMyGLView();
 
 		adjastFrameRate();

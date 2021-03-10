@@ -26,3 +26,11 @@
 *.exe
 *.out
 *.app
+
+# unity
+SunabaUnity/Library
+SunabaUnity/Logs
+SunabaUnity/obj
+
+# build
+Release/

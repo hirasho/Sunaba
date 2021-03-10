@@ -1,4 +1,4 @@
-﻿#include "System.h"
+#include "System.h"
 #include "Graphics/Graphics.h"
 #include "Base/Os.h"
 #include "Machine/Machine.h"
@@ -29,7 +29,7 @@ mObjectCodeSize(0){
 	STRONG_ASSERT(windowHandle);
 	mLocalization.init(langName);
 	beginTimer();
-	mSound = new Sound(IoState::SOUND_CHANNEL_COUNT, windowHandle); 
+	mSound = new Sound(IoState::SOUND_CHANNEL_COUNT, windowHandle);
 }
 
 inline System::~System(){
