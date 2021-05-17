@@ -1,4 +1,4 @@
-﻿#include "Compiler/Node.h"
+#include "Compiler/Node.h"
 #include "Base/MemoryPool.h"
 
 namespace Sunaba{
@@ -628,7 +628,7 @@ inline Node* Parser::parseExpression(const Array<Token>& in, int* pos){
 				case OPERATOR_EQ: preComputedValue = (valueA == valueB) ? 1 : 0; break;
 				case OPERATOR_NE: preComputedValue = (valueA != valueB) ? 1 : 0; break;
 				case OPERATOR_LT: preComputedValue = (valueA < valueB) ? 1 : 0; break;
-				case OPERATOR_LE: preComputedValue = (valueA > valueB) ? 1 : 0; break;
+				case OPERATOR_LE: preComputedValue = (valueA <= valueB) ? 1 : 0; break;
 				default: ASSERT(false); //LE,GEは上で変換されてなくなっていることに注意
 			}
 			if (abs(preComputedValue) <= getMaxImmS(IMM_BIT_COUNT_I)){ //即値に収まりません
