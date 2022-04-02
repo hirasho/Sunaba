@@ -1,7 +1,7 @@
-#include "Compiler/Node.h"
+﻿#include "Compiler/Node.h"
 #include "Base/MemoryPool.h"
 
-namespace Sunaba{
+namespace Sunaba{ 
 
 inline Node* Parser::process(
 const Array<Token>& in,
