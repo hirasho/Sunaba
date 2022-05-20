@@ -31,6 +31,9 @@
 SunabaUnity/Library
 SunabaUnity/Logs
 SunabaUnity/obj
+SunabaUnity/Temp
 
 # build
 Release/
+.DS_Store
+

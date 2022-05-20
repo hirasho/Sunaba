@@ -1,21 +1,40 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class Main : MonoBehaviour
+using UnityEngine.UI;
+
+namespace Sunaba
 {
-	[SerializeField]
-	UnityEngine.UI.RawImage screen;
-
-	Texture2D texture;
-
-	void Start()
+	public class Main : MonoBehaviour
 	{
-		this.texture = new Texture2D(100, 100, TextureFormat.ARGB32, mipChain: false, linear: true);
-		this.screen.texture = this.texture;
-	}
+		[SerializeField] RawImage appWindow;
+		[SerializeField] Text messageWindow;
+		[SerializeField] Button rebootButton;
 
-	void Update()
-	{
+		void Start()
+		{
+			pixels = new Texture2D(100, 100);
+			messageStream = new System.IO.MemoryStream();
+			messageStreamWriter = new System.IO.StreamWriter(messageStream);
+		}
 
+		void Update()
+		{
+			// UpdateごとにappWindowのテクスチャを送信する
+	//		pixels.
+			
+			
+		}
+
+		void OnProgramDrop()
+		{
+//			machine = new Machine();
+		}
+
+		// non public --------
+		Texture2D pixels;
+		Machine machine;
+		System.IO.StreamWriter messageStreamWriter;
+		System.IO.MemoryStream messageStream;
 	}
 }
