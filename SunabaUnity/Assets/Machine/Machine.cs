@@ -7,10 +7,12 @@ namespace Sunaba
 {
 	public class Machine
 	{
+		//設定定数。ただし、いじるとIOメモリの番号が変わるので、ソースコードが非互換になる。
 		public const int FreeAndProgramSize = 40000;
 		public const int StackSize = 10000;
 		public const int IoMemorySize = 10000;
 		public const int IoWritableOffset = 5000;
+
 		public const int ExecutionUnit = 10000; //これだけの命令実行したらウィンドウ状態を見に行く。
 		public const int MinimumFreeSize = 1000; //最低これだけのメモリは0から空いている。プログラムサイズが制約される。
 		public const int BusySleepThreshold = 100; //syncなしでこれだけ時間が経ったら強制的に待ち
@@ -73,7 +75,6 @@ namespace Sunaba
 			ScreenWidth = ScreenHeight = 100;
 
 			this.messageStream = messageStream;
-			timeArray = new System.DateTime[TimeArrayCount * 2];
 
 			var vramSize = ScreenWidth * ScreenHeight;
 			memory = new int[VmMemoryVramBase + vramSize];
@@ -172,7 +173,6 @@ namespace Sunaba
 		}
 
 		// non public ------------
-		const int TimeArrayCount = 60;
 		//デバグ関連
 		class CallInfo
 		{
@@ -199,7 +199,7 @@ namespace Sunaba
 
 		class DebugInfo
 		{
-			public DebugInfo(int timeArrayCount)
+			public DebugInfo()
 			{
 				callHistory = new CallInfo[CallHistorySize];
 			}
@@ -257,19 +257,12 @@ namespace Sunaba
 		int stackPointer = VmMemoryStackBase;
 		int framePointer;
 
-		bool error = true; //無事初期化が終わったらfalseにする
 		bool charDrawn;
-
 		int[] memory;
-
 		System.IO.StreamWriter messageStream;
 		DebugInfo debugInfo;
 		long executedInstructionCount;
-		System.DateTime[] timeArray;
-		int timeArrayPosition;
-		int timeArrayValidCount;
 		DecodedInst[] decodedInsts;
-		int decodedProgramCounter;
 
 		void ThreadFunc()
 		{
