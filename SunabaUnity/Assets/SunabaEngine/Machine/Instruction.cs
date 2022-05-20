@@ -1,3 +1,5 @@
+using System;
+
 namespace Sunaba
 {
 	public enum Instruction
@@ -30,7 +32,7 @@ namespace Sunaba
 
 	public static class InstructionUtil
 	{
-		public static Instruction NameToInstruction(string s, int l)
+		public static Instruction NameToInstruction(ReadOnlySpan<char> s)
 		{
 			if (infoTable == null)
 			{
@@ -39,7 +41,7 @@ namespace Sunaba
 			var r = Instruction.Unknown;
 			for (var i = 0; i < infoTable.Length; i++)
 			{
-				if (s == infoTable[i].name)
+				if (Utility.IsEqual(s, infoTable[i].name))
 				{
 					r = infoTable[i].instruction;
 					break;

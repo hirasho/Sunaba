@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{46ac0774-800b-1d4b-0a5b-b7cb608c5c35}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SunabaEngine", "SunabaEngine.csproj", "{05fcdcc4-fdfa-2b72-ba5b-69c68fade40d}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{2f352305-5198-2f4d-361c-cfa981bb5e1c}"
 EndProject
 Global
@@ -12,6 +14,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{46ac0774-800b-1d4b-0a5b-b7cb608c5c35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{46ac0774-800b-1d4b-0a5b-b7cb608c5c35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05fcdcc4-fdfa-2b72-ba5b-69c68fade40d}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05fcdcc4-fdfa-2b72-ba5b-69c68fade40d}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2f352305-5198-2f4d-361c-cfa981bb5e1c}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2f352305-5198-2f4d-361c-cfa981bb5e1c}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection

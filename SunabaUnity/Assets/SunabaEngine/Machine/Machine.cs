@@ -79,6 +79,7 @@ namespace Sunaba
 			var vramSize = ScreenWidth * ScreenHeight;
 			memory = new int[VmMemoryVramBase + vramSize];
 
+			ioState = new IoState();
 			ioState.AllocateMemoryCopy(
 				memory.Length, 
 				VmMemoryIoBase,
