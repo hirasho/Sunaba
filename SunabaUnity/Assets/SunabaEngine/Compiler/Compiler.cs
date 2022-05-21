@@ -6,7 +6,7 @@ namespace Sunaba
 	class Compiler
 	{
 		public static bool Process(
-			List<char> output,
+			System.Text.StringBuilder output,
 			System.IO.StreamWriter messageStream,
 			string filename,
 			Localization localization,
@@ -77,12 +77,17 @@ namespace Sunaba
 				return false;
 			}
 
-/*
 			//コード生成
-			if (!CodeGenerator::process(result, messageOut, rootNode, english)){
+			if (!CodeGenerator.Process(
+				output, 
+				messageStream, 
+				rootNode, 
+				english, 
+				outputIntermediates))
+			{
 				return false;
 			}
-*/
+
 			return true;
 		}
 	}

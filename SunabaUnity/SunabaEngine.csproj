@@ -52,6 +52,9 @@
      <Compile Include="Assets/SunabaEngine/Compiler/Structurizer.cs" />
      <Compile Include="Assets/SunabaEngine/Compiler/Node.cs" />
      <Compile Include="Assets/SunabaEngine/Compiler/Parser.cs" />
+     <Compile Include="Assets/SunabaEngine/Compiler/CodeGenerator.cs" />
+     <Compile Include="Assets/SunabaEngine/Compiler/FunctionInfo.cs" />
+     <Compile Include="Assets/SunabaEngine/Compiler/FunctionGenerator.cs" />
      <None Include="Assets/SunabaEngine/SunabaEngine.asmdef" />
     <Reference Include="UnityEngine">
         <HintPath>/Applications/Unity/2021.3.2f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
