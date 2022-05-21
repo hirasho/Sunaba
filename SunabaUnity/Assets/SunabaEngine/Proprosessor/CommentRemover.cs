@@ -8,7 +8,7 @@ namespace Sunaba
 		//TODO: 末尾に改行を加えるが、本来ここでやるべきことじゃない。
 		public static bool Process(
 			List<char> output,
-			List<char> input)
+			IList<char> input)
 		{
 			var l = input.Count;
 			if (l < 2)

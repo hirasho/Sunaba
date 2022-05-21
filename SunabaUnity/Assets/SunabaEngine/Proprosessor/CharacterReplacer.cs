@@ -7,7 +7,7 @@ namespace Sunaba
 	{
 		public static void Process(
 			List<char> output,
-			List<char> input,
+			IList<char> input,
 			Localization localization)
 		{
 			var size = input.Count;

@@ -19,26 +19,35 @@ namespace Sunaba
 			TabProcessor.Process(tabProcessed, compiled);
 			if (outputIntermediates)
 			{
-				File.WriteAllText("tabProcessed.txt", new string(tabProcessed.ToArray()));
+				File.WriteAllText("assemblerTabProcessed.txt", new string(tabProcessed.ToArray()));
 			}
 			//読めるテキストが来たケースに備えて念のため文字置換
 			var replaced = new List<char>();
 			CharacterReplacer.Process(replaced, tabProcessed, localization);
 			if (outputIntermediates)
 			{
-				File.WriteAllText("replaced.txt", new string(replaced.ToArray()));
+				File.WriteAllText("assemblerReplaced.txt", new string(replaced.ToArray()));
 			}
 			//コメントを削除する。行数は変えない。
 			var commentRemoved = new List<char>();
 			CommentRemover.Process(commentRemoved, replaced);
 			if (outputIntermediates)
 			{
-				File.WriteAllText("commentRemoved.txt", new string(commentRemoved.ToArray()));
+				File.WriteAllText("assemblerCommentRemoved.txt", new string(commentRemoved.ToArray()));
 			}
 			//まずトークン分解
 			var tokens = new List<Token>();
 			var assembler = new Assembler(messageStream);
 			assembler.Tokenize(tokens, commentRemoved.ToArray());
+			if (outputIntermediates)
+			{
+				var sb = new System.Text.StringBuilder();
+				foreach (var token in tokens)
+				{
+					sb.AppendFormat("{0}: {1} {2} {3} {4}\n", token.line, token.type, token.instruction, token.number, token.str);
+				}
+				File.WriteAllText("assemblerTokenized.txt", sb.ToString());
+			}
 			//ラベルだけ処理します。
 			assembler.CollectLabel(tokens);
 			//パースします。
@@ -51,6 +60,16 @@ namespace Sunaba
 			if (!assembler.ResolveLabelAddress(instructionsOut))
 			{
 				return false;
+			}
+
+			if (outputIntermediates)
+			{
+				var sb = new System.Text.StringBuilder();
+				foreach (var instruction in instructionsOut)
+				{
+					sb.AppendFormat("{0:x}\n", instruction);
+				}
+				File.WriteAllText("assemblerInstructions.txt", sb.ToString());
 			}
 			return true;
 		}
@@ -80,17 +99,12 @@ namespace Sunaba
 
 		class Token
 		{
-			public Token(int line)
+			public Token(int line) // Unknownのまま。最後の番兵データ
 			{
 				this.line = line;
 			}
 
 			public Token(ReadOnlySpan<char> s, int line)
-			{
-				Set(s, line);
-			}
-
-			public void Set(ReadOnlySpan<char> s, int line)
 			{
 				this.line = line;
 				if (s.Length == 0)

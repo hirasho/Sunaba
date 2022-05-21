@@ -7,7 +7,7 @@ namespace Sunaba
 	{
 		public static void Process(
 			List<char> output,
-			List<char> input,
+			IList<char> input,
 			int tabWidth = 8)
 		{
 			var col = 0; //行内位置

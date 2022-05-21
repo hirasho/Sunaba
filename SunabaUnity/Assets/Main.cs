@@ -81,7 +81,6 @@ namespace Sunaba
 				compiled,
 				localization,
 				outputIntermediates);
-
 			if (succeeded) 
 			{
 				//コード送信
@@ -95,6 +94,8 @@ namespace Sunaba
 				}
 				machine = new Machine(messageStreamWriter, objectCode);
 			}
+//			var bytes = messageStream.ToArray();
+//			messageWindow.text = System.Text.Encoding.UTF8.GetString(bytes);
 		}
 	}
 }
