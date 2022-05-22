@@ -267,7 +267,7 @@ namespace Sunaba
 			}
 			else if (type == TokenType.LineBegin)
 			{
-				sb.AppendFormat("行開始({0})\n", spaceCount);
+				sb.AppendFormat("行開始({0})", spaceCount);
 			}
 			else if ((type == TokenType.Name) || (type == TokenType.StringLiteral) || (type == TokenType.Number))
 			{

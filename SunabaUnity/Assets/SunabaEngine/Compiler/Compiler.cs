@@ -80,6 +80,7 @@ namespace Sunaba
 				localization);
 			if (rootNode == null)
 			{
+UnityEngine.Debug.LogError("Compile Failed");
 				return false;
 			}
 
@@ -91,6 +92,7 @@ namespace Sunaba
 				english, 
 				outputIntermediates))
 			{
+UnityEngine.Debug.LogError("Code Generation Failed");
 				return false;
 			}
 

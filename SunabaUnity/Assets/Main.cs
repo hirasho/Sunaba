@@ -6,8 +6,9 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Sunaba;
 
-public class Main : MonoBehaviour
+public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 {
+	[SerializeField] new Camera camera;
 	[SerializeField] RawImage appWindow;
 	[SerializeField] Text messageWindow;
 	[SerializeField] Button rebootButton;
@@ -16,11 +17,19 @@ public class Main : MonoBehaviour
 	[SerializeField] bool outputIntermediates;
 	[SerializeField] bool inMainThread;
 
-	void Start()
+	public override Camera eventCamera { get => camera; }
+
+	protected override void Start()
 	{
+		base.Start();
+		Application.targetFrameRate = 60;
+
 		keys = new int[(int)IoState.Key.Count];
 		rebootButton.onClick.AddListener(OnClickReboot);
+
 		pixels = new Texture2D(100, 100);
+		pixels.filterMode = FilterMode.Point;
+
 		appWindow.texture = pixels;
 		messageStream = new StringBuilder();
 	}
@@ -29,7 +38,7 @@ public class Main : MonoBehaviour
 	{
 		if (machine != null)
 		{
-//			UpdateMachine();
+			UpdateMachine();
 		}
 
 		// ログ吐き出し
@@ -40,14 +49,62 @@ public class Main : MonoBehaviour
 		}
 	}
 
+	public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
+	{
+		// 範囲外なら抜ける(エディタで範囲外クリックしても来るので)
+		if (
+		(eventData.position.x < 0f) ||
+		(eventData.position.y < 0f) ||
+		(eventData.position.x > Screen.width) ||
+		(eventData.position.y > Screen.height))
+		{
+			return;
+		}
+
+		var cameraTransform = camera.transform;
+		var result = new RaycastResult
+		{
+			gameObject = this.gameObject,
+			module = this,
+			distance = 1000f,
+			worldPosition = cameraTransform.position + (cameraTransform.forward * 1000f),
+			worldNormal = -cameraTransform.forward,
+			screenPosition = eventData.position,
+			index = resultAppendList.Count,
+			sortingLayer = 0,
+			sortingOrder = 0
+		};
+		resultAppendList.Add(result);
+		pointerPosition = eventData.position;
+	}
+
+	public void OnPointerDown(PointerEventData eventData)
+	{
+		if (pointerId == int.MaxValue)
+		{
+			pointerId = eventData.pointerId;
+			pointerDown = true;
+		}
+	}
+
+	public void OnPointerUp(PointerEventData eventData)
+	{
+		if (pointerId == eventData.pointerId)
+		{
+			pointerId = int.MaxValue;
+			pointerDown = false;
+		}
+	}
+
 	// non public --------
 	Texture2D pixels;
 	Machine machine;
-
 	StringBuilder messageStream;
-	int pointerX;
-	int pointerY;
 	int[] keys;
+	Vector3 pointerPosition; // 絶対スクリーン座標
+	bool pointerDown;
+	int pointerId = int.MaxValue;
+
 
 	void UpdateMachine()
 	{
@@ -60,7 +117,7 @@ public class Main : MonoBehaviour
 			}
 			else
 			{
-				messageStream.AppendLine("プログラムが最後まで実行された");
+				messageStream.Append("プログラムが最後まで実行された");
 				var ret = machine.OutputValue();
 				if (ret != 0)
 				{
@@ -68,15 +125,35 @@ public class Main : MonoBehaviour
 				}
 				else
 				{
-					messageStream.AppendLine("。");
+					messageStream.Append("\n");
 				}
 			}
 		}
 		else
 		{
+			Vector2 localPoint;
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(
+				appWindow.rectTransform as RectTransform,
+				pointerPosition,
+				camera,
+				out localPoint);
+			
+			var w = io.MemoryCopy[(int)Machine.VmMemory.GetScreenWidth];
+			var h = io.MemoryCopy[(int)Machine.VmMemory.GetScreenHeight];
+			var size = appWindow.rectTransform.sizeDelta;
+			var pointerX = Mathf.RoundToInt((float)w * (localPoint.x + (size.x * 0.5f)) / size.x);
+			var pointerY = Mathf.RoundToInt((float)h * (localPoint.y + (size.y * 0.5f)) / size.y);
+			keys[(int)IoState.Key.LButton] = pointerDown ? 1 : 0;
+			keys[(int)IoState.Key.RButton] = Input.GetKey(KeyCode.Mouse1) ? 1 : 0;
+			keys[(int)IoState.Key.Up] = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
+			keys[(int)IoState.Key.Down] = Input.GetKey(KeyCode.DownArrow) ? 1 : 0;
+			keys[(int)IoState.Key.Left] = Input.GetKey(KeyCode.LeftArrow) ? 1 : 0;
+			keys[(int)IoState.Key.Right] = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
+			keys[(int)IoState.Key.Space] = Input.GetKey(KeyCode.Space) ? 1 : 0;
+			keys[(int)IoState.Key.Enter] = Input.GetKey(KeyCode.Return) ? 1 : 0;
 			io.Update(pointerX, pointerY, keys);
-			UpdateScreen(io);
 		}
+		UpdateScreen(io);
 		machine.EndSync();
 
 		if (machine.IsTerminated())

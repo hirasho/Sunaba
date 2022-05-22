@@ -1,0 +1,7 @@
+while 1
+	if memory[50002]
+		if memory[50000] >= 0
+			if memory[50000] < 100
+				if memory[50001] >= 0
+					if memory[50001] < 100
+						memory[60000 + memory[50000] + (memory[50001] * 100)] -> 999999

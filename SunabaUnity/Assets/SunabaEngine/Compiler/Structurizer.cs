@@ -107,7 +107,8 @@ namespace Sunaba
 
 							while (newCount < oldCount)
 							{
-								oldCount = spaceCountStack.Pop();
+								spaceCountStack.Pop();
+								oldCount = spaceCountStack.Peek();
 								output.Add(new Token(TokenType.BlockEnd, t.line));
 							}
 						

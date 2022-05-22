@@ -15,6 +15,7 @@ namespace Sunaba
 		public const int IoWritableOffset = 5000;
 
 		public const int ExecutionUnit = 10000; //これだけの命令実行したらウィンドウ状態を見に行く。
+		public const int MainThreadExecutionUnit = 1000 * 1000;
 		public const int MinimumFreeSize = 1000; //最低これだけのメモリは0から空いている。プログラムサイズが制約される。
 		public const int VmMemoryStackBase = FreeAndProgramSize;
 		public const int VmMemoryStackEnd = VmMemoryStackBase + StackSize;
@@ -114,8 +115,10 @@ namespace Sunaba
 				memory[programBegin + i] += (objectCode[(i * 4) + 3] << 0);
 			}
 			memory[(int)VmMemory.FreeRegionEnd] = programBegin; //プログラム開始位置を入れる
-			memory[(int)VmMemory.GetScreenWidth] = memory[(int)VmMemory.SetScreenWidth] = ScreenWidth;
-			memory[(int)VmMemory.GetScreenHeight] = memory[(int)VmMemory.SetScreenHeight] = ScreenHeight;
+			memory[(int)VmMemory.GetScreenWidth] = ScreenWidth;
+			memory[(int)VmMemory.SetScreenWidth] = ScreenWidth;
+			memory[(int)VmMemory.GetScreenHeight] = ScreenHeight;
+			memory[(int)VmMemory.SetScreenHeight] = ScreenHeight;
 			memory[(int)VmMemory.ScreenBegin] = VmMemoryVramBase;
 			for (var i = 0; i < IoState.SoundChannelCount; ++i)
 			{
@@ -132,6 +135,10 @@ namespace Sunaba
 				if (!inMainThread)
 				{
 					executionThread = new Thread(ThreadFunc);
+				}
+				else
+				{
+					Sync(true);
 				}
 
 				if (outputDecoded)
@@ -177,7 +184,7 @@ namespace Sunaba
 			if (executionThread == null) // 実行
 			{
 				var end = false;
-				Execute(out end);
+				Execute(out end, stopOnSync: true, MainThreadExecutionUnit);
 				if (end)
 				{
 					terminatedEvent.Set();
@@ -269,7 +276,6 @@ namespace Sunaba
 		IoState ioState;
 		ManualResetEvent endRequestEvent;
 		ManualResetEvent terminatedEvent;
-		ManualResetEvent syncRequestEvent;
 		Thread executionThread;
 		int frameCount;
 		int programBegin;
@@ -284,13 +290,16 @@ namespace Sunaba
 		DebugInfo debugInfo;
 		long executedInstructionCount;
 		DecodedInst[] decodedInsts;
+		bool justSync;
 
-		void Execute(out bool end)
+		void Execute(out bool end, bool stopOnSync, int instructionCount)
 		{
+			justSync = false;
 			end = false;
-			for (var i = 0; i < ExecutionUnit; ++i)
+			for (var i = 0; i < instructionCount; ++i)
 			{
-				if (Error || (programCounter == FreeAndProgramSize)){ //終わりまで来た
+				if (Error || (programCounter == FreeAndProgramSize))
+				{ //終わりまで来た
 					end = true; //終わります
 					//正常終了時デバグコード
 					if (!Error)
@@ -302,6 +311,10 @@ namespace Sunaba
 					break;
 				}
 				ExecuteDecoded(); //最適化版
+				if (stopOnSync && justSync)
+				{
+					break;
+				}
 			}
 		}
 
@@ -317,7 +330,7 @@ namespace Sunaba
 				}
 				else
 				{
-					Execute(out end);
+					Execute(out end, stopOnSync: false, instructionCount: ExecutionUnit);
 				}
 			}
 			terminatedEvent.Set();
@@ -382,26 +395,30 @@ namespace Sunaba
 		void Sync(bool waitVSync)
 		{
 			//時刻測定
-			if (waitVSync)
+			if (waitVSync) // シングルスレッドモードでは待たない
 			{
 				var newFrame = frameCount;
-				var syncBeginTime = System.DateTime.Now;
-				//vsync待ち。同じフレームに二度は呼ばない
-				while (true)
+				if (executionThread != null)
 				{
-					if (endRequestEvent.WaitOne(0))
+					var syncBeginTime = System.DateTime.Now;
+					//vsync待ち。同じフレームに二度は呼ばない
+					while (true)
 					{
-						return;
+						if (endRequestEvent.WaitOne(0))
+						{
+							return;
+						}
+						ioState.Lock();
+						newFrame = ioState.FrameCount;
+						ioState.Unlock();
+						if (newFrame != frameCount)
+						{
+							break;
+						}
+						Thread.Sleep(1);
 					}
-					ioState.Lock();
-					newFrame = ioState.FrameCount;
-					ioState.Unlock();
-					if (newFrame != frameCount)
-					{
-						break;
-					}
-					Thread.Sleep(1);
 				}
+				justSync = true;
 				frameCount = newFrame;
 			}
 
@@ -437,10 +454,12 @@ namespace Sunaba
 				memory = tmpMemory;
 				ioState.AllocateMemoryCopy(memory.Length, VmMemoryIoBase, VmMemoryVramBase);
 			}
+
 			for (var i = 0; i < memory.Length; i++)
 			{
 				ioState.MemoryCopy[i] = memory[i];
 			}
+
 			//発音命令はリセット
 			for (var i = 0; i < IoState.SoundChannelCount; ++i)
 			{

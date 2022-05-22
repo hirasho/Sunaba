@@ -105,7 +105,7 @@ namespace Sunaba
 							Debug.Assert(left.token != null);
 							var vName = left.token.str;
 							var v = FindVariable(vName);
-							if (v != null)
+							if (v == null)
 							{ //ない。新しい変数を生成
 								if (!AddVariable(vName))
 								{
@@ -306,7 +306,7 @@ namespace Sunaba
 			}
 			else if (node.type == NodeType.Function)
 			{ //関数だけ呼んで結果を代入しない文
-				if (GenerateFunctionStatement(output, node))
+				if (!GenerateFunctionStatement(output, node))
 				{
 					return false;
 				}
@@ -351,6 +351,7 @@ namespace Sunaba
 			Debug.Assert(child != null);
 			if (!GenerateExpression(output, child))
 			{ //最初の子はExpression
+
 				return false;
 			}
 
