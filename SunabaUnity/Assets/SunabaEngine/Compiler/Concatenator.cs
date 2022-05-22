@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using System.IO;
 
 namespace Sunaba
@@ -7,7 +8,7 @@ namespace Sunaba
 	{
 		public static bool Process(
 			List<Token> output,
-			StreamWriter messageStream,
+			StringBuilder messageStream,
 			string rootFilename,
 			List<string> fullPathFilenamesOut,
 			Localization localization,
@@ -27,12 +28,12 @@ namespace Sunaba
 		List<string> fullPathFilenames; //今まで処理したファイル名をここに保存。フルパス。
 		HashSet<string> filenameSet;
 		List<Token> tokens;
-		StreamWriter messageStream; //借り物
+		StringBuilder messageStream; //借り物
 		Localization localization; //借り物
 
 		Concatenator(
 			List<string> fullPathFilenamesOut, 
-			StreamWriter messageStream,
+			StringBuilder messageStream,
 			string rootFilename,
 			Localization localization)
 		{
@@ -79,7 +80,7 @@ namespace Sunaba
 				if (!File.Exists(fullPath))
 				{
 					BeginError(filenameToken);
-					messageStream.WriteLine(string.Format("{0} を開けない。合ってる?", fullPath));
+					messageStream.AppendFormat("{0} を開けない。合ってる?\n", fullPath);
 					return false;
 				}
 			}
@@ -100,14 +101,14 @@ namespace Sunaba
 			catch (System.Exception e)
 			{
 				BeginError(filenameToken);
-				messageStream.WriteLine("を開けない。あるのか確認せよ。");
+				messageStream.Append("を開けない。あるのか確認せよ。\n");
 				return false;
 			}
 
 			if (string.IsNullOrEmpty(text))
 			{
 				BeginError(filenameToken);
-				messageStream.WriteLine("をテキストファイルとして解釈できない。文字コードは大丈夫か？そもそも本当にテキストファイル？");
+				messageStream.Append("をテキストファイルとして解釈できない。文字コードは大丈夫か？そもそも本当にテキストファイル？\n");
 				return false;
 			}
 
@@ -187,19 +188,19 @@ namespace Sunaba
 					if ((i + 2) >= tokenCount)
 					{
 						BeginError(filenameToken);
-						messageStream.WriteLine("挿入(include)行の途中でファイルが終わった。");
+						messageStream.Append("挿入(include)行の途中でファイルが終わった。\n");
 					}
 
 					if (structurized[i + 1].type != TokenType.StringLiteral)
 					{
 						BeginError(structurized[i]);
-						messageStream.WriteLine("挿入(include)と来たら、次は\"\"で囲まれたファイル名が必要。");
+						messageStream.Append("挿入(include)と来たら、次は\"\"で囲まれたファイル名が必要。\n");
 					}
 
 					if (structurized[i + 2].type != TokenType.StatementEnd)
 					{
 						BeginError(structurized[i]);
-						messageStream.WriteLine("挿入(include)行に続けて何かが書いてある。改行しよう。");
+						messageStream.Append("挿入(include)行に続けて何かが書いてある。改行しよう。\n");
 					}
 
 					if (!ProcessFile(structurized[i + 1], fullPath, outputIntermediates))
@@ -219,14 +220,14 @@ namespace Sunaba
 
 		void BeginError(Token token)
 		{
-			messageStream.Write(token.filename);
+			messageStream.Append(token.filename);
 			if (token.line != 0)
 			{
-				messageStream.Write(string.Format("({0})", token.line));
+				messageStream.AppendFormat("({0}) ", token.line);
 			}
 			else
 			{
-				messageStream.Write(' ');
+				messageStream.Append(' ');
 			}
 		}
 	}

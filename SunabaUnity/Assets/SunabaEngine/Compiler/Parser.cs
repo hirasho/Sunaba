@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 namespace Sunaba
 {
@@ -7,7 +8,7 @@ namespace Sunaba
 	{
 		public static Node Process(
 			IList<Token> input,
-			System.IO.StreamWriter messageStream,
+			StringBuilder messageStream,
 			bool english,
 			Localization localization)
 		{			
@@ -20,12 +21,12 @@ namespace Sunaba
 
 		// non public ---------
 		Dictionary<string, int> constMap;
-		System.IO.StreamWriter messageStream;
+		StringBuilder messageStream;
 		bool english;
 		Localization localization;
 
 		Parser(
-			System.IO.StreamWriter messageStream,
+			StringBuilder messageStream,
 			bool english, 
 			Localization localization)
 		{
@@ -43,7 +44,7 @@ namespace Sunaba
 			if (t == TokenType.BlockBegin)
 			{
 				BeginError(input[pos]);
-				messageStream.WriteLine("字下げを間違っているはず。上の行より多くなっていないか。");
+				messageStream.Append("字下げを間違っているはず。上の行より多くなっていないか。\n");
 				return StatementType.Unknown;
 			}
 			else if ((t == TokenType.WhilePre) || (t == TokenType.IfPre))
@@ -107,22 +108,22 @@ namespace Sunaba
 			BeginError(input[pos]);//TODO:なら、なかぎりを検索してあれば助言を出す
 			if (english)
 			{
-				messageStream.WriteLine("この行を解釈できない。注釈は//ではなく#だが大丈夫か？");
+				messageStream.Append("この行を解釈できない。注釈は//ではなく#だが大丈夫か？\n");
 			}
 			else
 			{
-				messageStream.WriteLine("この行を解釈できない。「なかぎり」や「なら」の左側には空白が必要だが、大丈夫か？また、注釈は//ではなく#だが大丈夫か？");
+				messageStream.Append("この行を解釈できない。「なかぎり」や「なら」の左側には空白が必要だが、大丈夫か？また、注釈は//ではなく#だが大丈夫か？\n");
 			}
 
 			for (var p = pos; p < endPos; ++p)
 			{
 				if (input[p].opType == Operator.Eq)
 				{
-					messageStream.WriteLine("=があるが、→や->と間違えてないか？");
+					messageStream.Append("=があるが、→や->と間違えてないか？\n");
 					break;
 				}
 			}
-			messageStream.WriteLine("");
+			messageStream.Append("\n");
 			return StatementType.Unknown;
 		}
 		
@@ -241,7 +242,7 @@ namespace Sunaba
 			if (input[pos].type != TokenType.Const)
 			{
 				BeginError(input[pos]);
-				messageStream.WriteLine("定数行のはずだが解釈できない。上の行からつながってないか。");
+				messageStream.Append("定数行のはずだが解釈できない。上の行からつながってないか。\n");
 				return false;
 			}
 			++pos;
@@ -252,11 +253,11 @@ namespace Sunaba
 				BeginError(input[pos]);
 				if (english)
 				{
-					messageStream.WriteLine(string.Format("constの次は定数名。\"{0}\"は定数名と解釈できない。", input[pos].ToString()));
+					messageStream.AppendFormat("constの次は定数名。\"{0}\"は定数名と解釈できない。\n", input[pos].ToString());
 				}
 				else
 				{
-					messageStream.WriteLine(string.Format("\"定数\"の次は定数名。\"{0}\"は定数名と解釈できない。", input[pos].ToString()));
+					messageStream.AppendFormat("\"定数\"の次は定数名。\"{0}\"は定数名と解釈できない。\n", input[pos].ToString());
 				}
 				return false;
 			}
@@ -269,11 +270,11 @@ namespace Sunaba
 				BeginError(input[pos]);
 				if (english)
 				{
-					messageStream.WriteLine(string.Format("const [名前]、と来たら次は\"->\"のはずだが\"{0}\"がある。", input[pos].ToString()));
+					messageStream.AppendFormat("const [名前]、と来たら次は\"->\"のはずだが\"{0}\"がある。\n", input[pos].ToString());
 				}
 				else
 				{
-					messageStream.WriteLine(string.Format("定数 [名前]、と来たら次は\"→\"のはずだが\"{0}\"がある。", input[pos].ToString()));
+					messageStream.AppendFormat("定数 [名前]、と来たら次は\"→\"のはずだが\"{0}\"がある。\n", input[pos].ToString());
 				}
 				return false;
 			}
@@ -288,7 +289,7 @@ namespace Sunaba
 			if (expression.type != NodeType.Number)
 			{ //数字に解決されていなければ駄目。
 				BeginError(input[pos]);
-				messageStream.WriteLine("定数の右辺の計算に失敗した。メモリや名前つきメモリ、部分プログラム参照などが入っていないか？");
+				messageStream.Append("定数の右辺の計算に失敗した。メモリや名前つきメモリ、部分プログラム参照などが入っていないか？\n");
 				return false;
 			}
 
@@ -297,7 +298,7 @@ namespace Sunaba
 			if (input[pos].type != TokenType.StatementEnd)
 			{
 				BeginError(input[pos]);
-				messageStream.WriteLine(string.Format("定数作成の後に\"{0}\"がある。改行してくれ。", input[pos].ToString()));
+				messageStream.AppendFormat("定数作成の後に\"{0}\"がある。改行してくれ。\n", input[pos].ToString());
 				return false;
 			}
 			++pos;
@@ -308,7 +309,7 @@ namespace Sunaba
 				if (constMap.ContainsKey(constName))
 				{
 					BeginError(input[pos]);
-					messageStream.WriteLine("すでに同じ名前の定数がある。");
+					messageStream.Append("すでに同じ名前の定数がある。\n");
 					return false;
 				}
 				else
@@ -343,7 +344,7 @@ namespace Sunaba
 			if (input[pos].type != TokenType.LeftBracket)
 			{
 				BeginError(input[pos]);
-				messageStream.WriteLine(string.Format("ここで入力リスト開始の\"(\"があるはずだが、\"{0}\"がある。これ、本当に部分プログラム？", input[pos].ToString()));
+				messageStream.AppendFormat("ここで入力リスト開始の\"(\"があるはずだが、\"{0}\"がある。これ、本当に部分プログラム？\n", input[pos].ToString());
 				return null;
 			}
 			++pos;
@@ -369,11 +370,11 @@ namespace Sunaba
 						BeginError(input[pos]);
 						if (english)
 						{
-							messageStream.WriteLine(string.Format("入力リスト中で\",\"があるということは、まだ入力があるはずだ。しかし、\"{0}\"は入力と解釈できない。", input[pos].ToString()));
+							messageStream.AppendFormat("入力リスト中で\",\"があるということは、まだ入力があるはずだ。しかし、\"{0}\"は入力と解釈できない。\n", input[pos].ToString());
 						}
 						else
 						{
-							messageStream.WriteLine(string.Format("入力リスト中で\"、\"があるということは、まだ入力があるはずだ。しかし、\"{0}\"は入力と解釈できない。", input[pos].ToString()));
+							messageStream.AppendFormat("入力リスト中で\"、\"があるということは、まだ入力があるはずだ。しかし、\"{0}\"は入力と解釈できない。\n", input[pos].ToString());
 						}
 						return null;
 					}
@@ -387,7 +388,7 @@ namespace Sunaba
 					if (arg.type == NodeType.Number)
 					{
 						BeginError(input[pos]);
-						messageStream.WriteLine("入力名はすでに定数に使われている。");
+						messageStream.Append("入力名はすでに定数に使われている。\n");
 						return null;
 					}
 					lastChild.brother = arg;
@@ -399,7 +400,7 @@ namespace Sunaba
 			if (input[pos].type != TokenType.RightBracket)
 			{ 
 				BeginError(input[pos]);
-				messageStream.WriteLine(string.Format("入力リストの後には\")\"があるはずだが、\"{0}\"がある。\",\"を書き忘れてないか？", input[pos].ToString()));
+				messageStream.AppendFormat("入力リストの後には\")\"があるはずだが、\"{0}\"がある。\",\"を書き忘れてないか？\n", input[pos].ToString());
 				return null;
 			}
 			++pos;
@@ -409,7 +410,7 @@ namespace Sunaba
 				if (defFound)
 				{
 					BeginError(input[pos]);
-					messageStream.WriteLine("\"def\"と\"とは\"が両方ある。片方にしてほしい。");
+					messageStream.Append("\"def\"と\"とは\"が両方ある。片方にしてほしい。\n");
 				}
 				++pos;
 			}
@@ -430,7 +431,7 @@ namespace Sunaba
 					else if (input[pos].type == TokenType.Const)
 					{ //定数。これはエラーです。
 						BeginError(input[pos]);
-						messageStream.WriteLine("部分プログラム内で定数は作れない。");
+						messageStream.Append("部分プログラム内で定数は作れない。\n");
 						return null;
 					}
 					else
@@ -460,7 +461,7 @@ namespace Sunaba
 			else
 			{
 				BeginError(input[pos]);
-				messageStream.WriteLine(string.Format("部分プログラムの最初の行の行末に\"{0}\"が続いている。ここで改行しよう。", input[pos].ToString()));
+				messageStream.AppendFormat("部分プログラムの最初の行の行末に\"{0}\"が続いている。ここで改行しよう。\n", input[pos].ToString());
 				return null;
 			}
 			return node;
@@ -478,7 +479,7 @@ namespace Sunaba
 			else if (type == StatementType.Def)
 			{ //関数定義はありえない
 				BeginError(input[pos]);
-				messageStream.WriteLine("部分プログラムの中で部分プログラムは作れない。");
+				messageStream.Append("部分プログラムの中で部分プログラムは作れない。\n");
 				return null;
 			}
 			else if (type == StatementType.Const)
@@ -499,22 +500,22 @@ namespace Sunaba
 					if (input[pos].type == TokenType.BlockBegin)
 					{
 						if (english){
-							messageStream.WriteLine("部分プログラムを作る気なら「def」が必要。あるいは、次の行の字下げが多すぎる。");
+							messageStream.Append("部分プログラムを作る気なら「def」が必要。あるいは、次の行の字下げが多すぎる。\n");
 						}
 						else
 						{
-							messageStream.WriteLine("部分プログラムを作る気なら「とは」が必要。あるいは、次の行の字下げが多すぎる。");
+							messageStream.Append("部分プログラムを作る気なら「とは」が必要。あるいは、次の行の字下げが多すぎる。\n");
 						}
 					}
 					else
 					{
 						if (english)
 						{
-							messageStream.WriteLine(string.Format("部分プログラム参照の後ろに、変なもの\"{0}\"がある。部分プログラムを作るなら「def」を置くこと。", input[pos].ToString()));
+							messageStream.AppendFormat("部分プログラム参照の後ろに、変なもの\"{0}\"がある。部分プログラムを作るなら「def」を置くこと。", input[pos].ToString());
 						}
 						else
 						{
-							messageStream.WriteLine(string.Format("部分プログラム参照の後ろに、変なもの\"{0}\"がある。部分プログラムを作るなら「とは」を置くこと。", input[pos].ToString()));
+							messageStream.AppendFormat("部分プログラム参照の後ろに、変なもの\"{0}\"がある。部分プログラムを作るなら「とは」を置くこと。", input[pos].ToString());
 						}
 					}
 					return null;
@@ -542,11 +543,11 @@ namespace Sunaba
 				BeginError(input[pos]);
 				if (english)
 				{
-					messageStream.WriteLine("->があるのでメモリセット行だと思うが、そうなら最初に「memory」や「out」、名前付きメモリがあるはずだ。 ");
+					messageStream.Append("->があるのでメモリセット行だと思うが、そうなら最初に「memory」や「out」、名前付きメモリがあるはずだ。\n");
 				}
 				else
 				{
-					messageStream.WriteLine("→があるのでメモリセット行だと思うが、そうなら最初に「メモリ」や「出力」、名前付きメモリがあるはずだ。");
+					messageStream.Append("→があるのでメモリセット行だと思うが、そうなら最初に「メモリ」や「出力」、名前付きメモリがあるはずだ。\n");
 				}
 				return null;
 			}
@@ -574,7 +575,7 @@ namespace Sunaba
 				if (left.type == NodeType.Number)
 				{ //定数じゃねえか！
 					BeginError(input[pos]);
-					messageStream.WriteLine(string.Format("定数 {0}は変えられない。", input[pos].ToString()));
+					messageStream.AppendFormat("定数 {0}は変えられない。\n", input[pos].ToString());
 					return null;
 				}
 			}
@@ -591,11 +592,11 @@ namespace Sunaba
 				BeginError(input[pos]);
 				if (english)
 				{
-					messageStream.WriteLine(string.Format("メモリセット行だと思ったのだが、\"->\"があるべき場所に、\"{0}\"がある。もしかして「if」か「while」？", input[pos].ToString()));
+					messageStream.AppendFormat("メモリセット行だと思ったのだが、\"->\"があるべき場所に、\"{0}\"がある。もしかして「if」か「while」？\n", input[pos].ToString());
 				}
 				else
 				{
-					messageStream.WriteLine(string.Format("メモリセット行だと思ったのだが、\"→\"があるべき場所に、\"{0}\"がある。もしかして「なら」か「なかぎり」？", input[pos].ToString()));
+					messageStream.AppendFormat("メモリセット行だと思ったのだが、\"→\"があるべき場所に、\"{0}\"がある。もしかして「なら」か「なかぎり」？\n", input[pos].ToString());
 				}
 				return null;
 			}
@@ -615,11 +616,11 @@ namespace Sunaba
 				BeginError(input[pos]);
 				if (input[pos].type == TokenType.BlockBegin)
 				{
-					messageStream.WriteLine("次の行の字下げが多すぎる。行頭の空白は同じであるはずだ。");
+					messageStream.Append("次の行の字下げが多すぎる。行頭の空白は同じであるはずだ。\n");
 				}
 				else
 				{
-					messageStream.WriteLine(string.Format("メモリ変更行が終わるべき場所に\"{0}\"がある。改行してね。", input[pos].ToString()));
+					messageStream.AppendFormat("メモリ変更行が終わるべき場所に\"{0}\"がある。改行してね。", input[pos].ToString());
 				}
 				return null;
 			}
@@ -692,7 +693,7 @@ namespace Sunaba
 					else if (input[pos].type == TokenType.Const)
 					{ //定数。これはエラーです。
 						BeginError(input[pos]);
-						messageStream.WriteLine("繰り返しや条件実行内で定数は作れない。");
+						messageStream.Append("繰り返しや条件実行内で定数は作れない。\n");
 						return null;
 					}
 					else
@@ -714,7 +715,7 @@ namespace Sunaba
 			else
 			{
 				BeginError(input[pos]);
-				messageStream.WriteLine(string.Format("条件行は条件の終わりで改行しよう。\"{0}\"が続いている。", input[pos].ToString()));
+				messageStream.AppendFormat("条件行は条件の終わりで改行しよう。\"{0}\"が続いている。\n", input[pos].ToString());
 				return null;
 			}
 			return node;
@@ -769,11 +770,11 @@ namespace Sunaba
 				BeginError(input[pos]);
 				if (english)
 				{
-					messageStream.WriteLine(string.Format("部分プログラムの入力は\")\"で終わるはず。だが、\"{0}\"がある。\",\"の書き忘れはないか？", input[pos].ToString()));
+					messageStream.AppendFormat("部分プログラムの入力は\")\"で終わるはず。だが、\"{0}\"がある。\",\"の書き忘れはないか？\n", input[pos].ToString());
 				}
 				else
 				{
-					messageStream.WriteLine(string.Format("部分プログラムの入力は\")\"で終わるはず。だが、\"{0}\"がある。\"、\"の書き忘れはないか？", input[pos].ToString()));
+					messageStream.AppendFormat("部分プログラムの入力は\")\"で終わるはず。だが、\"{0}\"がある。\"、\"の書き忘れはないか？\n", input[pos].ToString());
 				}
 				return null;
 			}
@@ -813,7 +814,7 @@ namespace Sunaba
 			if (input[pos].type != TokenType.IndexEnd)
 			{
 				BeginError(input[pos]);
-				messageStream.WriteLine(string.Format("名前つきメモリ[番号]の\"]\"の代わりに\"{0}\"がある。", input[pos].ToString()));
+				messageStream.AppendFormat("名前つきメモリ[番号]の\"]\"の代わりに\"{0}\"がある。\n", input[pos].ToString());
 				return null;
 			}
 			++pos;
@@ -881,7 +882,7 @@ namespace Sunaba
 				if ((input[pos].opType != Operator.Unknown) && (input[pos].opType != Operator.Minus))
 				{
 					BeginError(input[pos]);
-					messageStream.WriteLine("演算子が連続している。==,++,--はないし、=<,=>あたりは<=,>=の間違いだろう。");
+					messageStream.Append("演算子が連続している。==,++,--はないし、=<,=>あたりは<=,>=の間違いだろう。\n");
 					return null;
 				}
 
@@ -969,7 +970,7 @@ namespace Sunaba
 				if (input[pos].type != TokenType.RightBracket)
 				{ //)が必要
 					BeginError(input[pos]);
-					messageStream.WriteLine(string.Format("()で囲まれた式がありそうなのだが、終わりの\")\"の代わりに、\"{0}\"がある。\")\"を忘れていないか？", input[pos].ToString()));
+					messageStream.AppendFormat("()で囲まれた式がありそうなのだが、終わりの\")\"の代わりに、\"{0}\"がある。\")\"を忘れていないか？\n", input[pos].ToString());
 					return null;
 				}
 				++pos;
@@ -1003,11 +1004,11 @@ namespace Sunaba
 				BeginError(input[pos]);
 				if (english)
 				{
-					messageStream.WriteLine(string.Format("()で囲まれた式、memory[]、数、名前つきメモリ、部分プログラム参照のどれかがあるはずの場所に\"{0}\"がある。", input[pos].ToString()));
+					messageStream.AppendFormat("()で囲まれた式、memory[]、数、名前つきメモリ、部分プログラム参照のどれかがあるはずの場所に\"{0}\"がある。\n", input[pos].ToString());
 				}
 				else
 				{
-					messageStream.WriteLine(string.Format("()で囲まれた式、メモリ[]、数、名前つきメモリ、部分プログラム参照のどれかがあるはずの場所に\"{0}\"がある。", input[pos].ToString()));
+					messageStream.AppendFormat("()で囲まれた式、メモリ[]、数、名前つきメモリ、部分プログラム参照のどれかがあるはずの場所に\"{0}\"がある。\n", input[pos].ToString());
 				}
 			}
 		
@@ -1028,7 +1029,7 @@ namespace Sunaba
 
 		void BeginError(Token token)
 		{
-			messageStream.Write(string.Format("{0}({1})", token.filename, token.line));
+			messageStream.AppendFormat("{0}({1}) ", token.filename, token.line);
 		}
 	}
 } //namespace Sunaba

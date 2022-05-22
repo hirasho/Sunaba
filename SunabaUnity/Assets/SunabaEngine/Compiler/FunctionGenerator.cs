@@ -1,5 +1,4 @@
 using System.Text;
-using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
 
@@ -9,7 +8,7 @@ namespace Sunaba
 	{
 		public static bool Process(
 			StringBuilder output,
-			StreamWriter messageStream,
+			StringBuilder messageStream,
 			Node root,
 			string name,
 			FunctionInfo func,
@@ -55,18 +54,18 @@ namespace Sunaba
 				this.variables = new Dictionary<string, Variable>();
 			}
 
-			public void BeginError(StreamWriter messageStream, Node node)
+			public void BeginError(StringBuilder messageStream, Node node)
 			{
 				var token = node.token;
 				Debug.Assert(token != null);
-				messageStream.Write(token.filename);
+				messageStream.Append(token.filename);
 				if (token.line != 0)
 				{
-					messageStream.Write(string.Format("({0})", token.line));
+					messageStream.AppendFormat("({0}) ", token.line);
 				}
 				else
 				{
-					messageStream.Write(' ');
+					messageStream.Append(" ");
 				}
 			}
 
@@ -140,7 +139,7 @@ namespace Sunaba
 			Dictionary<string, Variable> variables;
 		}
 
-		StreamWriter messageStream; //借り物
+		StringBuilder messageStream; //借り物
 		Block rootBlock;
 		Block currentBlock;
 		int labelId;
@@ -152,7 +151,7 @@ namespace Sunaba
 		bool outputExist;
 
 		FunctionGenerator(
-			StreamWriter messageStream,
+			StringBuilder messageStream,
 			string name,
 			FunctionInfo info,
 			Dictionary<string, FunctionInfo> functionMap,
@@ -194,9 +193,9 @@ namespace Sunaba
 				if (!currentBlock.AddVariable(variableName, isArgument: true))
 				{
 					BeginError(node);
-					messageStream.WriteLine(string.Format("部分プログラム\"{0}\"の入力\"{1}\"はもうすでに現れた。二個同じ名前があるのはダメ。",
+					messageStream.AppendFormat("部分プログラム\"{0}\"の入力\"{1}\"はもうすでに現れた。二個同じ名前があるのはダメ。\n",
 						name,
-						variableName));
+						variableName);
 					return false;
 				}
 				child = child.brother;
@@ -245,13 +244,13 @@ namespace Sunaba
 				if (headNode.token != null)
 				{ //普通の関数ノード
 					BeginError(headNode);
-					messageStream.WriteLine(string.Format("部分プログラム\"{0}\"は出力したりしなかったりする。条件実行や繰り返しの中だけで出力していないか？", name));
+					messageStream.AppendFormat("部分プログラム\"{0}\"は出力したりしなかったりする。条件実行や繰り返しの中だけで出力していないか？\n", name);
 				}
 				else
 				{ //プログラムノード
 					Debug.Assert(headNode.child != null);
 					BeginError(headNode.child);
-					messageStream.WriteLine("このプログラムは出力したりしなかったりする。条件実行や繰り返しの中だけで出力していないか？");
+					messageStream.Append("このプログラムは出力したりしなかったりする。条件実行や繰り返しの中だけで出力していないか？\n");
 				}
 				return false;
 			}
@@ -432,7 +431,7 @@ namespace Sunaba
 			if (!functionMap.TryGetValue(funcName, out func))
 			{
 				BeginError(node);
-				messageStream.WriteLine(string.Format("部分プログラム\"{0}\"なんて知らない。", funcName));
+				messageStream.AppendFormat("部分プログラム\"{0}\"なんて知らない。\n", funcName);
 				return false;
 			}
 
@@ -448,7 +447,7 @@ namespace Sunaba
 			else if (!isStatement)
 			{ //戻り値がないなら式の中にあっちゃだめ
 				BeginError(node);
-				messageStream.WriteLine(string.Format("部分プログラム\"{0}\"は、\"出力\"か\"out\"という名前付きメモリがないので、出力は使えない。ifやwhileの中にあってもダメ。", funcName));
+				messageStream.AppendFormat("部分プログラム\"{0}\"は、\"出力\"か\"out\"という名前付きメモリがないので、出力は使えない。ifやwhileの中にあってもダメ。\n", funcName);
 				return false;
 			}
 
@@ -464,7 +463,7 @@ namespace Sunaba
 			if (argCount != func.ArgCount)
 			{
 				BeginError(node);
-				messageStream.WriteLine(string.Format("部分プログラム\"{0}\"は、入力を{1}個受け取るのに、ここには{2}個ある。間違い。", funcName, func.ArgCount, argCount));
+				messageStream.AppendFormat("部分プログラム\"{0}\"は、入力を{1}個受け取るのに、ここには{2}個ある。間違い。\n", funcName, func.ArgCount, argCount);
 				return false;
 			}
 			//引数を評価してプッシュ
@@ -513,7 +512,7 @@ namespace Sunaba
 				if (var == null)
 				{ //配列アクセス時でタイプミスすると変数が存在しないケースがある
 					BeginError(child);
-					messageStream.WriteLine(string.Format("名前付きメモリか定数\"{0}\"は存在しないか、まだ作られていない。", name));
+					messageStream.AppendFormat("名前付きメモリか定数\"{0}\"は存在しないか、まだ作られていない。\n", name);
 					return false; 
 				}
 				else if (!(var.Defined))
@@ -651,28 +650,28 @@ namespace Sunaba
 					if (var == null)
 					{
 						BeginError(node);
-						messageStream.WriteLine(string.Format("名前付きメモリか定数\"{0}\"は存在しない。", name));
+						messageStream.AppendFormat("名前付きメモリか定数\"{0}\"は存在しない。\n", name);
 						return false; 
 					}
 
 					if (!var.Defined)
 					{
 						BeginError(node);
-						messageStream.WriteLine(string.Format("名前付きメモリ\"{0}\"はまだ作られていない。", name));
+						messageStream.AppendFormat("名前付きメモリ\"{0}\"はまだ作られていない。\n", name);
 						return false; //まだ宣言してない
 					}
 
 					if (!(var.Initialized))
 					{
 						BeginError(node);
-						messageStream.Write(string.Format("名前付きメモリ\"{0}", name));
+						messageStream.AppendFormat("名前付きメモリ\"{0}", name);
 						if (english)
 						{
-							messageStream.WriteLine("\"は数をセットされる前に使われている。「a->a」みたいなのはダメ。");
+							messageStream.Append("\"は数をセットされる前に使われている。「a->a」みたいなのはダメ。\n");
 						}
 						else
 						{
-							messageStream.WriteLine("\"は数をセットされる前に使われている。「a→a」みたいなのはダメ。");
+							messageStream.Append("\"は数をセットされる前に使われている。「a→a」みたいなのはダメ。\n");
 						}
 						return false; //まだ宣言してない
 					}
@@ -788,13 +787,14 @@ namespace Sunaba
 		{
 			var token = node.token;
 			Debug.Assert(token != null);
-			messageStream.Write(token.filename);
-			if (token.line != 0){
-				messageStream.WriteLine(string.Format("({0})", token.line));
+			messageStream.Append(token.filename);
+			if (token.line != 0)
+			{
+				messageStream.AppendFormat("({0}) ", token.line);
 			}
 			else
 			{
-				messageStream.Write(' ');
+				messageStream.Append(' ');
 			}
 		}
 	}

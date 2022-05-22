@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using System.Text;
 using System.Diagnostics;
 
 namespace Sunaba
@@ -9,7 +10,7 @@ namespace Sunaba
 		//最後に改行があると仮定して動作する。前段で改行文字を後ろにつけること。
 		public static bool Process(
 			List<Token> output,
-			System.IO.StreamWriter messageStream,
+			StringBuilder messageStream,
 			char[] input,
 			string filename,
 			int lineStart,
@@ -27,7 +28,7 @@ namespace Sunaba
 		string filename; //処理中のファイル名
 		int line;
 		int lineStart;
-		System.IO.StreamWriter messageStream;
+		StringBuilder messageStream;
 		Localization localization; //借り物
 
 		enum Mode
@@ -43,7 +44,7 @@ namespace Sunaba
 		}
 
 		LexicalAnalyzer(
-			System.IO.StreamWriter messageStream, 
+			StringBuilder messageStream, 
 			string filename,
 			int lineStart, 
 			Localization localization)
@@ -160,16 +161,16 @@ namespace Sunaba
 						else
 						{
 							BeginError();
-							messageStream.Write(string.Format("Sunabaで使うはずのない文字\"{0}\"が現れた。", c));
+							messageStream.AppendFormat("Sunabaで使うはずのない文字\"{0}\"が現れた。", c);
 							if (c == ';')
 							{
-								messageStream.Write("C言語と違って文末の;は不要。");
+								messageStream.Append("C言語と違って文末の;は不要。");
 							}
 							else if ((c == '{') || (c == '}'))
 							{
-								messageStream.Write("C言語と違って{や}は使わない。");
+								messageStream.Append("C言語と違って{や}は使わない。");
 							}
-							messageStream.WriteLine("");
+							messageStream.Append("\n");
 							return false;
 						}
 						break;
@@ -199,7 +200,7 @@ namespace Sunaba
 						else
 						{
 							BeginError();
-							messageStream.WriteLine(string.Format("\'!\'の後は\'=\'しか来ないはずだが、\'{0}\'がある。\"!=\"と間違えてないか？", c));
+							messageStream.AppendFormat("\'!\'の後は\'=\'しか来ないはずだが、\'{0}\'がある。\"!=\"と間違えてないか？\n", c);
 							return false;
 						}
 						break;
@@ -240,13 +241,13 @@ namespace Sunaba
 							if (newToken.type == TokenType.Unknown)
 							{
 								BeginError();
-								messageStream.WriteLine(string.Format("解釈できない文字列( {0} )が現れた。", new string(input, begin, l)));
+								messageStream.AppendFormat("解釈できない文字列( {0} )が現れた。\n", new string(input, begin, l));
 								return false;
 							}
 							else if (newToken.type == TokenType.LargeNumber)
 							{ //大きすぎる数
 								BeginError();
-								messageStream.WriteLine(string.Format("数値はプラスマイナス{0}までしか書けない。", ImmUtil.GetMaxS(ImmBitCount.I)));
+								messageStream.AppendFormat("数値はプラスマイナス{0}までしか書けない。\n", ImmUtil.GetMaxS(ImmBitCount.I));
 								return false;
 							}
 							output.Add(newToken);
@@ -296,7 +297,7 @@ namespace Sunaba
 			if (mode == Mode.StringLiteral)
 			{
 				BeginError();
-				messageStream.WriteLine(string.Format("{0}行目の文字列(\"\"ではさまれたもの)が終わらないままファイルが終わった。", literalBeginLine));
+				messageStream.AppendFormat("{0}行目の文字列(\"\"ではさまれたもの)が終わらないままファイルが終わった。\n", literalBeginLine);
 				return false;
 			}
 			return true;
@@ -305,14 +306,14 @@ namespace Sunaba
 		void BeginError()
 		{
 			var rawFilename = System.IO.Path.GetFileName(filename);
-			messageStream.Write(rawFilename);
+			messageStream.Append(rawFilename);
 			if (line != 0)
 			{
-				messageStream.Write(string.Format("({0})", line));
+				messageStream.AppendFormat("({0}) ", line);
 			}
 			else
 			{
-				messageStream.Write(' ');
+				messageStream.Append(' ');
 			}
 		}
 	}

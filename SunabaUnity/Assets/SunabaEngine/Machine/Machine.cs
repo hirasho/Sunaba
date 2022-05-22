@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics;
+using System.Text;
 
 namespace Sunaba
 {
@@ -66,7 +67,7 @@ namespace Sunaba
 		public int ScreenHeight { get; private set; }
 
 		public Machine(
-			System.IO.StreamWriter messageStream,
+			StringBuilder messageStream,
 			byte[] objectCode,
 			bool inMainThread,
 			bool outputDecoded)
@@ -93,16 +94,15 @@ namespace Sunaba
 			var instructionCount = objectCode.Length  / 4;
 			if ((objectCode.Length % 4) != 0)
 			{
-				messageStream.WriteLine("不正なコード(32bit単位でない)。");
+				messageStream.Append("不正なコード(32bit単位でない)。\n");
 				return;
 			}
 			else if (instructionCount >= (FreeAndProgramSize - MinimumFreeSize))
 			{
-				messageStream.WriteLine(
-					string.Format(
-						"プログラムが大きすぎる({0}命令)。最大{1}命令。",
-						instructionCount, 
-						(FreeAndProgramSize - MinimumFreeSize)));
+				messageStream.AppendFormat(
+					"プログラムが大きすぎる({0}命令)。最大{1}命令。\n",
+					instructionCount, 
+					(FreeAndProgramSize - MinimumFreeSize));
 				return;
 			}
 			//0番地からプログラムをコピー
@@ -280,7 +280,7 @@ namespace Sunaba
 
 		bool charDrawn;
 		int[] memory;
-		System.IO.StreamWriter messageStream;
+		StringBuilder messageStream;
 		DebugInfo debugInfo;
 		long executedInstructionCount;
 		DecodedInst[] decodedInsts;
@@ -328,7 +328,7 @@ namespace Sunaba
 			if (stackPointer <= VmMemoryStackBase)
 			{
 				BeginError();
-				messageStream.WriteLine("ポップしすぎてスタック領域をはみ出した。");
+				messageStream.Append("ポップしすぎてスタック領域をはみ出した。\n");
 				return 0; //とりあえず0を返し、後で抜ける
 			}
 			else
@@ -343,12 +343,12 @@ namespace Sunaba
 			if ((stackPointer - n) < VmMemoryStackBase)
 			{
 				BeginError();
-				messageStream.WriteLine("ポップしすぎてスタック領域をはみ出した。");
+				messageStream.Append("ポップしすぎてスタック領域をはみ出した。\n");
 			}
 			else if ((stackPointer - n) >= VmMemoryStackEnd)
 			{
 				BeginError();
-				messageStream.WriteLine("スタックを使い切った。名前つきメモリを使いすぎ。");
+				messageStream.Append("スタックを使い切った。名前つきメモリを使いすぎ。\n");
 			}
 			else
 			{
@@ -365,7 +365,7 @@ namespace Sunaba
 			if (stackPointer >= VmMemoryStackEnd)
 			{
 				BeginError();
-				messageStream.WriteLine("スタックを使い切った。名前つきメモリを使いすぎ。");
+				messageStream.Append("スタックを使い切った。名前つきメモリを使いすぎ。\n");
 			}
 			else
 			{
@@ -475,7 +475,7 @@ namespace Sunaba
 		{
 			if (charDrawn)
 			{
-				messageStream.WriteLine();
+				messageStream.Append('\n');
 				charDrawn = false;
 			}
 			Error = true;
@@ -510,7 +510,7 @@ namespace Sunaba
 						(inst8 != (uint)Instruction.Ne))
 					{
 						BeginError();
-						messageStream.WriteLine(string.Format("存在しない算術命令。おそらく壊れている(コード:{0:x})", inst));
+						messageStream.AppendFormat("存在しない算術命令。おそらく壊れている(コード:{0:x})\n", inst);
 						return false;
 					}
 				}
@@ -524,7 +524,7 @@ namespace Sunaba
 						(inst8 != (int)Instruction.Fst))
 					{
 						BeginError();
-						messageStream.WriteLine(string.Format("存在しないロードストア命令。おそらく壊れている(コード:{0:x})", inst));
+						messageStream.AppendFormat("存在しないロードストア命令。おそらく壊れている(コード:{0:x})\n", inst);
 						return false;
 					}
 					imm = ImmUtil.GetS(inst, ImmBitCount.Ls);
@@ -540,7 +540,7 @@ namespace Sunaba
 						(inst8 != (int)Instruction.Pop))
 					{
 						BeginError();
-						messageStream.WriteLine(string.Format("存在しないフロー制御命令。おそらく壊れている(コード:{0:x})", inst));
+						messageStream.AppendFormat("存在しないフロー制御命令。おそらく壊れている(コード:{0:x})\n", inst);
 						return false;
 					}
 
@@ -598,7 +598,7 @@ namespace Sunaba
 						if (op1 == 0)
 						{
 							BeginError();
-							messageStream.WriteLine("0では割れない。");
+							messageStream.Append("0では割れない。\n");
 						}
 						else
 						{
@@ -652,7 +652,7 @@ namespace Sunaba
 					if (op0 < 0)
 					{
 						BeginError();
-						messageStream.WriteLine(string.Format("マイナスの番号のメモリを読みとろうとした(番号:{0})", op0));
+						messageStream.AppendFormat("マイナスの番号のメモリを読みとろうとした(番号:{0})\n", op0);
 					}
 					else if (op0 < programBegin)
 					{ //正常実行
@@ -661,7 +661,7 @@ namespace Sunaba
 					else if (op0 < VmMemoryStackBase)
 					{ //プログラム領域
 						BeginError();
-						messageStream.WriteLine(string.Format("プログラムが入っているメモリを読みとろうとした(番号:{0})", op0));
+						messageStream.AppendFormat("プログラムが入っているメモリを読みとろうとした(番号:{0})\n", op0);
 					}
 					else if (op0 < VmMemoryIoBase)
 					{ //スタック。正常実行
@@ -675,17 +675,17 @@ namespace Sunaba
 					else if (op0 < VmMemoryVramBase)
 					{ //書きこみ専用メモリ
 						BeginError();
-						messageStream.WriteLine(string.Format("このあたりのメモリはセットはできるが読み取ることはできない(番号:{0}", op0));
+						messageStream.AppendFormat("このあたりのメモリはセットはできるが読み取ることはできない(番号:{0}\n", op0);
 					}
 					else if (op0 < (VmMemoryVramBase + (ScreenWidth * ScreenHeight)))
 					{
 						BeginError();
-						messageStream.WriteLine(string.Format("画面メモリは読み取れない(番号:{0}", op0));
+						messageStream.AppendFormat("画面メモリは読み取れない(番号:{0})\n", op0);
 					}
 					else
 					{
 						BeginError();
-						messageStream.WriteLine(string.Format("メモリ範囲外を読みとろうとした(番号:{0}", op0));
+						messageStream.AppendFormat("メモリ範囲外を読みとろうとした(番号:{0})\n", op0);
 					}
 				}
 				else
@@ -704,7 +704,7 @@ namespace Sunaba
 					if (op0 < 0)
 					{ //負アドレス
 						BeginError();
-						messageStream.WriteLine(string.Format("マイナスの番号のメモリを変えようとした(番号:{0})", op0));
+						messageStream.AppendFormat("マイナスの番号のメモリを変えようとした(番号:{0})\n", op0);
 					}
 					else if (op0 < programBegin)
 					{ //正常実行
@@ -713,7 +713,7 @@ namespace Sunaba
 					else if (op0 < VmMemoryStackBase)
 					{ //プログラム領域
 						BeginError();
-						messageStream.WriteLine(string.Format("プログラムが入っているメモリに{0}をセットしようとした(番号:{1})", op1, op0));
+						messageStream.AppendFormat("プログラムが入っているメモリに{0}をセットしようとした(番号:{1})\n", op1, op0);
 					}
 					else if (op0 < VmMemoryIoBase)
 					{ //スタック。正常実行
@@ -722,7 +722,7 @@ namespace Sunaba
 					else if (op0 < (int)VmMemory.IoWritableBegin)
 					{ //IOのうち書きこみ不可能領域
 						BeginError();
-						messageStream.WriteLine(string.Format("このあたりのメモリは読み取れはするが、セットはできない(番号:{0})", op0));
+						messageStream.AppendFormat("このあたりのメモリは読み取れはするが、セットはできない(番号:{0})\n", op0);
 					}
 					else if (op0 == (int)VmMemory.Sync)
 					{ //vsync待ち検出
@@ -736,11 +736,11 @@ namespace Sunaba
 					{ //デバグ文字出力
 						if (op1 == '\n')
 						{
-							messageStream.WriteLine("");
+							messageStream.Append('\n');
 						}
 						else
 						{
-							messageStream.Write((char)op1);
+							messageStream.Append((char)op1);
 							charDrawn = true;
 						}
 					}
@@ -754,12 +754,12 @@ namespace Sunaba
 						if (op1 <= 0)
 						{
 							BeginError();
-							messageStream.WriteLine("横解像度として0以下の値を設定した");
+							messageStream.Append("横解像度として0以下の値を設定した\n");
 						}
 						else if (op1 > 512)
 						{
 							BeginError();
-							messageStream.WriteLine("横解像度の最大は512");
+							messageStream.Append("横解像度の最大は512\n");
 						}
 						memory[op0] = op1;
 					}
@@ -768,12 +768,12 @@ namespace Sunaba
 						if (op1 <= 0)
 						{
 							BeginError();
-							messageStream.WriteLine("縦解像度として0以下の値を設定した");
+							messageStream.Append("縦解像度として0以下の値を設定した\n");
 						}
 						else if (op1 > 512)
 						{
 							BeginError();
-							messageStream.WriteLine("縦解像度の最大は512");
+							messageStream.Append("縦解像度の最大は512\n");
 						}
 						memory[op0] = op1;
 					}
@@ -789,7 +789,7 @@ namespace Sunaba
 					else if (op0 < VmMemoryVramBase)
 					{ //IO書き込み領域からVRAMまで
 						BeginError();
-						messageStream.WriteLine(string.Format("このあたりのメモリは使えない(番号:{0})"));
+						messageStream.AppendFormat("このあたりのメモリは使えない(番号:{0})\n");
 					}
 					else if (op0 < (VmMemoryVramBase + (ScreenWidth * ScreenHeight)))
 					{ //VRAM書き込み
@@ -803,7 +803,7 @@ namespace Sunaba
 					else
 					{
 						BeginError();
-						messageStream.WriteLine(string.Format("メモリ範囲外をいじろうとした(番号:{0})", op0));
+						messageStream.AppendFormat("メモリ範囲外をいじろうとした(番号:{0})\n", op0);
 					}
 				}
 			}
@@ -836,7 +836,7 @@ namespace Sunaba
 					if (!debugInfo.Push(imm, framePointer))
 					{
 						BeginError();
-						messageStream.WriteLine(string.Format("部分プログラムを激しく呼びすぎ。たぶん再帰に間違いがある(命令:{0})", programCounter));
+						messageStream.AppendFormat("部分プログラムを激しく呼びすぎ。たぶん再帰に間違いがある(命令:{0})\n", programCounter);
 					}
 				}
 				else
@@ -847,7 +847,7 @@ namespace Sunaba
 					if (!debugInfo.Pop())
 					{
 						BeginError();
-						messageStream.WriteLine(string.Format("ret命令が多すぎている。絶対おかしい(命令:{0}", programCounter));
+						messageStream.AppendFormat("ret命令が多すぎている。絶対おかしい(命令:{0})\n", programCounter);
 					}
 				}
 			}

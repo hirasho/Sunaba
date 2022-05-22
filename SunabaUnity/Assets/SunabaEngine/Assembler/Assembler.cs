@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System;
-using System.IO;
+using System.Text;
 using System.Diagnostics;
 
 namespace Sunaba
@@ -9,7 +9,7 @@ namespace Sunaba
 	{
 		public static bool Process(
 			List<uint> instructionsOut,
-			System.IO.StreamWriter messageStream,
+			StringBuilder messageStream,
 			IList<char> compiled,
 			Localization localization,
 			bool outputIntermediates)
@@ -143,9 +143,9 @@ namespace Sunaba
 
 		Dictionary<string, Label> labelNameMap; //ラベル名->ラベル
 		Dictionary<int, Label> labelIdMap; //ラベルID->ラベル
-		System.IO.StreamWriter messageStream;
+		StringBuilder messageStream;
 
-		Assembler(System.IO.StreamWriter messageStream)
+		Assembler(StringBuilder messageStream)
 		{
 			this.messageStream = messageStream;
 			labelNameMap = new Dictionary<string, Label>();
@@ -278,7 +278,7 @@ namespace Sunaba
 				}
 				else
 				{ //後はエラー
-					messageStream.WriteLine(string.Format("{0} : 文頭にラベルでも命令でもないものがあるか、オペランドを取らない命令にオペランドがついていた。", input[pos].line));
+					messageStream.AppendFormat("{0} : 文頭にラベルでも命令でもないものがあるか、オペランドを取らない命令にオペランドがついていた。\n", input[pos].line);
 					return false;
 				}
 			}
@@ -294,10 +294,10 @@ namespace Sunaba
 			Label label;
 			if (!labelNameMap.TryGetValue(t.str, out label))
 			{
-				messageStream.WriteLine(string.Format(
-					"{0} : 文字列\"{1}\"は命令でもなく、ラベルでもないようだ。たぶん書き間違え。",
+				messageStream.AppendFormat(
+					"{0} : 文字列\"{1}\"は命令でもなく、ラベルでもないようだ。たぶん書き間違え。\n",
 					input[pos].line,
-					t.str));
+					t.str);
 				return false;
 			}
 			Debug.Assert(label != null);
@@ -306,7 +306,7 @@ namespace Sunaba
 			//ラベル終了の:があるはず
 			if (input[pos].type != TokenType.LabelEnd)
 			{
-				messageStream.WriteLine(string.Format("{0} : ラベルは\':\'で終わらないといけない。 ", input[pos].line));
+				messageStream.AppendFormat("{0} : ラベルは\':\'で終わらないといけない。\n", input[pos].line);
 				return false;
 			}
 			++pos;
@@ -329,13 +329,13 @@ namespace Sunaba
 				++pos;
 				if (op.type != TokenType.Number)
 				{
-					messageStream.WriteLine("{0} : 命令iの次に数字が必要。", input[pos].line);
+					messageStream.AppendFormat("{0} : 命令iの次に数字が必要。\n", input[pos].line);
 					return false;
 				}
 
 				if (Math.Abs(op.number) > ImmUtil.GetMaxS(ImmBitCount.I))
 				{
-					messageStream.WriteLine("{0} : 命令iが取れる数字はプラスマイナス{1}の範囲。", input[pos].line, ImmUtil.GetMaxS(ImmBitCount.I));
+					messageStream.AppendFormat("{0} : 命令iが取れる数字はプラスマイナス{1}の範囲。\n", input[pos].line, ImmUtil.GetMaxS(ImmBitCount.I));
 					return false;
 				}
 				output.Add(inst24 | (uint)(op.number & ImmUtil.GetMask(ImmBitCount.I)));
@@ -354,7 +354,7 @@ namespace Sunaba
 				var labelId = label.id;
 				if (labelId >= ImmUtil.GetMaxU(ImmBitCount.Flow))
 				{
-					messageStream.WriteLine("{0} : プログラムが大きすぎて処理できない(ラベルが{1}個以上ある)。", input[pos].line, ImmUtil.GetMaxU(ImmBitCount.Flow));
+					messageStream.AppendFormat("{0} : プログラムが大きすぎて処理できない(ラベルが{1}個以上ある)。\n", input[pos].line, ImmUtil.GetMaxU(ImmBitCount.Flow));
 					return false;
 				}
 				output.Add(inst24 | (uint)labelId); //ラベルIDを仮アドレスとして入れておく。
@@ -370,13 +370,13 @@ namespace Sunaba
 				++pos;
 				if (op.type != TokenType.Number)
 				{
-					messageStream.WriteLine("{0} : 命令ld,st,fld,fstの次に数字が必要。", input[pos].line);
+					messageStream.AppendFormat("{0} : 命令ld,st,fld,fstの次に数字が必要。\n", input[pos].line);
 					return false;
 				}
 
 				if (Math.Abs(op.number) > ImmUtil.GetMaxS(ImmBitCount.Ls))
 				{
-					messageStream.WriteLine("{0} : 命令popが取れる数字はプラスマイナス{1}の範囲。", input[pos].line, ImmUtil.GetMaxS(ImmBitCount.Ls));
+					messageStream.AppendFormat("{0} : 命令popが取れる数字はプラスマイナス{1}の範囲。\n", input[pos].line, ImmUtil.GetMaxS(ImmBitCount.Ls));
 					return false;
 				}
 				output.Add(inst24 | (uint)(op.number & ImmUtil.GetMask(ImmBitCount.Ls)));
@@ -388,13 +388,13 @@ namespace Sunaba
 				++pos;
 				if (op.type != TokenType.Number)
 				{
-					messageStream.WriteLine("{0} : 命令pop/retの次に数字が必要。", input[pos].line);
+					messageStream.AppendFormat("{0} : 命令pop/retの次に数字が必要。\n", input[pos].line);
 					return false;
 				}
 				//即値は符号付き
 				if (Math.Abs(op.number) > ImmUtil.GetMaxS(ImmBitCount.Flow))
 				{
-					messageStream.WriteLine("{0} : 命令pop/retが取れる数字はプラスマイナス{1}の範囲。", input[pos].line, (1 << (ImmBitCount.Flow - 1)));
+					messageStream.AppendFormat("{0} : 命令pop/retが取れる数字はプラスマイナス{1}の範囲。\n", input[pos].line, (1 << (ImmBitCount.Flow - 1)));
 					return false;
 				}
 				output.Add(inst24 | (uint)(op.number & ImmUtil.GetMask(ImmBitCount.Flow)));
@@ -440,7 +440,7 @@ namespace Sunaba
 					var address = label.address;
 					if ((address > ImmUtil.GetMaxU(ImmBitCount.Flow)) || (address < 0))
 					{
-						messageStream.WriteLine(string.Format("- : j,bz,call命令のメモリ番号を解決できない。メモリ番号がマイナスか、{0}を超えている。", ImmUtil.GetMaxU(ImmBitCount.Flow)));
+						messageStream.AppendFormat("- : j,bz,call命令のメモリ番号を解決できない。メモリ番号がマイナスか、{0}を超えている。\n", ImmUtil.GetMaxU(ImmBitCount.Flow));
 						return false;
 					}
 					instructions[i] = (inst & mask) | (uint)address;

@@ -8,7 +8,7 @@ namespace Sunaba
 	{
 		public static bool Process(
 			StringBuilder output,
-			System.IO.StreamWriter messageStream,
+			StringBuilder messageStream,
 			Node root,
 			bool english,
 			bool outputIntermediates)
@@ -18,11 +18,11 @@ namespace Sunaba
 		}
 
 		// non public --------------
-		System.IO.StreamWriter messageStream; //借り物
+		StringBuilder messageStream; //借り物
 		Dictionary<string, FunctionInfo> functionMap; //関数マップ。これはグローバル。
 		bool english;
 
-		CodeGenerator(System.IO.StreamWriter messageStream, bool english)
+		CodeGenerator(StringBuilder messageStream, bool english)
 		{
 			this.messageStream = messageStream;
 			this.english = english;
@@ -148,7 +148,7 @@ namespace Sunaba
 			if (functionMap.ContainsKey(funcName))
 			{
 				BeginError(node);
-				messageStream.WriteLine(string.Format("部分プログラム\"{0}\"はもう作られている。", funcName));
+				messageStream.AppendFormat("部分プログラム\"{0}\"はもう作られている。\n", funcName);
 				return false;
 			}
 
@@ -189,14 +189,14 @@ namespace Sunaba
 		{
 			var token = node.token;
 			Debug.Assert(token != null);
-			messageStream.Write(token.filename);
+			messageStream.Append(token.filename);
 			if (token.line != 0)
 			{
-				messageStream.Write(string.Format("({0})", token.line));
+				messageStream.AppendFormat("({0}) ", token.line);
 			}
 			else
 			{
-				messageStream.Write(' ');
+				messageStream.Append(' ');
 			}
 		}
 	}

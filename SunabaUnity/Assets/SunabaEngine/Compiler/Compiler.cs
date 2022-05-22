@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 namespace Sunaba
 {
@@ -7,7 +8,7 @@ namespace Sunaba
 	{
 		public static bool Process(
 			System.Text.StringBuilder output,
-			System.IO.StreamWriter messageStream,
+			StringBuilder messageStream,
 			string filename,
 			Localization localization,
 			bool outputIntermediates)

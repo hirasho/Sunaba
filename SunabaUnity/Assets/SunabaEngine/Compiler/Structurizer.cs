@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 
 namespace Sunaba
 {
@@ -15,7 +16,7 @@ namespace Sunaba
 		*/
 		public static bool Process(
 			List<Token> output,
-			System.IO.StreamWriter messageStream,
+			StringBuilder messageStream,
 			List<Token> input, // 破壊される
 			Localization localization)
 		{
@@ -24,7 +25,7 @@ namespace Sunaba
 		}
 
 		// non public -------
-		System.IO.StreamWriter messageStream;
+		StringBuilder messageStream;
 
 		bool Process(
 			List<Token> output,
@@ -51,7 +52,7 @@ namespace Sunaba
 					if (bracketLevel < 0)
 					{ //かっこがおかしくなった！
 						BeginError(t);
-						messageStream.WriteLine(")が(より多い。");
+						messageStream.Append(")が(より多い。\n");
 						return false;
 					}
 				}
@@ -65,7 +66,7 @@ namespace Sunaba
 					if (indexLevel < 0)
 					{ //かっこがおかしくなった！
 						BeginError(t);
-						messageStream.WriteLine("]が[より多い。");
+						messageStream.Append("]が[より多い。\n");
 						return false;
 					}
 				}
@@ -113,7 +114,7 @@ namespace Sunaba
 							if (newCount != oldCount)
 							{ //ずれてる
 								BeginError(t);
-								messageStream.WriteLine("字下げが不正。ずれてるよ。前の深さに合わせてね。");
+								messageStream.Append("字下げが不正。ずれてるよ。前の深さに合わせてね。\n");
 								return false;
 							}
 						}
@@ -144,21 +145,21 @@ namespace Sunaba
 			return true;
 		}
 
-		Structurizer(System.IO.StreamWriter messageStream)
+		Structurizer(StringBuilder messageStream)
 		{
 			this.messageStream = messageStream;
 		}
 
 		void BeginError(Token token)
 		{
-			messageStream.Write(token.filename);
+			messageStream.Append(token.filename);
 			if (token.line != 0)
 			{
-				messageStream.Write(string.Format("({0})", token.line));
+				messageStream.AppendFormat("({0}) ", token.line);
 			}
 			else
 			{
-				messageStream.Write(' ');
+				messageStream.Append(' ');
 			}
 		}
 	}

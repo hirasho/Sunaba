@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,31 +22,29 @@ public class Main : MonoBehaviour
 		rebootButton.onClick.AddListener(OnClickReboot);
 		pixels = new Texture2D(100, 100);
 		appWindow.texture = pixels;
-		messageStream = new System.IO.MemoryStream();
-		messageStreamWriter = new System.IO.StreamWriter(messageStream);
+		messageStream = new StringBuilder();
 	}
 
 	void Update()
 	{
-return;
 		if (machine != null)
 		{
-			UpdateMachine();
+//			UpdateMachine();
 		}
 
 		// ログ吐き出し
-		if (messageStream.Position > 0)
+		if (messageStream.Length > 0)
 		{
-			var bytes = messageStream.ToArray();
-			messageWindow.text = System.Text.Encoding.UTF8.GetString(bytes);
+			messageWindow.text += messageStream.ToString();
+			messageStream.Clear();
 		}
 	}
 
 	// non public --------
 	Texture2D pixels;
 	Machine machine;
-	System.IO.StreamWriter messageStreamWriter;
-	System.IO.MemoryStream messageStream;
+
+	StringBuilder messageStream;
 	int pointerX;
 	int pointerY;
 	int[] keys;
@@ -57,19 +56,19 @@ return;
 		{
 			if (machine.Error)
 			{
-				messageStreamWriter.WriteLine("プログラムが異常終了した。間違いがある");
+				messageStream.AppendLine("プログラムが異常終了した。間違いがある");
 			}
 			else
 			{
-				messageStreamWriter.Write("プログラムが最後まで実行された");
+				messageStream.AppendLine("プログラムが最後まで実行された");
 				var ret = machine.OutputValue();
 				if (ret != 0)
 				{
-					messageStreamWriter.WriteLine(string.Format("(出力:{0})", machine.OutputValue()));
+					messageStream.AppendFormat("(出力:{0})\n", machine.OutputValue());
 				}
 				else
 				{
-					messageStreamWriter.WriteLine("。");
+					messageStream.AppendLine("。");
 				}
 			}
 		}
@@ -125,7 +124,7 @@ return;
 		var exists = System.IO.File.Exists(path);
 		if (!exists)
 		{
-			messageStreamWriter.WriteLine(string.Format("ファイルが見つからない: {0}", path));
+			messageStream.AppendFormat("ファイルが見つからない: {0}\n", path);
 			return;
 		}
 
@@ -144,7 +143,7 @@ return;
 		{
 			succeeded = Compiler.Process(
 				compiled,
-				messageStreamWriter,
+				messageStream,
 				path,
 				localization,
 				outputIntermediates);
@@ -156,7 +155,7 @@ return;
 			var instructions = new List<uint>();
 			succeeded = Assembler.Process(
 				instructions,
-				messageStreamWriter,
+				messageStream,
 				compiled.ToString().ToCharArray(),
 				localization,
 				outputIntermediates);
@@ -173,17 +172,16 @@ return;
 				}
 
 				var program = ConvertToBytes(instructions);
-				machine = new Machine(messageStreamWriter, program, inMainThread, outputIntermediates);
+				machine = new Machine(messageStream, program, inMainThread, outputIntermediates);
 				if (machine.Error)
 				{
-					messageStreamWriter.WriteLine("指定されたプログラムを開始できなかった。");
+					messageStream.AppendLine("指定されたプログラムを開始できなかった。");
 					machine.Dispose();
 					machine = null;
 				}
 				else
 				{
-					messageStream.Seek(0, System.IO.SeekOrigin.Begin);
-					messageStreamWriter.WriteLine("プログラムを開始");
+					messageStream.AppendLine("プログラムを開始");
 				}
 			}
 		}
