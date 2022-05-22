@@ -36,14 +36,16 @@ namespace Sunaba
 			string rootFilename,
 			Localization localization)
 		{
-			this.fullPathFilenames = fullPathFilenames;
+			this.fullPathFilenames = fullPathFilenamesOut;
 			this.messageStream = messageStream;
 			this.rootFilename = rootFilename;
 			this.localization = localization;
+			this.filenameSet = new HashSet<string>();
 		}
 	 
 		bool Process(List<Token> tokensOut, string filename, bool outputIntermediates)
 		{
+			this.tokens = tokensOut;
 			var filenameToken = new Token();
 			filenameToken.str = filename;
 			filenameToken.filename = filenameToken.str;
@@ -109,12 +111,14 @@ namespace Sunaba
 				return false;
 			}
 
+			var filenameTrunk = Path.GetFileNameWithoutExtension(filename);
+
 			//タブ処理
 			var tabProcessed = new List<char>();
 			TabProcessor.Process(tabProcessed, text.ToCharArray());
 			if (outputIntermediates)
 			{
-				File.WriteAllText("concatenator_" + filename + "_tabProcessed.txt", new string(tabProcessed.ToArray()));
+				Utility.WriteDebugFile("concatenator_" + filenameTrunk + "_tabProcessed.txt", new string(tabProcessed.ToArray()));
 			}
 
 			//\rなど、文字数を変えない範囲で邪魔なものを取り除く。
@@ -122,7 +126,7 @@ namespace Sunaba
 			CharacterReplacer.Process(characterReplaced, tabProcessed, localization);
 			if (outputIntermediates)
 			{
-				File.WriteAllText("concatenator_" + filename + "_characterReplaced.txt", new string(characterReplaced.ToArray()));
+				Utility.WriteDebugFile("concatenator_" + filenameTrunk + "_characterReplaced.txt", new string(characterReplaced.ToArray()));
 			}
 
 			//コメントを削除する。行数は変えない。
@@ -134,7 +138,7 @@ namespace Sunaba
 
 			if (outputIntermediates)
 			{
-				File.WriteAllText("concatenator_" + filename + "_commentRemoved.txt", new string(commentRemoved.ToArray()));
+				Utility.WriteDebugFile("concatenator_" + filenameTrunk + "_commentRemoved.txt", new string(commentRemoved.ToArray()));
 			}
 
 			//トークン分解
@@ -146,8 +150,7 @@ namespace Sunaba
 
 			if (outputIntermediates)
 			{
-				File.WriteAllText("concatenator_" + filename + "_lexicalAnalyzed.txt",
-					Token.ToString(lexicalAnalyzed));
+				Utility.WriteDebugFile("concatenator_" + filenameTrunk + "_lexicalAnalyzed.txt", Token.ToString(lexicalAnalyzed));
 			}
 
 			//全トークンにファイル名を差し込む。そのためにファイル名だけにする。
@@ -165,8 +168,7 @@ namespace Sunaba
 
 			if (outputIntermediates)
 			{
-				File.WriteAllText("concatenator_" + filename + "_structurized.txt",
-					Token.ToString(structurized));
+				Utility.WriteDebugFile("concatenator_" + filenameTrunk + "_structurized.txt", Token.ToString(structurized));
 			}
 
 			//改めて全トークンにファイル名を差し込む

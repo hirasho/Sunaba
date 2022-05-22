@@ -22,10 +22,11 @@ namespace Sunaba
 		Dictionary<string, FunctionInfo> functionMap; //関数マップ。これはグローバル。
 		bool english;
 
-		CodeGenerator(System.IO.StreamWriter messageStream, bool englishGrammer)
+		CodeGenerator(System.IO.StreamWriter messageStream, bool english)
 		{
 			this.messageStream = messageStream;
 			this.english = english;
+			this.functionMap = new Dictionary<string, FunctionInfo>();
 		}
 
 		bool Process(StringBuilder output, Node root, bool outputIntermediates)
@@ -38,7 +39,7 @@ namespace Sunaba
 			//デバグ出力
 			if (outputIntermediates)
 			{
-				System.IO.File.WriteAllText("compiled.txt", output.ToString());				
+				Utility.WriteDebugFile("compiled.txt", output.ToString());				
 			}
 			return true;
 		}

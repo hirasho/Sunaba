@@ -890,8 +890,9 @@ MonoBehaviour:
   messageWindow: {fileID: 667802025}
   rebootButton: {fileID: 808281021}
   filenameInput: {fileID: 224513725}
-  readCompiled: 1
+  readCompiled: 0
   outputIntermediates: 1
+  inMainThread: 1
 --- !u!1 &1654538435
 GameObject:
   m_ObjectHideFlags: 0

@@ -102,18 +102,18 @@ namespace Sunaba
 					{ //0から始まり、
 						if ((s[pos + 1] == 'x') || (s[pos + 1] == 'X'))
 						{ //xなら16進
-							ret = ConvertHexNumber(out output, s.Slice(2));
+							ret = ConvertHexNumber(out output, s.Slice(pos + 2));
 						}
 						else if ((s[pos + 1] == 'b') || (s[pos + 1] == 'B'))
 						{ //bなら2進
-							ret = ConvertBinNumber(out output, s.Slice(2));
+							ret = ConvertBinNumber(out output, s.Slice(pos + 2));
 						}
 					}
 				}
 
 				if (!ret)
 				{ //2進や16進で引っかからなかったならば、10進を試す
-					ret = ConvertDecNumber(out output, s);
+					ret = ConvertDecNumber(out output, s.Slice(pos));
 				}
 
 				if (ret && minus)
@@ -197,5 +197,26 @@ namespace Sunaba
 		{
 			return ((c >= '0') && (c <= '9'));
 		}
+
+		public static System.Exception WriteDebugFile(string filename, string text)
+		{
+			System.Exception ret = null;
+			try
+			{
+				var cur = System.IO.Path.GetFullPath(".");
+				var dir = System.IO.Path.Combine(cur, "debugOut");
+				if (!System.IO.Directory.Exists(dir))
+				{
+					System.IO.Directory.CreateDirectory(dir);
+				}
+				var path = System.IO.Path.Combine(dir, filename);
+				System.IO.File.WriteAllText(path, text);
+			}
+			catch (System.Exception e)
+			{
+				ret = e;
+			}
+			return ret;
+		} 
 	}
 }

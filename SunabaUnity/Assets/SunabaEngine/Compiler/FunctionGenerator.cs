@@ -52,6 +52,7 @@ namespace Sunaba
 			public Block(int baseOffset)
 			{
 				this.baseOffset = baseOffset;
+				this.variables = new Dictionary<string, Variable>();
 			}
 
 			public void BeginError(StreamWriter messageStream, Node node)

@@ -15,7 +15,6 @@ namespace Sunaba
 
 		public const int ExecutionUnit = 10000; //これだけの命令実行したらウィンドウ状態を見に行く。
 		public const int MinimumFreeSize = 1000; //最低これだけのメモリは0から空いている。プログラムサイズが制約される。
-		public const int BusySleepThreshold = 100; //syncなしでこれだけ時間が経ったら強制的に待ち
 		public const int VmMemoryStackBase = FreeAndProgramSize;
 		public const int VmMemoryStackEnd = VmMemoryStackBase + StackSize;
 		public const int VmMemoryIoBase = VmMemoryStackEnd;
@@ -66,13 +65,15 @@ namespace Sunaba
 		public int ScreenWidth { get; private set; }
 		public int ScreenHeight { get; private set; }
 
-
 		public Machine(
 			System.IO.StreamWriter messageStream,
-			byte[] objectCode)
+			byte[] objectCode,
+			bool inMainThread,
+			bool outputDecoded)
 		{
 			Error = true; // 最初trueにしておき、正常終了したらfalseにする
 			ScreenWidth = ScreenHeight = 100;
+			debugInfo = new DebugInfo();
 
 			this.messageStream = messageStream;
 
@@ -84,6 +85,8 @@ namespace Sunaba
 				memory.Length, 
 				VmMemoryIoBase,
 				VmMemoryVramBase);
+			endRequestEvent = new ManualResetEvent(false);
+			terminatedEvent = new ManualResetEvent(false);
 				
 			//オブジェクトコードを命令列に変換
 			//すぐできるエラーチェック
@@ -126,14 +129,31 @@ namespace Sunaba
 				Error = false;
 				//実行開始
 				programCounter = programBegin;
-				executionThread = new Thread(ThreadFunc);
+				if (!inMainThread)
+				{
+					executionThread = new Thread(ThreadFunc);
+				}
+
+				if (outputDecoded)
+				{
+					var sb = new System.Text.StringBuilder();
+					for (var i = 0; i < this.decodedInsts.Length; i++)
+					{
+						var inst = decodedInsts[i];
+						sb.AppendFormat("{0}\t{1}\t{2}\n", i, inst.inst, inst.imm);
+					}
+					Utility.WriteDebugFile("decoded.txt", sb.ToString());
+				}
 			}
 		}
 
 		public void Dispose()
 		{
 			endRequestEvent.Set();
-			executionThread.Join();
+			if (executionThread != null)
+			{
+				executionThread.Join();
+			}
 			messageStream = null;
 			//endTimer(); // これなんだ?
 		}
@@ -152,36 +172,31 @@ namespace Sunaba
 			return memory[VmMemoryStackBase];
 		}
 
-		public int MemorySize()
-		{
-			return memory.Length;
-		}
-
-		public void RequestSync()
-		{
-			syncRequestEvent.Set();
-		}
-
 		public IoState BeginSync()
 		{
+			if (executionThread == null) // 実行
+			{
+				var end = false;
+				Execute(out end);
+				if (end)
+				{
+					terminatedEvent.Set();
+				}
+			}
+
 			ioState.Lock();
 			return ioState;
 		}
 
-		public void endSync()
+		public void EndSync()
 		{
 			ioState.Unlock();
 		}
 
 		// non public ------------
 		//デバグ関連
-		class CallInfo
+		struct CallInfo
 		{
-			public CallInfo()
-			{
-				Reset();
-			} 
-
 			public void Set(int pc, int fp)
 			{
 				programCounter = pc;
@@ -196,13 +211,17 @@ namespace Sunaba
 
 			public int programCounter;
 			public int framePointer;
-		};
+		}
 
 		class DebugInfo
 		{
 			public DebugInfo()
 			{
 				callHistory = new CallInfo[CallHistorySize];
+				foreach (var item in callHistory)
+				{
+					item.Reset();
+				}
 			}
 
 			public bool Push(int pc, int fp)
@@ -233,7 +252,8 @@ namespace Sunaba
 
 			// non public ------
 			const int CallHistorySize = 256;
-		};
+		}
+
 		//最適化実行
 		struct DecodedInst
 		{
@@ -244,7 +264,7 @@ namespace Sunaba
 			}
 			public Instruction inst;
 			public int imm;
-		};
+		}
 
 		IoState ioState;
 		ManualResetEvent endRequestEvent;
@@ -265,6 +285,26 @@ namespace Sunaba
 		long executedInstructionCount;
 		DecodedInst[] decodedInsts;
 
+		void Execute(out bool end)
+		{
+			end = false;
+			for (var i = 0; i < ExecutionUnit; ++i)
+			{
+				if (Error || (programCounter == FreeAndProgramSize)){ //終わりまで来た
+					end = true; //終わります
+					//正常終了時デバグコード
+					if (!Error)
+					{
+						Debug.Assert(programCounter == VmMemoryStackBase);
+						Debug.Assert(stackPointer == VmMemoryStackBase);
+						Debug.Assert(framePointer == VmMemoryStackBase);
+					}
+					break;
+				}
+				ExecuteDecoded(); //最適化版
+			}
+		}
+
 		void ThreadFunc()
 		{
 			Sync(true); //一回sync。起動直後に押されたキーを反映させる。vsyncしないとUIからの入力が来ない
@@ -277,29 +317,9 @@ namespace Sunaba
 				}
 				else
 				{
-					if (syncRequestEvent.WaitOne(0))
-					{
-						Sync(false);
-						syncRequestEvent.Reset();
-					}
-					for (var i = 0; i < ExecutionUnit; ++i)
-					{
-						if (Error || (programCounter == FreeAndProgramSize)){ //終わりまで来た
-							end = true; //終わります
-							//正常終了時デバグコード
-							if (!Error)
-							{
-								Debug.Assert(programCounter == VmMemoryStackBase);
-								Debug.Assert(stackPointer == VmMemoryStackBase);
-								Debug.Assert(framePointer == VmMemoryStackBase);
-							}
-							break;
-						}
-						ExecuteDecoded(); //最適化版
-					}
+					Execute(out end);
 				}
 			}
-			Sync(false); //一回sync。最後のIO命令を反映。
 			terminatedEvent.Set();
 		}
 

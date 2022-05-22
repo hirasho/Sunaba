@@ -237,6 +237,7 @@ namespace Sunaba
 					sb.Append('\t');
 				}
 				tokens[i].ToString(sb);
+				sb.AppendLine("");
 				if (tokens[i].type == TokenType.BlockBegin)
 				{
 					++level;

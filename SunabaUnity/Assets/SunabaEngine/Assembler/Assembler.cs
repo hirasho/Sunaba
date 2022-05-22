@@ -10,7 +10,7 @@ namespace Sunaba
 		public static bool Process(
 			List<uint> instructionsOut,
 			System.IO.StreamWriter messageStream,
-			List<char> compiled,
+			IList<char> compiled,
 			Localization localization,
 			bool outputIntermediates)
 		{
@@ -19,21 +19,21 @@ namespace Sunaba
 			TabProcessor.Process(tabProcessed, compiled);
 			if (outputIntermediates)
 			{
-				File.WriteAllText("assemblerTabProcessed.txt", new string(tabProcessed.ToArray()));
+				Utility.WriteDebugFile("assemblerTabProcessed.txt", new string(tabProcessed.ToArray()));
 			}
 			//読めるテキストが来たケースに備えて念のため文字置換
 			var replaced = new List<char>();
 			CharacterReplacer.Process(replaced, tabProcessed, localization);
 			if (outputIntermediates)
 			{
-				File.WriteAllText("assemblerReplaced.txt", new string(replaced.ToArray()));
+				Utility.WriteDebugFile("assemblerReplaced.txt", new string(replaced.ToArray()));
 			}
 			//コメントを削除する。行数は変えない。
 			var commentRemoved = new List<char>();
 			CommentRemover.Process(commentRemoved, replaced);
 			if (outputIntermediates)
 			{
-				File.WriteAllText("assemblerCommentRemoved.txt", new string(commentRemoved.ToArray()));
+				Utility.WriteDebugFile("assemblerCommentRemoved.txt", new string(commentRemoved.ToArray()));
 			}
 			//まずトークン分解
 			var tokens = new List<Token>();
@@ -46,7 +46,7 @@ namespace Sunaba
 				{
 					sb.AppendFormat("{0}: {1} {2} {3} {4}\n", token.line, token.type, token.instruction, token.number, token.str);
 				}
-				File.WriteAllText("assemblerTokenized.txt", sb.ToString());
+				Utility.WriteDebugFile("assemblerTokenized.txt", sb.ToString());
 			}
 			//ラベルだけ処理します。
 			assembler.CollectLabel(tokens);
@@ -65,11 +65,11 @@ namespace Sunaba
 			if (outputIntermediates)
 			{
 				var sb = new System.Text.StringBuilder();
-				foreach (var instruction in instructionsOut)
+				for (var i = 0; i < instructionsOut.Count; i++)
 				{
-					sb.AppendFormat("{0:x}\n", instruction);
+					sb.AppendFormat("{0}\t{1:x8}\n", i, instructionsOut[i]);
 				}
-				File.WriteAllText("assemblerInstructions.txt", sb.ToString());
+				Utility.WriteDebugFile("assembled.txt", sb.ToString());
 			}
 			return true;
 		}
@@ -250,7 +250,7 @@ namespace Sunaba
 			}
 		}
 
-		bool Parse(List<uint> output, List<Token> input)
+		bool Parse(List<uint> output, IList<Token> input)
 		{
 			var pos = 0;
 			while (input[pos].type != TokenType.Unknown)
@@ -285,7 +285,7 @@ namespace Sunaba
 			return true;
 		}
 		
-		bool ParseLabel(List<uint> output, List<Token> input, ref int pos)
+		bool ParseLabel(List<uint> output, IList<Token> input, ref int pos)
 		{
 			//トークンを取り出して
 			var t = input[pos];
@@ -313,7 +313,7 @@ namespace Sunaba
 			return true;
 		}
 
-		bool ParseInstruction(List<uint> output, List<Token> input, ref int pos)
+		bool ParseInstruction(List<uint> output, IList<Token> input, ref int pos)
 		{
 			//トークンを取り出して
 			var t = input[pos];
@@ -418,7 +418,7 @@ namespace Sunaba
 			return true;
 		}
 
-		bool ResolveLabelAddress(List<uint> instructions)
+		bool ResolveLabelAddress(IList<uint> instructions)
 		{
 			var instructionCount = instructions.Count;
 			var mask = (0xffffffff << ImmBitCount.Flow); //命令マスク

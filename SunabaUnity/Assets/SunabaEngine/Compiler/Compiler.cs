@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Sunaba
 {
-	class Compiler
+	public class Compiler
 	{
 		public static bool Process(
 			System.Text.StringBuilder output,
@@ -25,6 +25,11 @@ namespace Sunaba
 				outputIntermediates))
 			{
 				return false;
+			}
+
+			if (outputIntermediates)
+			{
+				Utility.WriteDebugFile("concatenated.txt", Token.ToString(tokens));
 			}
 
 			//英語文法主体か非英語文法主体かをここで判別

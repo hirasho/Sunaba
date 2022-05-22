@@ -41,6 +41,7 @@ namespace Sunaba
 
 		public IoState()
 		{
+			lockObject = new object();
 			keys = new int[(int)Key.Count];
 			for (int i = 0; i < keys.Length; ++i)
 			{
