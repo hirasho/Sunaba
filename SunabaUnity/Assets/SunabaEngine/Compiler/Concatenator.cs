@@ -144,7 +144,7 @@ namespace Sunaba
 
 			//トークン分解
 			var lexicalAnalyzed = new List<Token>();
-			if (!LexicalAnalyzer.Process(lexicalAnalyzed, messageStream, commentRemoved.ToArray(), fullPath, line, localization))
+			if (!LexicalAnalyzer.Process(lexicalAnalyzed, messageStream, commentRemoved.ToArray(), fullPath, localization))
 			{
 				return false;
 			}
@@ -223,11 +223,11 @@ namespace Sunaba
 			messageStream.Append(token.filename);
 			if (token.line != 0)
 			{
-				messageStream.AppendFormat("({0}) ", token.line);
+				messageStream.AppendFormat("({0}):", token.line);
 			}
 			else
 			{
-				messageStream.Append(' ');
+				messageStream.Append(':');
 			}
 		}
 	}

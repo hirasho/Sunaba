@@ -156,11 +156,11 @@ namespace Sunaba
 			messageStream.Append(token.filename);
 			if (token.line != 0)
 			{
-				messageStream.AppendFormat("({0}) ", token.line);
+				messageStream.AppendFormat("({0}):", token.line);
 			}
 			else
 			{
-				messageStream.Append(' ');
+				messageStream.Append(':');
 			}
 		}
 	}

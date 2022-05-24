@@ -13,13 +13,11 @@ namespace Sunaba
 			StringBuilder messageStream,
 			char[] input,
 			string filename,
-			int lineStart,
 			Localization localization)
 		{
 			var analyzer = new LexicalAnalyzer(
 				messageStream, 
 				filename, 
-				lineStart, 
 				localization);
 			return analyzer.Process(output, input);
 		}
@@ -27,7 +25,6 @@ namespace Sunaba
 		// non public -------
 		string filename; //処理中のファイル名
 		int line;
-		int lineStart;
 		StringBuilder messageStream;
 		Localization localization; //借り物
 
@@ -46,13 +43,12 @@ namespace Sunaba
 		LexicalAnalyzer(
 			StringBuilder messageStream, 
 			string filename,
-			int lineStart, 
 			Localization localization)
 		{
 			this.messageStream = messageStream;
 			this.filename = filename;
-			this.lineStart = lineStart;
 			this.localization = localization; 
+			this.line = 1;
 		}
 
 		//最後に改行があると仮定して動作する。前段で改行文字を後ろにつけること。
@@ -309,11 +305,11 @@ namespace Sunaba
 			messageStream.Append(rawFilename);
 			if (line != 0)
 			{
-				messageStream.AppendFormat("({0}) ", line);
+				messageStream.AppendFormat("({0}):", line);
 			}
 			else
 			{
-				messageStream.Append(' ');
+				messageStream.Append(':');
 			}
 		}
 	}

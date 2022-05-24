@@ -246,6 +246,13 @@ namespace Sunaba
 			return sb.ToString();
 		}
 
+		public override string ToString()
+		{
+			var sb = new System.Text.StringBuilder();
+			ToString(sb);
+			return sb.ToString();
+		}
+
 		public void ToString(System.Text.StringBuilder sb)
 		{
 			if (type == TokenType.Operator)

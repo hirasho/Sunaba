@@ -16,6 +16,7 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 	[SerializeField] bool readCompiled;
 	[SerializeField] bool outputIntermediates;
 	[SerializeField] bool inMainThread;
+	[SerializeField] int messageLineCapacity;
 
 	public override Camera eventCamera { get => camera; }
 
@@ -29,9 +30,20 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 
 		pixels = new Texture2D(100, 100);
 		pixels.filterMode = FilterMode.Point;
+		pixels.wrapMode = TextureWrapMode.Clamp;
 
 		appWindow.texture = pixels;
 		messageStream = new StringBuilder();
+		messageLines = new string[messageLineCapacity];
+		
+		try
+		{
+			dropHandler = new DropHandlerWrapper(OnDrop);
+		}
+		catch (System.Exception e)
+		{
+			Debug.LogException(e);
+		}
 	}
 
 	void Update()
@@ -44,7 +56,25 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 		// ログ吐き出し
 		if (messageStream.Length > 0)
 		{
-			messageWindow.text += messageStream.ToString();
+			var append = messageStream.ToString();
+			var lines = append.Split('\n', System.StringSplitOptions.RemoveEmptyEntries);
+			for (var i = 0; i < lines.Length; i++)
+			{
+				messageLines[nextMessageLine] = lines[i];
+				nextMessageLine++;
+				if (nextMessageLine == messageLines.Length)
+				{
+					nextMessageLine = 0;
+				}
+			}
+
+			messageStream.Clear(); // 使い回してるだけ
+			for (var i = 0; i < messageLines.Length; i++)
+			{
+				var idx = (nextMessageLine + i) % messageLines.Length;
+				messageStream.AppendLine(messageLines[idx]);
+			}
+			messageWindow.text = messageStream.ToString();
 			messageStream.Clear();
 		}
 	}
@@ -104,7 +134,15 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 	Vector3 pointerPosition; // 絶対スクリーン座標
 	bool pointerDown;
 	int pointerId = int.MaxValue;
+	DropHandlerWrapper dropHandler;
+	string[] messageLines;
+	int nextMessageLine;
 
+	void OnDrop(string path)
+	{
+		filenameInput.text = path;
+		OnClickReboot();
+	}
 
 	void UpdateMachine()
 	{
@@ -197,7 +235,17 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 		{
 			return;
 		}
-		var path = System.IO.Path.GetFullPath(filename);
+
+		string path;
+		if (System.IO.Path.IsPathFullyQualified(filename))
+		{
+			path = filename;
+		}
+		else
+		{
+			path = System.IO.Path.GetFullPath(filename);
+		}
+
 		var exists = System.IO.File.Exists(path);
 		if (!exists)
 		{

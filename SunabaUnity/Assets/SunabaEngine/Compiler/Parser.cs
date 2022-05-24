@@ -511,11 +511,11 @@ namespace Sunaba
 					{
 						if (english)
 						{
-							messageStream.AppendFormat("部分プログラム参照の後ろに、変なもの\"{0}\"がある。部分プログラムを作るなら「def」を置くこと。", input[pos].ToString());
+							messageStream.AppendFormat("部分プログラム参照の後ろに、変なもの\"{0}\"がある。部分プログラムを作るなら「def」を置くこと。\n", input[pos].ToString());
 						}
 						else
 						{
-							messageStream.AppendFormat("部分プログラム参照の後ろに、変なもの\"{0}\"がある。部分プログラムを作るなら「とは」を置くこと。", input[pos].ToString());
+							messageStream.AppendFormat("部分プログラム参照の後ろに、変なもの\"{0}\"がある。部分プログラムを作るなら「とは」を置くこと。\n", input[pos].ToString());
 						}
 					}
 					return null;
@@ -1029,7 +1029,14 @@ namespace Sunaba
 
 		void BeginError(Token token)
 		{
-			messageStream.AppendFormat("{0}({1}) ", token.filename, token.line);
+			if (token.line > 0)
+			{
+				messageStream.AppendFormat("{0}({1}):", token.filename, token.line);
+			}
+			else
+			{
+				messageStream.AppendFormat("{0}:", token.filename);
+			}
 		}
 	}
 } //namespace Sunaba
