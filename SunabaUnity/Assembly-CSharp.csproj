@@ -36,12 +36,12 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets/SpectrumViewer.cs" />
+     <Compile Include="Assets/SoundSynthesizer.cs" />
      <Compile Include="Assets/ExternalAssets/B83.Win32.cs" />
      <Compile Include="Assets/Main.cs" />
      <Compile Include="Assets/DropHandlerWrapper.cs" />
      <Compile Include="Assets/TutorialInfo/Scripts/Readme.cs" />
-     <Compile Include="Assets/SoundSynthesizer.cs" />
-     <Compile Include="Assets/SpectrumViewer.cs" />
     <Reference Include="UnityEngine">
         <HintPath>/Applications/Unity/2021.3.3f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
