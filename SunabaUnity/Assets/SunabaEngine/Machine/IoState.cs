@@ -36,9 +36,6 @@ namespace Sunaba
 		public int PointerY { get; private set; }
 		public ReadOnlySpan<int> Keys { get => new ReadOnlySpan<int>(keys); }
 		
-		//開発用
-		public int[] soundRequests;
-
 		public IoState()
 		{
 			lockObject = new object();
@@ -65,6 +62,13 @@ namespace Sunaba
 			{
 				soundRequests[channel] = amplitude;
 			}
+		}
+
+		public int GetAndResetSoundRequest(int channel)
+		{
+			var ret = soundRequests[channel];
+			soundRequests[channel] = 0;
+			return ret;
 		}
 
 		public int GetKey(Key key)
@@ -125,5 +129,6 @@ namespace Sunaba
 		bool screenSizeChanged;
 		object lockObject;
 		int[] keys;
+		int[] soundRequests;
 	}
 }

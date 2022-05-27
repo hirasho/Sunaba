@@ -13,6 +13,7 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 	[SerializeField] Text messageWindow;
 	[SerializeField] Button rebootButton;
 	[SerializeField] InputField filenameInput;
+	[SerializeField] SoundSynthesizer soundSynthesizer;
 	[SerializeField] bool readCompiled;
 	[SerializeField] bool outputIntermediates;
 	[SerializeField] bool inMainThread;
@@ -24,6 +25,7 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 	{
 		base.Start();
 		Application.targetFrameRate = 60;
+		soundSynthesizer.ManualStart(IoState.SoundChannelCount);
 
 		keys = new int[(int)IoState.Key.Count];
 		rebootButton.onClick.AddListener(OnClickReboot);
@@ -149,6 +151,7 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 		var io = machine.BeginSync();
 		if (machine.IsTerminated())
 		{
+			soundSynthesizer.StopAll();
 			if (machine.Error)
 			{
 				messageStream.AppendLine("プログラムが異常終了した。間違いがある");
@@ -190,6 +193,7 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 			keys[(int)IoState.Key.Space] = Input.GetKey(KeyCode.Space) ? 1 : 0;
 			keys[(int)IoState.Key.Enter] = Input.GetKey(KeyCode.Return) ? 1 : 0;
 			io.Update(pointerX, pointerY, keys);
+			UpdateSound(io);
 		}
 		UpdateScreen(io);
 		machine.EndSync();
@@ -198,6 +202,20 @@ public class Main : BaseRaycaster, IPointerDownHandler, IPointerUpHandler
 		{
 			machine.Dispose();
 			machine = null;
+		}
+	}
+
+	void UpdateSound(IoState io)
+	{
+		for (var i = 0; i < IoState.SoundChannelCount; i++)
+		{
+			var amp = (float)io.GetAndResetSoundRequest(i) * 0.00001f;
+			if (amp > 0f)
+			{
+				var f = (float)io.MemoryCopy[(int)Machine.VmMemory.SetSoundFrequency0 + i];
+				var d = (float)io.MemoryCopy[(int)Machine.VmMemory.SetSoundDumping0 + i] * 0.00001f;
+				soundSynthesizer.Play(i, f, d, amp);
+			}
 		}
 	}
 
